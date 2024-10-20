@@ -1,0 +1,9 @@
+name: autogen_env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10.13
+  - pip=24.0
+  - pip:
+    - fastapi==0.111.0
+    - pyautogen[retrievechat,long-context]==0.2.29
