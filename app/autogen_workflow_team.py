@@ -129,7 +129,7 @@ config_list_gpt4 = [
     {
         "model": "lantek-gpt4",
         "api_key": "sk-12345",
-        "base_url": "http://localhost:4000",  # Your LiteLLM URL
+        "base_url": "http://litellm:4000",  # Your LiteLLM URL
     },
 ]
 
