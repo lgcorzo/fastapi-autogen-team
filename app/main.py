@@ -21,8 +21,8 @@ app = FastAPI(
 )
 
 model_info = ModelInformation(
-    id="lantek-gpt4_v0.1",
-    name="lantek-gpt4",
+    id="internal-gpt4_v0.1",
+    name="internal-gpt",
     description="This is a state-of-the-art model.",
     pricing={
         "prompt": "0.00",
