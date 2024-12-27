@@ -28,7 +28,7 @@ curl -X 'POST' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "model": "lantek-gpt4",
+  "model": "azure-gpt4",
   "messages": [
     {
       "role": "user",

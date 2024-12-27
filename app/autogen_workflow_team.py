@@ -127,7 +127,7 @@ def streamed_print_received_message(
 
 config_list_gpt4 = [
     {
-        "model": "lantek-gpt",
+        "model": "azure-gpt",
         "api_key": "sk-12345",
         "base_url": "http://litellm:4000",  # Your LiteLLM URL
     },
