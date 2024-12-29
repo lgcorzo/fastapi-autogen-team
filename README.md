@@ -45,7 +45,8 @@ curl -X 'POST' \
 Note that you must provide the entire conversation history to the backend, as the server expects input in OpenAI format. 
 
 ## Documentation
-
+``` 
 docker build -t autogen_team 
+``` 
 Navigate to http://localhost:8001/autogen/api/v1/docs to see the docs. 
 
