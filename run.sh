@@ -13,4 +13,4 @@ conda activate autogen_env
 # export OTEL_LOG_LEVEL="info"
 
 echo "Starting backend with OpenTelemetry instrumentation..."
-opentelemetry-instrument uvicorn app.main:app --host $BE_HOST --port $BE_PORT --workers 1 --proxy-headers
+uvicorn app.main:app --host $BE_HOST --port $BE_PORT --workers 1 --proxy-headers
