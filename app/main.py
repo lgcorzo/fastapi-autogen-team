@@ -1,18 +1,71 @@
+import os
 from dotenv import load_dotenv
-from fastapi import FastAPI
-from fastapi import HTTPException
+from fastapi import FastAPI, HTTPException
 from starlette.responses import RedirectResponse
 
 from autogen_server import serve_autogen
 from data_model import Input, ModelInformation
 
+from opentelemetry import trace
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+
+import logging
+
+# Load environment variables
 load_dotenv()
 
+# Get OpenTelemetry endpoint from environment variables
+otel_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://otel_collector:4317")
+
+# Set up OpenTelemetry resources and tracer
+resource = Resource(attributes={"service.name": "Autogen-fastapi-service"})
+tracer_provider = TracerProvider(resource=resource)
+trace.set_tracer_provider(tracer_provider)
+
+# Configure OTLP exporter
+otlp_exporter = OTLPSpanExporter(endpoint=otel_endpoint, insecure=True)
+span_processor = BatchSpanProcessor(otlp_exporter)
+tracer_provider.add_span_processor(span_processor)
+
+# Set up logging
+logging.basicConfig(
+    filename="app.log",
+    filemode="a",
+    format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
+    datefmt="%H:%M:%S",
+    level=logging.DEBUG,
+)
+logger = logging.getLogger(__name__)
+
+# Add a tracer to logger manually
+logger_tracer = trace.get_tracer_provider().get_tracer(__name__)
+
+
+def log_with_trace(message: str, level: str = "info"):
+    with logger_tracer.start_as_current_span("log"):
+        if level == "info":
+            logger.info(message)
+        elif level == "error":
+            logger.error(message)
+        elif level == "debug":
+            logger.debug(message)
+        elif level == "warning":
+            logger.warning(message)
+        else:
+            logger.log(level, message)
+
+
+# Application base paths
 base = "/autogen/"
 prefix = base + "api/v1"
 openapi_url = prefix + "/openapi.json"
 docs_url = prefix + "/docs"
 
+# Create FastAPI app
 app = FastAPI(
     title="Autogen FastAPI Backend",
     openapi_url=openapi_url,
@@ -20,6 +73,10 @@ app = FastAPI(
     redoc_url=None,
 )
 
+# Instrument FastAPI with OpenTelemetry
+FastAPIInstrumentor.instrument_app(app)
+
+# Model information
 model_info = ModelInformation(
     id="internal-gpt4_v0.1",
     name="internal-gpt",
@@ -40,7 +97,7 @@ model_info = ModelInformation(
     per_request_limits=None,
 )
 
-
+# Define endpoints
 @app.get(path=base, include_in_schema=False)
 async def docs_redirect():
     return RedirectResponse(url=docs_url)
@@ -48,13 +105,13 @@ async def docs_redirect():
 
 @app.get(prefix + "/models")
 async def get_models():
-    return {
-        "data": {"data": model_info.dict()}
-    }
+    log_with_trace("Get models endpoint accessed")
+    return {"data": {"data": model_info.dict()}}
 
 
 @app.post(prefix + "/chat/completions")
 async def route_query(model_input: Input):
+    log_with_trace("Chat completion endpoint accessed")
     model_services = {
         model_info.name: serve_autogen,
     }
