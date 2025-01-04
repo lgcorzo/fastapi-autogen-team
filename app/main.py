@@ -11,7 +11,7 @@ from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 
 import logging
 
@@ -19,7 +19,7 @@ import logging
 load_dotenv()
 
 # Get OpenTelemetry endpoint from environment variables
-otel_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://otel_collector:4317")
+otel_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "otel-collector:4317")
 
 # Set up OpenTelemetry resources and tracer
 resource = Resource(attributes={"service.name": "Autogen-fastapi-service"})
@@ -27,7 +27,7 @@ tracer_provider = TracerProvider(resource=resource)
 trace.set_tracer_provider(tracer_provider)
 
 # Configure OTLP exporter
-otlp_exporter = OTLPSpanExporter(endpoint=otel_endpoint, insecure=True)
+otlp_exporter = OTLPSpanExporter(endpoint=otel_endpoint)
 span_processor = BatchSpanProcessor(otlp_exporter)
 tracer_provider.add_span_processor(span_processor)
 
