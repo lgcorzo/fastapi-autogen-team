@@ -20,13 +20,20 @@ from opentelemetry.sdk.metrics.export import (
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.exporter.otlp.proto.http.metric_exporter import OTLPMetricExporter
+
 
 # Load environment variables
 load_dotenv()
 
 # Get OpenTelemetry endpoint from environment variables
-otel_endpoint = os.getenv(
-    "OTEL_EXPORTER_OTLP_ENDPOINT", "http://otel-collector:4318/v1/traces"
+otel_traces_endpoint = os.getenv(
+    "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", "http://otel-collector:4318/v1/traces"
+)  # Default OTLP/HTTP port
+
+# Get OpenTelemetry endpoint from environment variables
+otel_metrics_endpoint = os.getenv(
+    "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", "http://otel-collector:4318/v1/metrics"
 )  # Default OTLP/HTTP port
 
 # Set up OpenTelemetry resources and tracer
@@ -35,13 +42,16 @@ resource = Resource.create(attributes={"service.name": "Autogen-fastapi-service"
 # Tracer setup
 tracer_provider = TracerProvider(resource=resource)
 trace.set_tracer_provider(tracer_provider)
-otlp_exporter = OTLPSpanExporter(endpoint=otel_endpoint)
+otlp_exporter = OTLPSpanExporter(endpoint=otel_traces_endpoint)
 span_processor = BatchSpanProcessor(otlp_exporter)
 tracer_provider.add_span_processor(span_processor)
 
 # Meter setup with correct initialization
-exporter = ConsoleMetricExporter()
-metric_reader = PeriodicExportingMetricReader(exporter, export_interval_millis=10000)
+# exporter = ConsoleMetricExporter() ## only for debuging
+otlp_metric_exporter = OTLPMetricExporter(endpoint=otel_metrics_endpoint)
+metric_reader = PeriodicExportingMetricReader(
+    otlp_metric_exporter, export_interval_millis=30000
+)
 meter_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
 metrics.set_meter_provider(meter_provider)
 meter = metrics.get_meter(__name__)

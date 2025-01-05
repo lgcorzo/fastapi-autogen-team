@@ -13,5 +13,6 @@ dependencies:
     - opentelemetry-instrumentation-fastapi
     - opentelemetry-exporter-otlp
     - opentelemetry-instrumentation
+    - opentelemetry-exporter-otlp-proto-http
     - apscheduler
     - starlette
