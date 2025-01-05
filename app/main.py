@@ -1,67 +1,95 @@
 import os
+import logging
+
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from starlette.responses import RedirectResponse
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from autogen_server import serve_autogen
 from data_model import Input, ModelInformation
 
-from opentelemetry import trace
+from opentelemetry import trace, metrics
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.metrics.export import (
+    ConsoleMetricExporter,
+    PeriodicExportingMetricReader,
+)
+from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-
-import logging
 
 # Load environment variables
 load_dotenv()
 
 # Get OpenTelemetry endpoint from environment variables
-otel_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "otel-collector:4317")
+otel_endpoint = os.getenv(
+    "OTEL_EXPORTER_OTLP_ENDPOINT", "http://otel-collector:4318/v1/traces"
+)  # Default OTLP/HTTP port
 
 # Set up OpenTelemetry resources and tracer
-resource = Resource(attributes={"service.name": "Autogen-fastapi-service"})
+resource = Resource.create(attributes={"service.name": "Autogen-fastapi-service"})
+
+# Tracer setup
 tracer_provider = TracerProvider(resource=resource)
 trace.set_tracer_provider(tracer_provider)
-
-# Configure OTLP exporter
 otlp_exporter = OTLPSpanExporter(endpoint=otel_endpoint)
 span_processor = BatchSpanProcessor(otlp_exporter)
 tracer_provider.add_span_processor(span_processor)
+
+# Meter setup with correct initialization
+exporter = ConsoleMetricExporter()
+metric_reader = PeriodicExportingMetricReader(exporter, export_interval_millis=10000)
+meter_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
+metrics.set_meter_provider(meter_provider)
+meter = metrics.get_meter(__name__)
+
+# Create heartbeat metric
+heartbeat_counter = meter.create_counter(
+    name="service.heartbeat",
+    description="Counts the number of heartbeat signals",
+    unit="1",
+)
 
 # Set up logging
 logging.basicConfig(
     filename="app.log",
     filemode="a",
-    format="%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s",
-    datefmt="%H:%M:%S",
+    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
     level=logging.DEBUG,
 )
 logger = logging.getLogger(__name__)
-
-# Add a tracer to logger manually
 logger_tracer = trace.get_tracer_provider().get_tracer(__name__)
 
 
 def log_with_trace(message: str, level: str = "info"):
+    """Logs messages with OpenTelemetry tracing support."""
     with logger_tracer.start_as_current_span("log"):
-        if level == "info":
-            logger.info(message)
-        elif level == "error":
-            logger.error(message)
-        elif level == "debug":
-            logger.debug(message)
-        elif level == "warning":
-            logger.warning(message)
+        log_method = getattr(logger, level, None)
+        if callable(log_method):
+            log_method(message)
         else:
-            logger.log(level, message)
+            logger.error(f"Unsupported log level: {level}. Message: {message}")
 
+
+# Function to record heartbeat
+def record_heartbeat():
+    """Increments the heartbeat counter and logs the event."""
+    heartbeat_counter.add(1, {"service": "Autogen-fastapi-service"})
+    log_with_trace("Heartbeat recorded", level="debug")
+
+
+# Initialize scheduler for heartbeat
+scheduler = BackgroundScheduler()
+scheduler.add_job(record_heartbeat, "interval", seconds=10)
+scheduler.start()
 
 # Application base paths
-base = "/autogen/"
-prefix = base + "api/v1"
+base = "/autogen"
+prefix = base + "/api/v1"
 openapi_url = prefix + "/openapi.json"
 docs_url = prefix + "/docs"
 
@@ -97,21 +125,25 @@ model_info = ModelInformation(
     per_request_limits=None,
 )
 
+
 # Define endpoints
 @app.get(path=base, include_in_schema=False)
 async def docs_redirect():
+    """Redirects to API documentation."""
     return RedirectResponse(url=docs_url)
 
 
 @app.get(prefix + "/models")
 async def get_models():
+    """Returns available model information."""
     log_with_trace("Get models endpoint accessed")
     return {"data": {"data": model_info.dict()}}
 
 
 @app.post(prefix + "/chat/completions")
 async def route_query(model_input: Input):
-    log_with_trace("Chat completion endpoint accessed")
+    """Handles chat completion requests."""
+    log_with_trace(f"Chat completion request for model: {model_input.model}")
     model_services = {
         model_info.name: serve_autogen,
     }
