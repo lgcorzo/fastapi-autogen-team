@@ -33,7 +33,7 @@ otel_traces_endpoint = os.getenv(
 
 # Get OpenTelemetry endpoint from environment variables
 otel_metrics_endpoint = os.getenv(
-    "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", "http://otel-collector:4318/v1/metrics"
+    "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", "http://otel-collector:4318/v1/metrics"
 )  # Default OTLP/HTTP port
 
 # Set up OpenTelemetry resources and tracer
