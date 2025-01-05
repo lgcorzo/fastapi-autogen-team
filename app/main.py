@@ -48,7 +48,7 @@ meter = metrics.get_meter(__name__)
 
 # Create heartbeat metric
 heartbeat_counter = meter.create_counter(
-    name="service.heartbeat",
+    name="autogen_service.heartbeat",
     description="Counts the number of heartbeat signals",
     unit="1",
 )
@@ -59,7 +59,7 @@ logging.basicConfig(
     filemode="a",
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
-    level=logging.DEBUG,
+    level=logging.INFO,
 )
 logger = logging.getLogger(__name__)
 logger_tracer = trace.get_tracer_provider().get_tracer(__name__)
