@@ -99,7 +99,7 @@ scheduler.start()
 
 # Application base paths
 base = "/autogen"
-prefix = base + "/api/v1"
+prefix = base + "/api/v1beta"
 openapi_url = prefix + "/openapi.json"
 docs_url = prefix + "/docs"
 
@@ -162,3 +162,9 @@ async def route_query(model_input: Input):
     if not service:
         raise HTTPException(status_code=404, detail="Model not found")
     return service(model_input)
+
+
+
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app, host='0.0.0.0', port=int(4100))

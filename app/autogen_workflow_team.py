@@ -134,7 +134,7 @@ config_list_gpt4 = [
 ]
 
 llm_config = {
-    "cache_seed": 42,  # change the cache_seed for different trials
+    "cache_seed": None,  # change the cache_seed for different trials
     "temperature": 0,
     "config_list": config_list_gpt4,
     "timeout": 240,

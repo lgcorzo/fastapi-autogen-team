@@ -24,11 +24,11 @@ Make sure to set `OPENAI_API_KEY` in your environment variables or in `.env` fil
 You can query the autogen agents using the following command: 
 ```sh
 curl -X 'POST' \
-  'http://localhost:8001/autogen/api/v1/chat/completions' \
+  'http://localhost:4100/autogen/api/v1beta/chat/completions' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "model": "azure-gpt4",
+  "model": "internal-gpt",
   "messages": [
     {
       "role": "user",
