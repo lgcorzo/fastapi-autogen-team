@@ -49,9 +49,7 @@ tracer_provider.add_span_processor(span_processor)
 # Meter setup with correct initialization
 # exporter = ConsoleMetricExporter() ## only for debuging
 otlp_metric_exporter = OTLPMetricExporter(endpoint=otel_metrics_endpoint)
-metric_reader = PeriodicExportingMetricReader(
-    otlp_metric_exporter, export_interval_millis=30000
-)
+metric_reader = PeriodicExportingMetricReader(otlp_metric_exporter, export_interval_millis=30000)
 meter_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
 metrics.set_meter_provider(meter_provider)
 meter = metrics.get_meter(__name__)
@@ -164,7 +162,7 @@ async def route_query(model_input: Input):
     return service(model_input)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host='0.0.0.0', port=int(4100))
+
+    uvicorn.run(app, host="0.0.0.0", port=int(4100))

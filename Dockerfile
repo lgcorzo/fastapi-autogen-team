@@ -4,7 +4,7 @@ FROM continuumio/miniconda3:4.10.3-alpine
 # Environment variables
 ENV \
     PORT=8080 \
-    PYTHONPATH=/autogen/app
+    PYTHONPATH=/autogen/src/fastapi_autogen_team
 
 # Set working directory where the Docker container will run
 WORKDIR /autogen
