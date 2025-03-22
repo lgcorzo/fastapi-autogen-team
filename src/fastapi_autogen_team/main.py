@@ -40,6 +40,7 @@ DEFAULT_HOST = os.getenv("DEFAULT_HOST", "127.0.0.1")
 DEFAULT_PORT = int(os.getenv("DEFAULT_PORT", "4100"))
 TRACES_ENDPOINT = os.getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", f"{DEFAULT_OTEL_ENDPOINT}/traces")
 METRICS_ENDPOINT = os.getenv("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", f"{DEFAULT_OTEL_ENDPOINT}/metrics")
+LOGS_ENDPOINT = os.getenv("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT", f"{DEFAULT_OTEL_ENDPOINT}/logs")
 
 
 # OpenTelemetry Setup
@@ -63,7 +64,7 @@ meter = metrics.get_meter(__name__)
 # Logging setup
 logger_provider = LoggerProvider(resource=resource)
 set_logger_provider(logger_provider)
-otlp_log_exporter = OTLPLogExporter()
+otlp_log_exporter = OTLPLogExporter(endpoint=LOGS_ENDPOINT)
 logger_provider.add_log_record_processor(BatchLogRecordProcessor(otlp_log_exporter))
 
 # Attach OpenTelemetry handler to Python's logging
