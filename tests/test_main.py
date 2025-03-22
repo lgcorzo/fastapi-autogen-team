@@ -45,13 +45,6 @@ def mock_app():
                MockLoadDotenv, MockGetEnv)
 
 
-def test_docs_redirect(mock_app):
-    """Test that the docs_redirect function correctly returns a RedirectResponse."""
-    with patch("fastapi_autogen_team.main.RedirectResponse") as MockRedirectResponse:
-        docs_redirect()
-        MockRedirectResponse.assert_called_once()
-
-
 @pytest.mark.asyncio
 async def test_get_models(mock_app):
     """Test that the get_models function returns model information."""

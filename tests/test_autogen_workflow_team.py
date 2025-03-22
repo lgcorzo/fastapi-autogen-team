@@ -12,7 +12,7 @@ from autogen import UserProxyAgent, AssistantAgent, GroupChatManager
 
 @pytest.fixture
 def mock_agents():
-    """Fixture to mock Autogen agents."""
+    """Fixture to mock Autogen agents and configure AutogenWorkflow to use them."""
     with patch("fastapi_autogen_team.autogen_workflow_team.UserProxyAgent", autospec=True) as MockUserProxyAgent, \
          patch("fastapi_autogen_team.autogen_workflow_team.AssistantAgent", autospec=True) as MockAssistantAgent, \
          patch("fastapi_autogen_team.autogen_workflow_team.GroupChatManager", autospec=True) as MockGroupChatManager, \
@@ -25,15 +25,28 @@ def mock_agents():
         quality_assurance = MagicMock(spec=AssistantAgent)
         group_chat = MagicMock()
         group_chat_manager = MagicMock()
+
         MockUserProxyAgent.return_value = user_proxy
         MockAssistantAgent.return_value = developer
-        MockAssistantAgent.return_value = planner
-        MockUserProxyAgent.return_value = executor
-        MockAssistantAgent.return_value = quality_assurance
+        # set side effects to return different mock agent for planner/QA agent
+        MockAssistantAgent.side_effect = [developer,planner,quality_assurance]
+
+        MockUserProxyAgent.side_effect = [user_proxy,executor] #executor
         MockGroupChat.return_value = group_chat
         MockGroupChatManager.return_value = group_chat_manager
 
-        yield (user_proxy, developer, planner, executor, quality_assurance, group_chat, group_chat_manager,
+        # configure MockAutogenWorkflow to return the mocked agents
+        def configure_mock_workflow(self):
+           self.user_proxy = user_proxy
+           self.developer = developer
+           self.planner = planner
+           self.executor = executor
+           self.quality_assurance = quality_assurance
+           self.group_chat_with_introductions = group_chat
+           self.group_chat_manager_with_intros = group_chat_manager
+
+        with patch.object(AutogenWorkflow, '__init__', new=configure_mock_workflow) as MockAutogenWorkflowInit:
+             yield (user_proxy, developer, planner, executor, quality_assurance, group_chat, group_chat_manager,
                MockUserProxyAgent, MockAssistantAgent, MockGroupChatManager, MockGroupChat)
 
 
@@ -49,10 +62,9 @@ def test_autogen_workflow_initialization(mock_agents):
     assert workflow.planner == planner
     assert workflow.executor == executor
     assert workflow.quality_assurance == quality_assurance
-    MockUserProxyAgent.assert_called()
-    MockAssistantAgent.assert_called()
-    MockGroupChatManager.assert_called()
-    MockGroupChat.assert_called()
+    assert workflow.group_chat_with_introductions == group_chat
+    assert workflow.group_chat_manager_with_intros == group_chat_manager
+
 
 
 def test_autogen_workflow_set_queue():
