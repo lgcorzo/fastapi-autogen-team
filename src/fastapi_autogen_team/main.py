@@ -164,5 +164,4 @@ async def route_query(model_input: Input):
 
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=int(4100))
