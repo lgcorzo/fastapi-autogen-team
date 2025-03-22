@@ -41,17 +41,6 @@ ruff = "^0.5.0"
 pytest-mock = "^3.14.0"
 
 
-[tool.poetry.group.checks.dependencies]
-bandit = "^1.7.9"
-coverage = "^7.5.4"
-mypy = "^1.10.1"
-pytest = "^8.2.2"
-pytest-cov = "^5.0.0"
-pytest-xdist = "^3.6.1"
-pandera = { extras = ["mypy"], version = "^0.20.1" }
-ruff = "^0.5.0"
-pytest-mock = "^3.14.0"
-
 [tool.poetry.group.commits.dependencies]
 commitizen = "^3.27.0"
 pre-commit = "^3.7.1"
