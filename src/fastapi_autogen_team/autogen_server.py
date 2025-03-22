@@ -7,8 +7,8 @@ from threading import Thread
 from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
 
-from autogen_workflow_team import AutogenWorkflow
-from data_model import Input, Output
+from fastapi_autogen_team.autogen_workflow_team import AutogenWorkflow
+from fastapi_autogen_team.data_model import Input, Output
 
 empty_usage = {
     "prompt_tokens": 0,

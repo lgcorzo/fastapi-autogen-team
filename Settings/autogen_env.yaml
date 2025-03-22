@@ -1,21 +1,6 @@
-name: autogen_env
+name: python_3_11
 channels:
   - conda-forge
 dependencies:
   - python=3.11
-  - pip=24.0
-  - pip:
-    - fastapi
-    - ag2[retrievechat,long-context,openai]
-    - flaml[automl]
-    - opentelemetry-api
-    - opentelemetry-sdk
-    - opentelemetry-instrumentation-fastapi
-    - opentelemetry-exporter-otlp
-    - opentelemetry-instrumentation
-    - opentelemetry-exporter-otlp-proto-http
-    - apscheduler
-    - starlette
-    - dotenv
-    - uvicorn
-    - invoke
+  - pip

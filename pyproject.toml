@@ -12,6 +12,7 @@ readme = "README.md"
 keywords = ["mlops", "python", "package", "fastapi"]
 packages = [{ include = "fastapi_autogen_team", from = "src" }]
 
+# DEPENDENCIES
 
 [tool.poetry.dependencies]
 python = "3.11.*"

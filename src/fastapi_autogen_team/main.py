@@ -6,8 +6,8 @@ from fastapi import FastAPI, HTTPException
 from starlette.responses import RedirectResponse
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from autogen_server import serve_autogen
-from data_model import Input, ModelInformation
+from fastapi_autogen_team.autogen_server import serve_autogen
+from fastapi_autogen_team.data_model import Input, ModelInformation
 
 from opentelemetry import trace, metrics
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
