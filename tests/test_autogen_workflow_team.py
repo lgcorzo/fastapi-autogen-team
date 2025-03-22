@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock, call
 from queue import Queue
+from autogen import Agent
 from termcolor import colored
 
 
@@ -13,7 +14,8 @@ from fastapi_autogen_team.autogen_workflow_team import (
     handle_regular_message,
     handle_suggested_function_call,
     handle_function_tool_message,
-    handle_suggested_tool_calls
+    handle_suggested_tool_calls,
+    streamed_print_received_message,
 )
 
 
@@ -21,7 +23,7 @@ from fastapi_autogen_team.autogen_workflow_team import (
 @pytest.fixture
 def mock_iostream():
     """Mock the IOStream for testing print functions"""
-    with patch("autogen.io.IOStream") as mock_io:
+    with patch("fastapi_autogen_team.autogen_workflow_team.IOStream") as mock_io:
         mock_default = MagicMock()
         mock_io.get_default.return_value = mock_default
         yield mock_default
@@ -37,6 +39,22 @@ def mock_queue():
 def workflow():
     """Create an instance of AutogenWorkflow for testing"""
     return AutogenWorkflow()
+
+@pytest.fixture
+def mock_agent():
+    """Create a mock agent for testing"""
+    agent = MagicMock(spec=Agent)
+    agent.name = "TestAgent"
+    agent._message_to_dict = MagicMock(side_effect=lambda x: x if isinstance(x, dict) else {"content": x})
+    return agent
+
+
+@pytest.fixture
+def mock_sender():
+    """Create a mock sender for testing"""
+    sender = MagicMock(spec=Agent)
+    sender.name = "TestSender"
+    return sender
 
 
 # Test create_llm_config function
@@ -182,14 +200,6 @@ def test_handle_regular_message_with_context(mock_iostream):
 
         assert "Hello World" in result
         mock_wrapper.instantiate.assert_called_with("Hello {name}", {"name": "World"}, True)
-        
-@pytest.fixture
-def mock_iostream():
-    """Mock the IOStream for testing print functions"""
-    with patch("autogen.io.IOStream") as mock_io:
-        mock_default = MagicMock()
-        mock_io.get_default.return_value = mock_default
-        yield mock_default
 
 
 def test_handle_function_tool_message_function(mock_iostream):
@@ -204,11 +214,13 @@ def test_handle_function_tool_message_function(mock_iostream):
     assert "*" * len(expected_func_print) in result
 
     # Check the print calls
-    mock_iostream.print.assert_has_calls([
-        call(colored(expected_func_print, "green"), flush=True),
-        call("Function output", flush=True),
-        call(colored("*" * len(expected_func_print), "green"), flush=True),
-    ])
+    mock_iostream.print.assert_has_calls(
+        [
+            call(colored(expected_func_print, "green"), flush=True),
+            call("Function output", flush=True),
+            call(colored("*" * len(expected_func_print), "green"), flush=True),
+        ]
+    )
 
 
 def test_handle_function_tool_message_tool(mock_iostream):
@@ -223,11 +235,13 @@ def test_handle_function_tool_message_tool(mock_iostream):
     assert "*" * len(expected_func_print) in result
 
     # Check the print calls
-    mock_iostream.print.assert_has_calls([
-        call(colored(expected_func_print, "green"), flush=True),
-        call("Tool output", flush=True),
-        call(colored("*" * len(expected_func_print), "green"), flush=True),
-    ])
+    mock_iostream.print.assert_has_calls(
+        [
+            call(colored(expected_func_print, "green"), flush=True),
+            call("Tool output", flush=True),
+            call(colored("*" * len(expected_func_print), "green"), flush=True),
+        ]
+    )
 
 
 def test_handle_function_tool_message_no_id(mock_iostream):
@@ -242,11 +256,13 @@ def test_handle_function_tool_message_no_id(mock_iostream):
     assert "*" * len(expected_func_print) in result
 
     # Check the print calls
-    mock_iostream.print.assert_has_calls([
-        call(colored(expected_func_print, "green"), flush=True),
-        call("Function output", flush=True),
-        call(colored("*" * len(expected_func_print), "green"), flush=True),
-    ])
+    mock_iostream.print.assert_has_calls(
+        [
+            call(colored(expected_func_print, "green"), flush=True),
+            call("Function output", flush=True),
+            call(colored("*" * len(expected_func_print), "green"), flush=True),
+        ]
+    )
 
 
 def test_handle_suggested_tool_calls_single_tool(mock_iostream):
@@ -262,7 +278,7 @@ def test_handle_suggested_tool_calls_single_tool(mock_iostream):
     # Check the returned streaming message
     expected_func_print = "***** Suggested tool call (tool_1): test_tool *****"
     assert expected_func_print in result
-    assert "Arguments: \n{\"arg1\": \"value1\"}" in result
+    assert 'Arguments: \n{"arg1": "value1"}' in result
     assert "*" * len(expected_func_print) in result
 
     # Check the print calls
@@ -294,8 +310,8 @@ def test_handle_suggested_tool_calls_multiple_tools(mock_iostream):
     expected_func_print_2 = "***** Suggested tool call (tool_2): test_tool_2 *****"
     assert expected_func_print_1 in result
     assert expected_func_print_2 in result
-    assert "Arguments: \n{\"arg1\": \"value1\"}" in result
-    assert "Arguments: \n{\"arg2\": \"value2\"}" in result
+    assert 'Arguments: \n{"arg1": "value1"}' in result
+    assert 'Arguments: \n{"arg2": "value2"}' in result
     assert "*" * len(expected_func_print_1) in result
     assert "*" * len(expected_func_print_2) in result
 
@@ -324,7 +340,7 @@ def test_handle_suggested_tool_calls_no_id(mock_iostream):
     # Check the returned streaming message
     expected_func_print = "***** Suggested tool call (No tool call id found): test_tool *****"
     assert expected_func_print in result
-    assert "Arguments: \n{\"arg1\": \"value1\"}" in result
+    assert 'Arguments: \n{"arg1": "value1"}' in result
     assert "*" * len(expected_func_print) in result
 
     # Check the print calls
@@ -350,7 +366,7 @@ def test_handle_suggested_tool_calls_no_function_name(mock_iostream):
     # Check the returned streaming message
     expected_func_print = "***** Suggested tool call (tool_1): (No function name found) *****"
     assert expected_func_print in result
-    assert "Arguments: \n{\"arg1\": \"value1\"}" in result
+    assert 'Arguments: \n{"arg1": "value1"}' in result
     assert "*" * len(expected_func_print) in result
 
     # Check the print calls
@@ -387,3 +403,130 @@ def test_handle_suggested_tool_calls_no_arguments(mock_iostream):
             call(colored("*" * len(expected_func_print), "green"), flush=True),
         ]
     )
+
+def test_streamed_print_received_message_basic_message(mock_agent, mock_sender, mock_queue, mock_iostream):
+    """Test streamed_print_received_message with a basic message"""
+    message = {"content": "Test message content"}
+    streamed_print_received_message(mock_agent, message, mock_sender, mock_queue, 0)
+
+    # Check print calls
+    mock_iostream.print.assert_has_calls(
+        [
+            call(colored("TestSender", "yellow"), "(to", "TestAgent):\n", flush=True),
+            call("Test message content", flush=True),
+            call("\n", "-" * 80, flush=True, sep=""),
+        ]
+    )
+
+    # Check queue put
+    mock_queue.put.assert_called_once()
+    queue_call_args = mock_queue.put.call_args[0][0]
+    assert queue_call_args["index"] == 0
+    assert "TestSender (to TestAgent):\nTest message content\n" in queue_call_args["delta"]["content"]
+    assert queue_call_args["finish_reason"] == "stop"
+
+
+def test_streamed_print_received_message_function_call(mock_agent, mock_sender, mock_queue, mock_iostream):
+    """Test streamed_print_received_message with a function call message"""
+    message = {"role": "function", "name": "test_function", "content": "Function output"}
+    with patch("fastapi_autogen_team.autogen_workflow_team.handle_function_tool_message") as mock_handle_func:
+        mock_handle_func.return_value = "Function message handled"
+        streamed_print_received_message(mock_agent, message, mock_sender, mock_queue, 0)
+
+        mock_handle_func.assert_called_once_with(message, mock_iostream, 'TestSender (to TestAgent):\n')
+
+    # Check print calls
+    mock_iostream.print.assert_has_calls(
+        [
+            call(colored("TestSender", "yellow"), "(to", "TestAgent):\n", flush=True),
+            call("\n", "-" * 80, flush=True, sep=""),
+        ]
+    )
+
+    # Check queue put
+    mock_queue.put.assert_called_once()
+    queue_call_args = mock_queue.put.call_args[0][0]
+    assert queue_call_args["index"] == 0
+    assert "Function message handled\n" in queue_call_args["delta"]["content"]
+    assert queue_call_args["finish_reason"] == "stop"
+
+
+def test_streamed_print_received_message_tool_call(mock_agent, mock_sender, mock_queue, mock_iostream):
+    """Test streamed_print_received_message with a tool call message"""
+    message = {"role": "tool", "tool_call_id": "tool_123", "content": "Tool output"}
+    with patch("fastapi_autogen_team.autogen_workflow_team.handle_function_tool_message") as mock_handle_func:
+        mock_handle_func.return_value = "Tool message handled"
+        streamed_print_received_message(mock_agent, message, mock_sender, mock_queue, 0)
+
+        mock_handle_func.assert_called_once_with(message, mock_iostream, "")
+
+    # Check print calls
+    mock_iostream.print.assert_has_calls(
+        [
+            call(colored("TestSender", "yellow"), "(to", "TestAgent):\n", flush=True),
+            call("\n", "-" * 80, flush=True, sep=""),
+        ]
+    )
+
+    # Check queue put
+    mock_queue.put.assert_called_once()
+    queue_call_args = mock_queue.put.call_args[0][0]
+    assert queue_call_args["index"] == 0
+    assert "TestSender (to TestAgent):\nTool message handled\n" in queue_call_args["delta"]["content"]
+    assert queue_call_args["finish_reason"] == "stop"
+
+
+def test_streamed_print_received_message_tool_responses(mock_agent, mock_sender, mock_queue, mock_iostream):
+    """Test streamed_print_received_message with tool responses"""
+    message = {"tool_responses": [{"content": "Tool response 1"}, {"content": "Tool response 2"}]}
+    with patch("fastapi_autogen_team.autogen_workflow_team.handle_tool_responses") as mock_handle_tool:
+        mock_handle_tool.return_value = "Tool responses handled"
+        streamed_print_received_message(mock_agent, message, mock_sender, mock_queue, 0)
+
+        mock_handle_tool.assert_called_once_with(
+            mock_agent, message, mock_sender, mock_queue, 0, mock_iostream, "", *(), **{}
+        )
+    # Check print calls
+    mock_iostream.print.assert_called_once_with(colored("TestSender", "yellow"), "(to", "TestAgent):\n", flush=True)
+    # Check queue put
+    assert mock_queue.put.call_count == 0
+
+
+def test_handle_tool_responses_not_tool_role(mock_agent, mock_sender, mock_queue, mock_iostream):
+    """Test handling tool responses when the message role is not tool"""
+    message = {"tool_responses": [{"content": "Tool response 1"}], "role": "user"}
+    with patch.object(mock_agent, "_print_received_message") as mock_print_received:
+        result = handle_tool_responses(mock_agent, message, mock_sender, mock_queue, 0, mock_iostream, "")
+        assert result == ""
+        assert mock_queue.put.call_count == 1
+        assert mock_print_received.call_count == 1
+
+
+def test_handle_tool_responses_tool_role(mock_agent, mock_sender, mock_queue, mock_iostream):
+    """Test handling tool responses when the message role is tool"""
+    message = {"tool_responses": [{"content": "Tool response 1"}], "role": "tool"}
+    with patch.object(mock_agent, "_print_received_message") as mock_print_received:
+        result = handle_tool_responses(mock_agent, message, mock_sender, mock_queue, 0, mock_iostream, "")
+        assert result == ""
+        assert mock_queue.put.call_count == 1
+        assert mock_print_received.call_count == 1
+
+
+def test_handle_regular_message_with_function_call(mock_iostream, mock_agent):
+    """Test handling messages with function call"""
+    message = {"content": "Hello", "function_call": {"name": "test_func", "arguments": "{}"}}
+    with patch("fastapi_autogen_team.autogen_workflow_team.handle_suggested_function_call") as mock_handle_func:
+        mock_handle_func.return_value = "Function call handled"
+        result = handle_regular_message(mock_agent, message, mock_iostream, "Initial message")
+        assert "Function call handled" in result
+        mock_handle_func.assert_called_once_with(message["function_call"], mock_iostream, "Initial message")
+
+
+def test_handle_regular_message_with_tool_calls(mock_iostream, mock_agent):
+    """Test handling messages with tool calls"""
+    message = {"content": "Hello", "tool_calls": [{"id": "1", "function": {"name": "test_tool", "arguments": "{}"}}]}
+    with patch("fastapi_autogen_team.autogen_workflow_team.handle_suggested_tool_calls") as mock_handle_tool:
+        mock_handle_tool.return_value = "Tool calls handled"
+        result = handle_regular_message(mock_agent, message, mock_iostream, "Initial message")
+        assert "Tool calls handled" in result
+        mock_handle_tool.assert_called_once_with(message["tool_calls"], mock_iostream, "Initial message")
