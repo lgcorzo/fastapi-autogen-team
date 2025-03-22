@@ -458,7 +458,7 @@ def test_streamed_print_received_message_tool_call(mock_agent, mock_sender, mock
         mock_handle_func.return_value = "Tool message handled"
         streamed_print_received_message(mock_agent, message, mock_sender, mock_queue, 0)
 
-        mock_handle_func.assert_called_once_with(message, mock_iostream, "")
+        mock_handle_func.assert_called_once_with(message, mock_iostream, 'TestSender (to TestAgent):\n')
 
     # Check print calls
     mock_iostream.print.assert_has_calls(
@@ -472,7 +472,7 @@ def test_streamed_print_received_message_tool_call(mock_agent, mock_sender, mock
     mock_queue.put.assert_called_once()
     queue_call_args = mock_queue.put.call_args[0][0]
     assert queue_call_args["index"] == 0
-    assert "TestSender (to TestAgent):\nTool message handled\n" in queue_call_args["delta"]["content"]
+    assert "Tool message handled\n"  in queue_call_args["delta"]["content"]
     assert queue_call_args["finish_reason"] == "stop"
 
 
@@ -484,7 +484,7 @@ def test_streamed_print_received_message_tool_responses(mock_agent, mock_sender,
         streamed_print_received_message(mock_agent, message, mock_sender, mock_queue, 0)
 
         mock_handle_tool.assert_called_once_with(
-            mock_agent, message, mock_sender, mock_queue, 0, mock_iostream, "", *(), **{}
+            mock_agent, message, mock_sender, mock_queue, 0, mock_iostream, 'TestSender (to TestAgent):\n', *(), **{}
         )
     # Check print calls
     mock_iostream.print.assert_called_once_with(colored("TestSender", "yellow"), "(to", "TestAgent):\n", flush=True)
@@ -506,7 +506,7 @@ def test_handle_tool_responses_tool_role(mock_agent, mock_sender, mock_queue, mo
     """Test handling tool responses when the message role is tool"""
     message = {"tool_responses": [{"content": "Tool response 1"}], "role": "tool"}
     with patch.object(mock_agent, "_print_received_message") as mock_print_received:
-        result = handle_tool_responses(mock_agent, message, mock_sender, mock_queue, 0, mock_iostream, "")
+        result = handle_tool_responses(mock_agent, message, mock_sender, mock_queue, 0, mock_iostream, 'TestSender (to TestAgent):\n')
         assert result == ""
         assert mock_queue.put.call_count == 1
         assert mock_print_received.call_count == 1
