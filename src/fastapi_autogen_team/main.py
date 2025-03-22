@@ -29,20 +29,17 @@ from fastapi_autogen_team.autogen_server import serve_autogen
 from fastapi_autogen_team.data_model import Input, ModelInformation
 
 # Configuration
-APP_NAME = "Autogen-fastapi-service"
-DEFAULT_OTEL_ENDPOINT = "http://otel-collector:4318/v1"
-OTEL_TRACES_ENDPOINT_ENV = "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"
-OTEL_METRICS_ENDPOINT_ENV = "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT"
-LOG_FILE = "app.log"
-HEARTBEAT_INTERVAL = 60  # seconds
-METRICS_EXPORT_INTERVAL = 30000  # milliseconds
-DEFAULT_HOST = "127.0.0.1"
-DEFAULT_PORT = 4100
-
-# Initialize
 load_dotenv()
-TRACES_ENDPOINT = os.getenv(OTEL_TRACES_ENDPOINT_ENV, f"{DEFAULT_OTEL_ENDPOINT}/traces")
-METRICS_ENDPOINT = os.getenv(OTEL_METRICS_ENDPOINT_ENV, f"{DEFAULT_OTEL_ENDPOINT}/metrics")
+
+APP_NAME = os.getenv("APP_NAME", "Autogen-fastapi-service")
+DEFAULT_OTEL_ENDPOINT = os.getenv("DEFAULT_OTEL_ENDPOINT", "http://otel-collector:4318/v1")
+LOG_FILE = os.getenv("LOG_FILE", "app.log")
+HEARTBEAT_INTERVAL = int(os.getenv("HEARTBEAT_INTERVAL", "60"))  # seconds
+METRICS_EXPORT_INTERVAL = int(os.getenv("METRICS_EXPORT_INTERVAL", "30000"))  # milliseconds
+DEFAULT_HOST = os.getenv("DEFAULT_HOST", "127.0.0.1")
+DEFAULT_PORT = int(os.getenv("DEFAULT_PORT", "4100"))
+TRACES_ENDPOINT = os.getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", f"{DEFAULT_OTEL_ENDPOINT}/traces")
+METRICS_ENDPOINT = os.getenv("OTEL_EXPORTER_OTLP_METRICS_ENDPOINT", f"{DEFAULT_OTEL_ENDPOINT}/metrics")
 
 
 # OpenTelemetry Setup
