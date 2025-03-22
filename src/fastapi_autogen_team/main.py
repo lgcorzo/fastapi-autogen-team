@@ -7,14 +7,24 @@ from fastapi.routing import APIRoute
 from starlette.responses import RedirectResponse
 from apscheduler.schedulers.background import BackgroundScheduler
 from opentelemetry import metrics, trace
+from opentelemetry._logs import set_logger_provider
+
 from opentelemetry.exporter.otlp.proto.http.metric_exporter import OTLPMetricExporter
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
+from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
+from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
+from opentelemetry.sdk.resources import Resource
+
+
 import uvicorn
 
 from fastapi_autogen_team.autogen_server import serve_autogen
@@ -36,15 +46,6 @@ load_dotenv()
 TRACES_ENDPOINT = os.getenv(OTEL_TRACES_ENDPOINT_ENV, f"{DEFAULT_OTEL_ENDPOINT}/traces")
 METRICS_ENDPOINT = os.getenv(OTEL_METRICS_ENDPOINT_ENV, f"{DEFAULT_OTEL_ENDPOINT}/metrics")
 
-# Logging Setup
-logging.basicConfig(
-    filename=LOG_FILE,
-    filemode="a",
-    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    level=logging.INFO,
-)
-logger = logging.getLogger(__name__)
 
 # OpenTelemetry Setup
 resource = Resource.create(attributes={"service.name": APP_NAME})
@@ -65,6 +66,22 @@ metric_reader = PeriodicExportingMetricReader(
 meter_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
 metrics.set_meter_provider(meter_provider)
 meter = metrics.get_meter(__name__)
+
+# Logging setup
+logger_provider = LoggerProvider(resource=resource)
+set_logger_provider(logger_provider)
+otlp_log_exporter = OTLPLogExporter()
+logger_provider.add_log_record_processor(BatchLogRecordProcessor(otlp_log_exporter))
+
+# Attach OpenTelemetry handler to Python's logging
+otel_handler = LoggingHandler(level=logging.INFO, logger_provider=logger_provider)
+logging.getLogger().addHandler(otel_handler)
+
+# Root logger configuration
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
+
+logger.info("Logging started")
 
 # Heartbeat Metric
 heartbeat_counter = meter.create_counter(

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import types
+import logging
 from functools import partial
 from queue import Queue
 from typing import Dict, Union
@@ -18,6 +19,10 @@ from autogen import (
 from autogen.code_utils import content_str
 from autogen.io import IOStream
 from termcolor import colored
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 SYSTEM_MESSAGE_MANAGER = "You are the manager of a research group; your role is to manage the team and ensure the project is completed successfully."
 
