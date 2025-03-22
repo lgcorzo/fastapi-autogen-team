@@ -3,7 +3,6 @@ import logging
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
-from fastapi.routing import APIRoute
 from starlette.responses import RedirectResponse
 from apscheduler.schedulers.background import BackgroundScheduler
 from opentelemetry import metrics, trace
@@ -22,7 +21,6 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
-from opentelemetry.sdk.resources import Resource
 
 
 import uvicorn
@@ -38,7 +36,7 @@ OTEL_METRICS_ENDPOINT_ENV = "OTEL_EXPORTER_OTLP_METRICS_ENDPOINT"
 LOG_FILE = "app.log"
 HEARTBEAT_INTERVAL = 60  # seconds
 METRICS_EXPORT_INTERVAL = 30000  # milliseconds
-DEFAULT_HOST = "0.0.0.0"
+DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 4100
 
 # Initialize
@@ -166,7 +164,11 @@ async def route_query(model_input: Input) -> dict:
     if not service:
         raise HTTPException(status_code=404, detail="Model not found")
 
-    return service(model_input)
+    response = service(model_input)
+    if isinstance(response, dict):
+        return response
+    else:
+        raise HTTPException(status_code=500, detail="Unexpected response type")
 
 
 # Heartbeat Scheduler

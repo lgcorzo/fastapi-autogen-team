@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 import types
 import logging
 from functools import partial
@@ -66,16 +65,17 @@ def streamed_print_received_message(
     streaming_message += f"{sender.name} (to {self.name}):\n"
 
     message = self._message_to_dict(message)
-    if message.get("tool_responses"):
+    if isinstance(message, dict) and message.get("tool_responses"):
         streaming_message = handle_tool_responses(
             self, message, sender, queue, index, iostream, streaming_message, *args, **kwargs
         )
         return
 
-    if message.get("role") in ["function", "tool"]:
+    if isinstance(message, dict) and message.get("role") in ["function", "tool"]:
         streaming_message = handle_function_tool_message(message, iostream, streaming_message)
     else:
-        streaming_message = handle_regular_message(self, message, iostream, streaming_message)
+        if isinstance(message, dict):
+            streaming_message = handle_regular_message(self, message, iostream, streaming_message)
 
     iostream.print("\n", "-" * 80, flush=True, sep="")
     streaming_message += f"\n{'-' * 80}\n"
@@ -318,6 +318,7 @@ class AutogenWorkflow:
         chat_history = self.user_proxy.initiate_chat(self.group_chat_manager_with_intros, message=message)
 
         if stream:
-            self.queue.put("[DONE]")
+            if self.queue is not None:
+                self.queue.put("[DONE]")
 
         return chat_history

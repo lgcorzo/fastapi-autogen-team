@@ -57,7 +57,7 @@ def test_input_valid():
     assert input_data.top_p == 1
     assert input_data.presence_penalty == 0
     assert input_data.frequency_penalty == 0
-    assert input_data.stream == True
+    assert input_data.stream
 
 
 def test_input_custom_values():
@@ -74,7 +74,7 @@ def test_input_custom_values():
     )
     assert input_data.model == "custom_model"
     assert input_data.temperature == 0.7
-    assert input_data.stream == False
+    assert not input_data.stream
 
 
 def test_input_missing_field():

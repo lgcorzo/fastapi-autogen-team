@@ -1,6 +1,5 @@
 import json
 import logging
-import traceback
 import uuid
 from queue import Queue
 from threading import Thread
@@ -40,12 +39,12 @@ def serve_autogen(inp: Input) -> StreamingResponse | dict:
         last_message = inp.messages[-1]
 
         if inp.stream:
-            queue = Queue()
+            queue: Queue = Queue()
             workflow.set_queue(queue)
             Thread(target=workflow.run, args=(last_message, inp.stream)).start()
             return StreamingResponse(generate_streaming_response(inp, queue), media_type="text/event-stream")
         else:
-            chat_results = workflow.run(message=last_message, stream=inp.stream)
+            chat_results = workflow.run(message=str(last_message), stream=inp.stream)
             return create_non_streaming_response(chat_results, inp.model)
 
     except Exception as e:

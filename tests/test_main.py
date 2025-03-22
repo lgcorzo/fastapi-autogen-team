@@ -1,19 +1,14 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from fastapi import FastAPI, HTTPException
-from starlette.responses import RedirectResponse
 
-from fastapi_autogen_team.autogen_server import serve_autogen
-from fastapi_autogen_team.data_model import Input, ModelInformation
+from fastapi_autogen_team.data_model import Input
 from fastapi_autogen_team.main import (
     get_models,
     record_heartbeat,
     route_query,
-    docs_redirect,
     log_with_trace,
-    app,
 )
-from fastapi_autogen_team import main
 
 
 @pytest.fixture
