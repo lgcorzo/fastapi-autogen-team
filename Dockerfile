@@ -1,5 +1,4 @@
 # https://docs.docker.com/engine/reference/builder/
-
 FROM python:3.11
 COPY dist/*.whl .
 RUN pip install *.whl
