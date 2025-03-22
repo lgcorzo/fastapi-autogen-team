@@ -10,14 +10,16 @@ from fastapi_autogen_team.autogen_workflow_team import (
 )
 from autogen import UserProxyAgent, AssistantAgent, GroupChatManager
 
+
 @pytest.fixture
 def mock_agents():
     """Fixture to mock Autogen agents and configure AutogenWorkflow to use them."""
-    with patch("fastapi_autogen_team.autogen_workflow_team.UserProxyAgent", autospec=True) as MockUserProxyAgent, \
-         patch("fastapi_autogen_team.autogen_workflow_team.AssistantAgent", autospec=True) as MockAssistantAgent, \
-         patch("fastapi_autogen_team.autogen_workflow_team.GroupChatManager", autospec=True) as MockGroupChatManager, \
-         patch("fastapi_autogen_team.autogen_workflow_team.GroupChat", autospec=True) as MockGroupChat:
-
+    with (
+        patch("fastapi_autogen_team.autogen_workflow_team.UserProxyAgent", autospec=True) as MockUserProxyAgent,
+        patch("fastapi_autogen_team.autogen_workflow_team.AssistantAgent", autospec=True) as MockAssistantAgent,
+        patch("fastapi_autogen_team.autogen_workflow_team.GroupChatManager", autospec=True) as MockGroupChatManager,
+        patch("fastapi_autogen_team.autogen_workflow_team.GroupChat", autospec=True) as MockGroupChat,
+    ):
         user_proxy = MagicMock(spec=UserProxyAgent)
         developer = MagicMock(spec=AssistantAgent)
         planner = MagicMock(spec=AssistantAgent)
@@ -29,31 +31,53 @@ def mock_agents():
         MockUserProxyAgent.return_value = user_proxy
         MockAssistantAgent.return_value = developer
         # set side effects to return different mock agent for planner/QA agent
-        MockAssistantAgent.side_effect = [developer,planner,quality_assurance]
+        MockAssistantAgent.side_effect = [developer, planner, quality_assurance]
 
-        MockUserProxyAgent.side_effect = [user_proxy,executor] #executor
+        MockUserProxyAgent.side_effect = [user_proxy, executor]  # executor
         MockGroupChat.return_value = group_chat
         MockGroupChatManager.return_value = group_chat_manager
 
         # configure MockAutogenWorkflow to return the mocked agents
         def configure_mock_workflow(self):
-           self.user_proxy = user_proxy
-           self.developer = developer
-           self.planner = planner
-           self.executor = executor
-           self.quality_assurance = quality_assurance
-           self.group_chat_with_introductions = group_chat
-           self.group_chat_manager_with_intros = group_chat_manager
+            self.user_proxy = user_proxy
+            self.developer = developer
+            self.planner = planner
+            self.executor = executor
+            self.quality_assurance = quality_assurance
+            self.group_chat_with_introductions = group_chat
+            self.group_chat_manager_with_intros = group_chat_manager
 
-        with patch.object(AutogenWorkflow, '__init__', new=configure_mock_workflow) as MockAutogenWorkflowInit:
-             yield (user_proxy, developer, planner, executor, quality_assurance, group_chat, group_chat_manager,
-               MockUserProxyAgent, MockAssistantAgent, MockGroupChatManager, MockGroupChat)
+        with patch.object(AutogenWorkflow, "__init__", new=configure_mock_workflow) as MockAutogenWorkflowInit:
+            yield (
+                user_proxy,
+                developer,
+                planner,
+                executor,
+                quality_assurance,
+                group_chat,
+                group_chat_manager,
+                MockUserProxyAgent,
+                MockAssistantAgent,
+                MockGroupChatManager,
+                MockGroupChat,
+            )
 
 
 def test_autogen_workflow_initialization(mock_agents):
     """Test AutogenWorkflow initializes agents correctly."""
-    (user_proxy, developer, planner, executor, quality_assurance, group_chat, group_chat_manager,
-     MockUserProxyAgent, MockAssistantAgent, MockGroupChatManager, MockGroupChat) = mock_agents
+    (
+        user_proxy,
+        developer,
+        planner,
+        executor,
+        quality_assurance,
+        group_chat,
+        group_chat_manager,
+        MockUserProxyAgent,
+        MockAssistantAgent,
+        MockGroupChatManager,
+        MockGroupChat,
+    ) = mock_agents
 
     workflow = AutogenWorkflow()
 
@@ -66,7 +90,6 @@ def test_autogen_workflow_initialization(mock_agents):
     assert workflow.group_chat_manager_with_intros == group_chat_manager
 
 
-
 def test_autogen_workflow_set_queue():
     """Test that the set_queue method correctly sets the queue attribute."""
     workflow = AutogenWorkflow()
@@ -77,8 +100,19 @@ def test_autogen_workflow_set_queue():
 
 def test_autogen_workflow_run_streaming(mock_agents):
     """Test the run method in streaming mode."""
-    (user_proxy, developer, planner, executor, quality_assurance, group_chat, group_chat_manager,
-     MockUserProxyAgent, MockAssistantAgent, MockGroupChatManager, MockGroupChat) = mock_agents
+    (
+        user_proxy,
+        developer,
+        planner,
+        executor,
+        quality_assurance,
+        group_chat,
+        group_chat_manager,
+        MockUserProxyAgent,
+        MockAssistantAgent,
+        MockGroupChatManager,
+        MockGroupChat,
+    ) = mock_agents
 
     workflow = AutogenWorkflow()
     mock_queue = MagicMock(spec=Queue)
@@ -93,8 +127,19 @@ def test_autogen_workflow_run_streaming(mock_agents):
 
 def test_autogen_workflow_run_non_streaming(mock_agents):
     """Test the run method in non-streaming mode."""
-    (user_proxy, developer, planner, executor, quality_assurance, group_chat, group_chat_manager,
-     MockUserProxyAgent, MockAssistantAgent, MockGroupChatManager, MockGroupChat) = mock_agents
+    (
+        user_proxy,
+        developer,
+        planner,
+        executor,
+        quality_assurance,
+        group_chat,
+        group_chat_manager,
+        MockUserProxyAgent,
+        MockAssistantAgent,
+        MockGroupChatManager,
+        MockGroupChat,
+    ) = mock_agents
     workflow = AutogenWorkflow()
     message = "Hello, Autogen!"
     workflow.run(message=message, stream=False)
@@ -117,10 +162,22 @@ def test_create_llm_config_custom():
     assert config["timeout"] == 120
     assert config["config_list"] == custom_config_list
 
+
 def test_streamed_print_received_message(mock_agents, capsys):
     """Test streamed_print_received_message function."""
-    (user_proxy, developer, planner, executor, quality_assurance, group_chat, group_chat_manager,
-     MockUserProxyAgent, MockAssistantAgent, MockGroupChatManager, MockGroupChat) = mock_agents
+    (
+        user_proxy,
+        developer,
+        planner,
+        executor,
+        quality_assurance,
+        group_chat,
+        group_chat_manager,
+        MockUserProxyAgent,
+        MockAssistantAgent,
+        MockGroupChatManager,
+        MockGroupChat,
+    ) = mock_agents
     workflow = AutogenWorkflow()
     mock_queue = MagicMock(spec=Queue)
     message = {"role": "assistant", "content": "Test message"}

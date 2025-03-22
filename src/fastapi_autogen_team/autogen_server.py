@@ -43,9 +43,7 @@ def serve_autogen(inp: Input) -> StreamingResponse | dict:
             queue = Queue()
             workflow.set_queue(queue)
             Thread(target=workflow.run, args=(last_message, inp.stream)).start()
-            return StreamingResponse(
-                generate_streaming_response(inp, queue), media_type="text/event-stream"
-            )
+            return StreamingResponse(generate_streaming_response(inp, queue), media_type="text/event-stream")
         else:
             chat_results = workflow.run(message=last_message, stream=inp.stream)
             return create_non_streaming_response(chat_results, inp.model)
@@ -83,12 +81,9 @@ def create_non_streaming_response(chat_results, model: str) -> dict:
     try:
         if chat_results:
             choices = [
-                {"index": i, "message": msg, "finish_reason": "stop"}
-                for i, msg in enumerate(chat_results.chat_history)
+                {"index": i, "message": msg, "finish_reason": "stop"} for i, msg in enumerate(chat_results.chat_history)
             ]
-            output = Output(
-                id=str(chat_results.chat_id), choices=choices, usage=chat_results.cost, model=model
-            )
+            output = Output(id=str(chat_results.chat_id), choices=choices, usage=chat_results.cost, model=model)
         else:
             choices = [
                 {

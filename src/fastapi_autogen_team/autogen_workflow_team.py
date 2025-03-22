@@ -29,13 +29,17 @@ SYSTEM_MESSAGE_MANAGER = "You are the manager of a research group; your role is 
 
 def create_llm_config(config_list: list[dict] | None = None, temperature: int = 0, timeout: int = 240) -> dict:
     """Creates a llm configuration for autogen agents."""
-    config_list_used = config_list if config_list is not None else [
-        {
-            "model": "azure-gpt",
-            "api_key": "sk-12345",
-            "base_url": "http://litellm:4000",  # Your LiteLLM URL
-        },
-    ]
+    config_list_used = (
+        config_list
+        if config_list is not None
+        else [
+            {
+                "model": "azure-gpt",
+                "api_key": "sk-12345",
+                "base_url": "http://litellm:4000",  # Your LiteLLM URL
+            },
+        ]
+    )
 
     return {
         "cache_seed": None,  # change the cache_seed for different trials
@@ -63,7 +67,9 @@ def streamed_print_received_message(
 
     message = self._message_to_dict(message)
     if message.get("tool_responses"):
-        streaming_message = handle_tool_responses(self, message, sender, queue, index, iostream, streaming_message, *args, **kwargs)
+        streaming_message = handle_tool_responses(
+            self, message, sender, queue, index, iostream, streaming_message, *args, **kwargs
+        )
         return
 
     if message.get("role") in ["function", "tool"]:
@@ -83,7 +89,17 @@ def streamed_print_received_message(
     )
 
 
-def handle_tool_responses(self, message: Dict, sender: Agent, queue: Queue, index: int, iostream: IOStream, streaming_message: str, *args, **kwargs) -> str:
+def handle_tool_responses(
+    self,
+    message: Dict,
+    sender: Agent,
+    queue: Queue,
+    index: int,
+    iostream: IOStream,
+    streaming_message: str,
+    *args,
+    **kwargs,
+) -> str:
     """Handles messages containing tool responses, including printing and queuing."""
     if message.get("role") == "tool":
         queue.put(
@@ -166,7 +182,9 @@ def handle_suggested_tool_calls(tool_calls: list[dict], iostream: IOStream, stre
     for tool_call in tool_calls:
         id_str = tool_call.get("id", "No tool call id found")
         function_call = dict(tool_call.get("function", {}))
-        func_print = f"***** Suggested tool call ({id_str}): {function_call.get('name', '(No function name found)')} *****"
+        func_print = (
+            f"***** Suggested tool call ({id_str}): {function_call.get('name', '(No function name found)')} *****"
+        )
         iostream.print(colored(func_print, "green"), flush=True)
         streaming_message += f"{func_print}\n"
 

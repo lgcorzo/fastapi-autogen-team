@@ -42,5 +42,6 @@ def environment(ctx: Context) -> None:
         json.dump(configuration, writer, indent=4)
         writer.write("\n")  # add new line at the end
 
+
 def all(_: Context) -> None:
     """Run all project tasks."""

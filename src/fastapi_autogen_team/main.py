@@ -60,9 +60,7 @@ logger_tracer = trace.get_tracer_provider().get_tracer(__name__)
 
 # Meter Provider
 otlp_metric_exporter = OTLPMetricExporter(endpoint=METRICS_ENDPOINT)
-metric_reader = PeriodicExportingMetricReader(
-    otlp_metric_exporter, export_interval_millis=METRICS_EXPORT_INTERVAL
-)
+metric_reader = PeriodicExportingMetricReader(otlp_metric_exporter, export_interval_millis=METRICS_EXPORT_INTERVAL)
 meter_provider = MeterProvider(resource=resource, metric_readers=[metric_reader])
 metrics.set_meter_provider(meter_provider)
 meter = metrics.get_meter(__name__)
@@ -90,6 +88,7 @@ heartbeat_counter = meter.create_counter(
     unit="1",
 )
 
+
 def log_with_trace(message: str, level: str = "info") -> None:
     """Logs messages with OpenTelemetry tracing support."""
     with logger_tracer.start_as_current_span("log"):
@@ -99,10 +98,12 @@ def log_with_trace(message: str, level: str = "info") -> None:
         else:
             logger.error(f"Unsupported log level: {level}. Message: {message}")
 
+
 def record_heartbeat() -> None:
     """Increments the heartbeat counter and logs the event."""
     heartbeat_counter.add(1, {"service": APP_NAME})
     log_with_trace("Heartbeat recorded", level="debug")
+
 
 # Model Information
 model_info = ModelInformation(
@@ -140,17 +141,20 @@ app = FastAPI(
 
 FastAPIInstrumentor.instrument_app(app)
 
+
 # Routes
 @app.get(path=BASE_PATH, include_in_schema=False)
 async def docs_redirect() -> RedirectResponse:
     """Redirects to API documentation."""
     return RedirectResponse(url=DOCS_URL)
 
+
 @app.get(API_PREFIX + "/models")
 async def get_models() -> dict:
     """Returns available model information."""
     log_with_trace("Get models endpoint accessed")
     return {"data": {"data": model_info.dict()}}
+
 
 @app.post(API_PREFIX + "/chat/completions")
 async def route_query(model_input: Input) -> dict:
@@ -163,6 +167,7 @@ async def route_query(model_input: Input) -> dict:
         raise HTTPException(status_code=404, detail="Model not found")
 
     return service(model_input)
+
 
 # Heartbeat Scheduler
 scheduler = BackgroundScheduler()
