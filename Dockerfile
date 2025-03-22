@@ -1,29 +1,6 @@
-# Use the official Miniconda3 image with alpine
-FROM continuumio/miniconda3:4.10.3-alpine
-
-# Environment variables
-ENV \
-    PORT=8080 \
-    PYTHONPATH=/autogen/app
-
-# Set working directory where the Docker container will run
-WORKDIR /autogen
-
-# Copy conda environment file
-COPY Settings/autogen_env.yaml ./
-
-# Install system dependencies
-RUN apk add --no-cache libstdc++
-
-# Create the conda environment
-RUN conda env create -f autogen_env.yaml && \
-    conda clean -afy
-
-# Copy the rest of the application code
-COPY . .
-
-# Command to run the application
-COPY ./run.sh ./run.sh
-RUN chmod +x ./run.sh
-
-ENTRYPOINT ["./run.sh"]
+# https://docs.docker.com/engine/reference/builder/
+FROM python:3.11
+COPY dist/*.whl .
+RUN pip install *.whl
+# Ejecuta la función main() del módulo controller.kafka_app
+CMD ["python", "-m", "fastapi_autogen_team.main"]
