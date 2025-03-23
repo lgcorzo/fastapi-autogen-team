@@ -35,8 +35,10 @@ def handle_response(response: Output) -> dict:
 def serve_autogen(inp: Input) -> StreamingResponse | dict:
     """Serves the autogen workflow based on the input (streaming or non-streaming)."""
     try:
+        model_dump = inp.model_dump()
+        model_messages = model_dump["messages"]
         workflow = AutogenWorkflow()
-        last_message = inp.messages[-1]
+        last_message = model_messages[-1]
 
         if inp.stream:
             queue: Queue = Queue()
@@ -58,7 +60,7 @@ def generate_streaming_response(inp: Input, queue: Queue):
         while True:
             message = queue.get()
             if message == "[DONE]":
-                yield " [DONE]\n\n"
+                yield "data: [DONE]\n\n"
                 break
 
             chunk = Output(
@@ -68,7 +70,7 @@ def generate_streaming_response(inp: Input, queue: Queue):
                 usage=EMPTY_USAGE,
                 model=inp.model,
             )
-            yield f" {json.dumps(handle_response(chunk))}\n\n"
+            yield f"data: {json.dumps(handle_response(chunk))}\n\n"
             queue.task_done()
     except Exception as e:
         logger.error(f"Streaming response failed: {e}", exc_info=True)
