@@ -163,10 +163,8 @@ async def route_query(model_input: Input) -> dict:
         raise HTTPException(status_code=404, detail="Model not found")
 
     response = service(model_input)
-    if isinstance(response, dict):
-        return response
-    else:
-        raise HTTPException(status_code=500, detail="Unexpected response type")
+    return response
+
 
 
 # Heartbeat Scheduler
