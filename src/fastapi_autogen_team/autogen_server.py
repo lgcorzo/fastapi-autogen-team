@@ -60,7 +60,7 @@ def generate_streaming_response(inp: Input, queue: Queue):
         while True:
             message = queue.get()
             if message == "[DONE]":
-                yield " [DONE]\n\n"
+                yield "data: [DONE]\n\n"
                 break
 
             chunk = Output(
@@ -70,7 +70,7 @@ def generate_streaming_response(inp: Input, queue: Queue):
                 usage=EMPTY_USAGE,
                 model=inp.model,
             )
-            yield f" {json.dumps(handle_response(chunk))}\n\n"
+            yield f"data: {json.dumps(handle_response(chunk))}\n\n"
             queue.task_done()
     except Exception as e:
         logger.error(f"Streaming response failed: {e}", exc_info=True)
