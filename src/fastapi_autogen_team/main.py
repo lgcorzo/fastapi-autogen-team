@@ -166,7 +166,6 @@ async def route_query(model_input: Input) -> dict:
     return response
 
 
-
 # Heartbeat Scheduler
 scheduler = BackgroundScheduler()
 scheduler.add_job(record_heartbeat, "interval", seconds=HEARTBEAT_INTERVAL)

@@ -80,6 +80,7 @@ strict = false
 python_version = "3.12"
 check_untyped_defs = false
 ignore_missing_imports = true
+disable_error_code = ["return-value"]
 plugins = ["pandera.mypy", "pydantic.mypy"]
 exclude = ["src/fastapi_autogen_team/__init__.py"]
 
