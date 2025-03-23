@@ -35,8 +35,10 @@ def handle_response(response: Output) -> dict:
 def serve_autogen(inp: Input) -> StreamingResponse | dict:
     """Serves the autogen workflow based on the input (streaming or non-streaming)."""
     try:
+        model_dump = inp.model_dump()
+        model_messages = model_dump["messages"]
         workflow = AutogenWorkflow()
-        last_message = inp.messages[-1]
+        last_message = model_messages[-1]
 
         if inp.stream:
             queue: Queue = Queue()
