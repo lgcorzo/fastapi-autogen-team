@@ -33,7 +33,7 @@ def create_llm_config(config_list: list[dict] | None = None, temperature: int = 
         if config_list is not None
         else [
             {
-                "model": "azure-gpt",
+                "model": "gemini-pro",
                 "api_key": "sk-12345",
                 "base_url": "http://litellm:4000",  # Your LiteLLM URL
             },
