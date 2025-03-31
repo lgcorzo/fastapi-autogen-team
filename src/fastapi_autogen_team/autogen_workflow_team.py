@@ -317,8 +317,7 @@ class AutogenWorkflow:
 
         chat_history = self.user_proxy.initiate_chat(self.group_chat_manager_with_intros, message=message)
 
-        if stream:
-            if self.queue is not None:
-                self.queue.put("[DONE]")
+        if stream and self.queue is not None:
+            self.queue.put("[DONE]")
 
         return chat_history
