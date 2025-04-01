@@ -314,7 +314,7 @@ class AutogenWorkflow:
             self.group_chat_manager_with_intros._print_received_message = types.MethodType(
                 streamed_print_received_message_with_queue_and_index, self.group_chat_manager_with_intros
             )
-            
+
         try:
             chat_history = self.user_proxy.initiate_chat(self.group_chat_manager_with_intros, message=message)
 
@@ -322,30 +322,27 @@ class AutogenWorkflow:
                 self.queue.put("[DONE]")
 
             return chat_history
-          
+
         except Exception as e:
             # Handle any other exceptions
-            error_message = {
-                "error": "Workflow Error",
-                "details": str(e),
-                "type": "system_error"
-            }
-            
+            error_message = {"error": "Workflow Error", "details": str(e), "type": "system_error"}
+
             logger.error(f"Workflow error: {str(e)}")
-           
+
             if stream and self.queue is not None:
-                self.queue.put({
-                    "index": index_counter["index"] if 'index_counter' in locals() else 0,
-                    "delta": {"role": "assistant", "content": f"System error occurred: {str(e)}"},
-                    "finish_reason": "error",
-                    "error": error_message
-                })
+                self.queue.put(
+                    {
+                        "index": index_counter["index"] if "index_counter" in locals() else 0,
+                        "delta": {"role": "assistant", "content": f"System error occurred: {str(e)}"},
+                        "finish_reason": "error",
+                        "error": error_message,
+                    }
+                )
                 self.queue.put("[DONE]")
-            
+
             # Return a chat result with error information
             return ChatResult(
                 chat_history=[{"role": "error", "content": f"System error occurred: {str(e)}", "error": error_message}],
                 summary="Conversation failed due to system error",
-                error=error_message
+                error=error_message,
             )
-    
