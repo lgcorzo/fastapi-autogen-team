@@ -68,7 +68,7 @@ def test_create_llm_config_default():
     assert config["temperature"] == 0
     assert config["timeout"] == 240
     assert len(config["config_list"]) == 1
-    assert config["config_list"][0]["model"] == "gemini-pro"
+    assert config["config_list"][0]["model"] == "azure-gpt"
     assert config["config_list"][0]["api_key"] == "sk-12345"
     assert config["config_list"][0]["base_url"] == "http://litellm:4000"
 
