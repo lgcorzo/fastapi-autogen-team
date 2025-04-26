@@ -14,10 +14,13 @@ from autogen import (
     GroupChatManager,
     OpenAIWrapper,
     UserProxyAgent,
+    register_function
 )
 from autogen.code_utils import content_str
 from autogen.io import IOStream
 from termcolor import colored
+
+from fastapi_autogen_team.tool import search
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -270,9 +273,18 @@ class AutogenWorkflow:
             "3. If the task isn't solved, analyze the problem, revisit assumptions, gather more info, and suggest a different approach.",
             llm_config=llm_config_used,
         )
+        
+        self.rag_assurance = AssistantAgent(
+            name="rag_assurance",
+            system_message="You are an AI RAG assitant. Follow these instructions:\n"
+            "1. Get information using the toll.\n"
+            "2. summary the content of the reponse form the rag server.\n",
+            llm_config=llm_config_used,
+        )
 
         self.allowed_transitions = {
-            self.user_proxy: [self.planner, self.quality_assurance],
+            self.user_proxy: [self.planner, self.quality_assurance, self.rag_assurance],
+            self.rag_assurance: [self.planner, self.user_proxy],
             self.planner: [self.user_proxy, self.developer, self.quality_assurance],
             self.developer: [self.executor, self.quality_assurance, self.user_proxy],
             self.executor: [self.developer],
@@ -292,6 +304,14 @@ class AutogenWorkflow:
             groupchat=self.group_chat_with_introductions,
             llm_config=llm_config_used,
             system_message=SYSTEM_MESSAGE_MANAGER,
+        )
+        
+        register_function(
+        search,
+        caller=self.rag_assurance,
+        executor=self.user_proxy,
+        name="search",
+        description="A tool for searching the Azure AI search.",
         )
 
     def set_queue(self, queue: Queue):
