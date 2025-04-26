@@ -36,6 +36,8 @@ def create_llm_config(config_list: list[dict] | None = None, temperature: int = 
                 "model": "azure-gpt",
                 "api_key": "sk-12345",
                 "base_url": "http://litellm:4000",  # Your LiteLLM URL
+                "project_id": "project_id",
+                "location": "eastus"
             },
         ]
     )
