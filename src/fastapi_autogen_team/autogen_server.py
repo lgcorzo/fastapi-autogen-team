@@ -22,9 +22,6 @@ def handle_response(response: Output) -> dict:
     if isinstance(response, str):
         raise HTTPException(status_code=500, detail=f"Unexpected string response: {response}")
 
-    if not hasattr(response, "model_dump"):
-        raise HTTPException(status_code=500, detail=f"Response object missing 'model_dump' method: {type(response)}")
-
     try:
         return response.model_dump()
     except Exception as e:

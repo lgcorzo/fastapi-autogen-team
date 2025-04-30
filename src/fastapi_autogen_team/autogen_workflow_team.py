@@ -39,8 +39,6 @@ def create_llm_config(config_list: list[dict] | None = None, temperature: int = 
                 "model": "azure-gpt",
                 "api_key": "sk-12345",
                 "base_url": "http://litellm:4000",  # Your LiteLLM URL
-                "project_id": "project_id",
-                "location": "eastus"
             },
         ]
     )
@@ -292,7 +290,7 @@ class AutogenWorkflow:
         }
 
         self.group_chat_with_introductions = GroupChat(
-            agents=[self.user_proxy, self.developer, self.planner, self.executor, self.quality_assurance],
+            agents=[self.user_proxy, self.developer, self.planner, self.executor, self.quality_assurance, self.rag_assurance],
             allowed_or_disallowed_speaker_transitions=self.allowed_transitions,
             messages=[],
             speaker_transitions_type="allowed",
