@@ -279,6 +279,14 @@ class AutogenWorkflow:
             "2. summary the content of the reponse form the rag server.\n",
             llm_config=llm_config_used,
         )
+        
+        register_function(
+            search,
+            caller=self.rag_assurance,
+            executor=self.user_proxy,
+            name="search",
+            description="A tool for searching the Azure AI search.",
+        )
 
         self.allowed_transitions = {
             self.user_proxy: [self.planner, self.quality_assurance, self.rag_assurance],
@@ -304,13 +312,7 @@ class AutogenWorkflow:
             system_message=SYSTEM_MESSAGE_MANAGER,
         )
         
-        register_function(
-        search,
-        caller=self.rag_assurance,
-        executor=self.user_proxy,
-        name="search",
-        description="A tool for searching the Azure AI search.",
-        )
+       
 
     def set_queue(self, queue: Queue):
         """Sets the queue for streaming messages."""
@@ -354,8 +356,7 @@ class AutogenWorkflow:
                     {
                         "index": index_counter["index"] if "index_counter" in locals() else 0,
                         "delta": {"role": "assistant", "content": f"System error occurred: {str(e)}"},
-                        "finish_reason": "error",
-                        "error": error_message,
+                        "finish_reason": "error"
                     }
                 )
                 self.queue.put("[DONE]")
@@ -363,6 +364,5 @@ class AutogenWorkflow:
             # Return a chat result with error information
             return ChatResult(
                 chat_history=[{"role": "error", "content": f"System error occurred: {str(e)}", "error": error_message}],
-                summary="Conversation failed due to system error",
-                error=error_message,
+                summary="Conversation failed due to system error"
             )

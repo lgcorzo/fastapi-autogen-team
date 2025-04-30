@@ -14,4 +14,4 @@ def search(query: str):
   response = client.retrieval.rag(
     query=query,
   )
-  return response.to_json()
+  return response
