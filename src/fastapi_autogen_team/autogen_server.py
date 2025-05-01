@@ -5,7 +5,7 @@ from queue import Queue
 from threading import Thread
 
 from fastapi import HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 
 from fastapi_autogen_team.autogen_workflow_team import AutogenWorkflow
 from fastapi_autogen_team.data_model import Input, Output
@@ -22,6 +22,9 @@ def handle_response(response: Output) -> dict:
     if isinstance(response, str):
         raise HTTPException(status_code=500, detail=f"Unexpected string response: {response}")
 
+    if not hasattr(response, "model_dump"):
+        raise HTTPException(status_code=500, detail=f"Response object missing 'model_dump' method: {type(response)}")
+
     try:
         return response.model_dump()
     except Exception as e:
@@ -29,7 +32,7 @@ def handle_response(response: Output) -> dict:
         raise HTTPException(status_code=500, detail=f"Serialization error: {e}") from e
 
 
-def serve_autogen(inp: Input) -> StreamingResponse | dict:
+def serve_autogen(inp: Input) -> StreamingResponse | JSONResponse:
     """Serves the autogen workflow based on the input (streaming or non-streaming)."""
     try:
         model_dump = inp.model_dump()
@@ -43,8 +46,13 @@ def serve_autogen(inp: Input) -> StreamingResponse | dict:
             Thread(target=workflow.run, args=(last_message, inp.stream)).start()
             return StreamingResponse(generate_streaming_response(inp, queue), media_type="text/event-stream")
         else:
-            chat_results = workflow.run(message=str(last_message), stream=inp.stream)
-            return create_non_streaming_response(chat_results, inp.model)
+            result = workflow.run(message=str(last_message), stream=False)
+            # handle generator output
+            if hasattr(result, "__next__"):
+                result = next(result)
+
+            response_data = create_non_streaming_response(result, inp.model)
+            return JSONResponse(content=response_data, media_type="	application/json")
 
     except Exception as e:
         logger.error(f"Error processing Autogen request: {e}", exc_info=True)
@@ -74,12 +82,19 @@ def generate_streaming_response(inp: Input, queue: Queue):
         raise HTTPException(status_code=500, detail=f"Streaming error: {e}") from e
 
 
-def create_non_streaming_response(chat_results, model: str) -> dict:
+def create_non_streaming_response(chat_results, model: str):
     """Creates a non-streaming response from the chat results."""
     try:
         if chat_results:
+            
             choices = [
-                {"index": i, "message": msg, "finish_reason": "stop"} for i, msg in enumerate(chat_results.chat_history)
+                {
+                    "index": 0, 
+                    "message": {
+                        "role": "assistant",
+                        "content": chat_results.summary,
+                    }, 
+                 "finish_reason": "stop"} 
             ]
             output = Output(id=str(chat_results.chat_id), choices=choices, usage=chat_results.cost, model=model)
         else:
@@ -100,3 +115,4 @@ def create_non_streaming_response(chat_results, model: str) -> dict:
     except Exception as e:
         logger.error(f"Failed to create non-streaming response: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Response creation error: {e}") from e
+

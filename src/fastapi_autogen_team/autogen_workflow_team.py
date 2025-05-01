@@ -302,7 +302,7 @@ class AutogenWorkflow:
             allowed_or_disallowed_speaker_transitions=self.allowed_transitions,
             messages=[],
             speaker_transitions_type="allowed",
-            max_round=10,
+            max_round=2,
             send_introductions=True,
         )
 
