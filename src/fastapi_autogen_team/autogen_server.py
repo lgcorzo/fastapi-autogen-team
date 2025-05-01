@@ -32,14 +32,13 @@ def handle_response(response: Output) -> dict:
         raise HTTPException(status_code=500, detail=f"Serialization error: {e}") from e
 
 
-def serve_autogen(inp: Input) -> StreamingResponse | JSONResponse:
+def serve_autogen(inp: Input) -> StreamingResponse | dict:
     """Serves the autogen workflow based on the input (streaming or non-streaming)."""
     try:
         model_dump = inp.model_dump()
         model_messages = model_dump["messages"]
         workflow = AutogenWorkflow()
         last_message = model_messages[-1]
-
         if inp.stream:
             queue: Queue = Queue()
             workflow.set_queue(queue)
@@ -52,7 +51,7 @@ def serve_autogen(inp: Input) -> StreamingResponse | JSONResponse:
                 result = next(result)
 
             response_data = create_non_streaming_response(result, inp.model)
-            return JSONResponse(content=response_data, media_type="	application/json")
+            return  response_data
 
     except Exception as e:
         logger.error(f"Error processing Autogen request: {e}", exc_info=True)
