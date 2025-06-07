@@ -26,8 +26,13 @@ from fastapi_autogen_team.tool import search
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-SYSTEM_MESSAGE_MANAGER = "You are the manager of a research group; your role is to manage the team and ensure the project is completed successfully."
 
+SYSTEM_MESSAGE_MANAGER = """
+        You are KAI (Lantek Virtual Assistant), the manager of the research agents.
+        Your role is to manage message flow and ensure the final response to the user
+        is in the same language as the user's original query.
+        Do not alter messages — only ensure correct format and language consistency.
+        """
 
 def create_llm_config(config_list: list[dict] | None = None, temperature: int = 0, timeout: int = 240) -> dict:
     """Creates a llm configuration for autogen agents."""
@@ -239,25 +244,25 @@ class AutogenWorkflow:
 
             DO NOT speak to the user until you have processed results or need clarification.
             """,
-            is_termination_msg=lambda msg: msg.get("content") is not None
-            and "TERMINATE" in msg["content"],
             description="You are the planner prepare the  task to  get the usefull information.",
         )
 
         self.quality_assurance = AssistantAgent(
             name="Quality_assurance",
             system_message="You are an AI Quality Assurance. Follow these instructions:\n"
-            "1. Double-check the plan.\n"
+            "1. Check the content to be ralative to the lantek  use case of the sheet metal.\n"
             "2. Suggest resolutions for bugs or errors.\n"
             "3. If the task isn't solved, analyze the problem, revisit assumptions, gather more info, and suggest a different approach."
-            "4. Always end your message to the user with 'TERMINATE' if the answer is complete.",
+            "4. Always end your final message with 'TERMINATE'.",
+            is_termination_msg=lambda msg: msg.get("content") is not None
+            and "TERMINATE" in msg["content"],
             llm_config=llm_config_used,
         )
         
         self.rag_assurance = AssistantAgent(
             name="rag_assurance",
             system_message="""
-            You are the content controlle. Your job is to query Azure AI Search and return results.
+            You are the content controller. Your job is to query Azure AI Search and return results.
             Rules:
             1. Search only using the translated English query from Admin.
             2. Use only the content retrieved from the Azure AI Search.
@@ -279,10 +284,10 @@ class AutogenWorkflow:
         )
 
         self.allowed_transitions = {
-            self.user_proxy: [self.planner, self.quality_assurance, self.rag_assurance],
-            self.rag_assurance: [self.planner, self.user_proxy],
-            self.planner: [self.user_proxy, self.quality_assurance],
-            self.quality_assurance: [self.planner, self.user_proxy],
+            self.user_proxy: [self.planner],
+            self.planner: [self.rag_assurance],
+            self.rag_assurance: [self.quality_assurance],
+  
         }
 
         self.group_chat_with_introductions = GroupChat(
