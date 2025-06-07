@@ -214,53 +214,34 @@ class AutogenWorkflow:
             code_execution_config=False,
             llm_config=llm_config_used,
             description="The UserProxy interacts with other agents in the group chat as the user.",
+            is_termination_msg=lambda msg: msg.get("content") is not None
+            and "TERMINATE" in msg["content"],
         )
 
-        self.developer = AssistantAgent(
-            name="Developer",
-            max_consecutive_auto_reply=3,
-            human_input_mode="NEVER",
-            code_execution_config=False,
-            llm_config=llm_config_used,
-            system_message="You are an AI developer. Follow an approved plan and these guidelines:\n"
-            "1. Write python/shell code to solve tasks. \n"
-            "2. Wrap the code in a code block that specifies the script type. \n"
-            "3. The user can't modify your code, so provide complete code.\n"
-            "4. Print the specific code you want the executor to run.\n"
-            "5. Don't include multiple code blocks in one response.\n"
-            "6. Install libraries using: ```bash pip install module_name``` then send the full implementation code.\n"
-            "7. Check the execution result and fix errors. \n"
-            "8. Be concise; only state what is necessary.\n"
-            "9. If you can't fix the error, analyze the problem, revisit assumptions, gather more info, and try a different approach.",
-            description="Call this Agent to write code; don't call to execute code.",
-        )
-
+        
         self.planner = AssistantAgent(
             name="Planner",
             max_consecutive_auto_reply=3,
             human_input_mode="NEVER",
             code_execution_config=False,
             llm_config=llm_config_used,
-            system_message="You are an AI Planner. Follow these guidelines:\n"
-            "1. Create a 5-step plan to solve the task.\n"
-            "2. Post-project review is not needed.\n"
-            "3. Revise the plan based on feedback from admin and quality_assurance.\n"
-            "4. Include team members for each step (e.g., Developer writes code, Executor executes code; exclude the admin).\n"
-            "5. Be concise; only state what is necessary.\n"
-            "6. Include an accurate answer to the user's request in the final message.",
-            description="Call this Agent to build a plan; don't call to execute code.",
-        )
+            system_message="""
+            You are the Admin. You manage the workflow and coordinate between the user and the RAG_searcher.
+            Rules:
+            1. The user may speak any language. You must detect the language of the user query.
+            2. You must translate the user message to English before sending it to RAG_searcher.
+            3. ALL messages exchanged between you and RAG_searcher MUST be in English.
+            4. The RAG_searcher can only respond based on retrieved content. It cannot fabricate information.
+            5. If relevant data is found, summarize it and translate your final response back into the user’s original
+            language before replying to the user.
+            6. If no relevant data is found, ask the user for clarification in their original language.
+            7. Always end your message to the user with 'TERMINATE' if the answer is complete.
 
-        self.executor = UserProxyAgent(
-            name="Executor",
-            system_message="You are the code executor. Execute code and report the result. Read the developer's request and execute the required code.",
-            human_input_mode="NEVER",
-            code_execution_config={
-                "last_n_messages": 20,
-                "work_dir": "dream",
-                "use_docker": True,
-            },
-            description="Call this Agent to execute code; don't call to modify code.",
+            DO NOT speak to the user until you have processed results or need clarification.
+            """,
+            is_termination_msg=lambda msg: msg.get("content") is not None
+            and "TERMINATE" in msg["content"],
+            description="You are the planner prepare the  task to  get the usefull information.",
         )
 
         self.quality_assurance = AssistantAgent(
@@ -268,15 +249,24 @@ class AutogenWorkflow:
             system_message="You are an AI Quality Assurance. Follow these instructions:\n"
             "1. Double-check the plan.\n"
             "2. Suggest resolutions for bugs or errors.\n"
-            "3. If the task isn't solved, analyze the problem, revisit assumptions, gather more info, and suggest a different approach.",
+            "3. If the task isn't solved, analyze the problem, revisit assumptions, gather more info, and suggest a different approach."
+            "4. Always end your message to the user with 'TERMINATE' if the answer is complete.",
             llm_config=llm_config_used,
         )
         
         self.rag_assurance = AssistantAgent(
             name="rag_assurance",
-            system_message="You are an AI RAG assitant. Follow these instructions:\n"
-            "1. Get information using the toll.\n"
-            "2. summary the content of the reponse form the rag server.\n",
+            system_message="""
+            You are the content controlle. Your job is to query Azure AI Search and return results.
+            Rules:
+            1. Search only using the translated English query from Admin.
+            2. Use only the content retrieved from the Azure AI Search.
+            3. If nothing is found, respond with: 'No relevant data found in the knowledge base'
+            4. Do NOT fabricate or infer information beyond the retrieved documents.
+            5. Always end your final message with 'TERMINATE'.
+            """,
+            is_termination_msg=lambda msg: msg.get("content") is not None
+            and "TERMINATE" in msg["content"],
             llm_config=llm_config_used,
         )
         
@@ -291,14 +281,12 @@ class AutogenWorkflow:
         self.allowed_transitions = {
             self.user_proxy: [self.planner, self.quality_assurance, self.rag_assurance],
             self.rag_assurance: [self.planner, self.user_proxy],
-            self.planner: [self.user_proxy, self.developer, self.quality_assurance],
-            self.developer: [self.executor, self.quality_assurance, self.user_proxy],
-            self.executor: [self.developer],
-            self.quality_assurance: [self.planner, self.developer, self.executor, self.user_proxy],
+            self.planner: [self.user_proxy, self.quality_assurance],
+            self.quality_assurance: [self.planner, self.user_proxy],
         }
 
         self.group_chat_with_introductions = GroupChat(
-            agents=[self.user_proxy, self.developer, self.planner, self.executor, self.quality_assurance, self.rag_assurance],
+            agents=[self.user_proxy, self.planner, self.quality_assurance, self.rag_assurance],
             allowed_or_disallowed_speaker_transitions=self.allowed_transitions,
             messages=[],
             speaker_transitions_type="allowed",
