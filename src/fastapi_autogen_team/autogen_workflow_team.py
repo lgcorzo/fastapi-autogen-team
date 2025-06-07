@@ -240,8 +240,6 @@ class AutogenWorkflow:
             5. If relevant data is found, summarize it and translate your final response back into the user’s original
             language before replying to the user.
             6. If no relevant data is found, ask the user for clarification in their original language.
-            7. Always end your message to the user with 'TERMINATE' if the answer is complete.
-
             DO NOT speak to the user until you have processed results or need clarification.
             """,
             description="You are the planner prepare the  task to  get the usefull information.",
@@ -251,9 +249,10 @@ class AutogenWorkflow:
             name="Quality_assurance",
             system_message="You are an AI Quality Assurance. Follow these instructions:\n"
             "1. Check the content to be ralative to the lantek  use case of the sheet metal.\n"
-            "2. Suggest resolutions for bugs or errors.\n"
-            "3. If the task isn't solved, analyze the problem, revisit assumptions, gather more info, and suggest a different approach."
-            "4. Always end your final message with 'TERMINATE'.",
+            "2. Check the response is in the same language as the user's original query .\n"
+            "3. Suggest resolutions for bugs or errors.\n"
+            "4. If the task isn't solved, analyze the problem, revisit assumptions, gather more info, and suggest a different approach."
+            "5. Always end your final message with 'TERMINATE'.",
             is_termination_msg=lambda msg: msg.get("content") is not None
             and "TERMINATE" in msg["content"],
             llm_config=llm_config_used,
@@ -268,10 +267,7 @@ class AutogenWorkflow:
             2. Use only the content retrieved from the Azure AI Search.
             3. If nothing is found, respond with: 'No relevant data found in the knowledge base'
             4. Do NOT fabricate or infer information beyond the retrieved documents.
-            5. Always end your final message with 'TERMINATE'.
             """,
-            is_termination_msg=lambda msg: msg.get("content") is not None
-            and "TERMINATE" in msg["content"],
             llm_config=llm_config_used,
         )
         
@@ -295,7 +291,7 @@ class AutogenWorkflow:
             allowed_or_disallowed_speaker_transitions=self.allowed_transitions,
             messages=[],
             speaker_transitions_type="allowed",
-            max_round=10,
+            max_round=20,
             send_introductions=True,
         )
 
