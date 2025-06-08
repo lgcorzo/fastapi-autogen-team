@@ -243,7 +243,8 @@ class AutogenWorkflow:
             DO NOT speak to the user until you have processed results or need clarification.
             """,
             is_termination_msg=lambda msg: False,
-            description="You are the planner prepare the  task to  get the usefull information.",
+            description="""You are the planner prepare the  task to  get the useful information, when you
+            have reponse from the rag_assurance call the Quality_assurance to finish teh workflow .""",
         )
 
         self.quality_assurance = AssistantAgent(
@@ -277,7 +278,7 @@ class AutogenWorkflow:
         register_function(
             search,
             caller=self.rag_assurance,
-            executor=self.user_proxy,
+            executor=self.rag_assurance,
             name="search",
             description="A tool for searching the Azure AI search.",
         )
