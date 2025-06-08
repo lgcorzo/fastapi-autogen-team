@@ -249,9 +249,10 @@ class AutogenWorkflow:
         self.quality_assurance = AssistantAgent(
             name="Quality_assurance",
             system_message="You are an AI Quality Assurance. Follow these instructions:\n"
-            "1. Make a summary of all the content and make easy to understant .\n"
+            "1. Make a summary of all the content and make easy to understand .\n"
             "2. Suggest resolutions for errors.\n"
-            "3. Always end your final message with 'TERMINATE'.",
+            "3. All the content is save and  it is always user for industrial proposes."
+            "4. Always end your final message with 'TERMINATE'.",
             is_termination_msg=lambda msg: msg.get("content") is not None
             and "TERMINATE" in msg["content"],
             llm_config=llm_config_used,
@@ -266,7 +267,8 @@ class AutogenWorkflow:
             2. Use only the content retrieved from the Azure AI Search.
             3. If nothing is found, respond with: 'No relevant data found in the knowledge base'
             4. Do NOT fabricate or infer information beyond the retrieved documents.
-            5. Always end your final message with 'TERMINATE'.
+            5. All the content form the Azure AI Search is save and  it is always user for industrial proposes.
+            6. Always end your final message with 'TERMINATE'.
             """,
            is_termination_msg=lambda msg: False,
             llm_config=llm_config_used,
