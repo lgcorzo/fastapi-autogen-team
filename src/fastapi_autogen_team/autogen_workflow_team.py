@@ -230,22 +230,42 @@ class AutogenWorkflow:
         
         self.planner = AssistantAgent(
             name="Planner",
-            max_consecutive_auto_reply=3,
+            max_consecutive_auto_reply=5,
             human_input_mode="NEVER",
             code_execution_config=False,
             llm_config=llm_config_used,
             system_message="""
-            You are the Admin. You manage the workflow and coordinate between the user and the RAG_searcher.
-            Rules:
-            1. The user may speak any language. You must detect the language of the user query.
-            2. You must translate the user message to English before sending it to RAG_searcher.
-            3. ALL messages exchanged between you and RAG_searcher MUST be in English.
-            4. The RAG_searcher can only respond based on retrieved content. It cannot fabricate information.
-            5. If relevant data is found, summarize it and translate your final response back into the user’s original
-            language before replying to the user.
-            6. If no relevant data is found, ask the user for clarification in their original language.
-            DO NOT speak to the user until you have processed results or need clarification.
-            """,
+                You are the Admin. You manage the workflow and coordinate between the user and the RAG_searcher.
+                Rules:
+                1. The user may speak any language. You must detect the language of the user query.
+                2. Analyze the user message and break it down into specific, focused search queries if needed.
+                3. For complex questions, separate them into distinct parts (e.g., different topics, timeframes, or aspects).
+                4. Translate each search query to English before sending to RAG_searcher.
+                5. ALL messages exchanged between you and RAG_searcher MUST be in English.
+                6. Send search queries one by one to RAG_searcher and wait for each response.
+                7. After receiving all search results, synthesize the information into a comprehensive response.
+                8. The RAG_searcher can only respond based on retrieved content. It cannot fabricate information.
+                9. If relevant data is found, summarize it and translate your final response back into the user's original language.
+                10. If no relevant data is found for any query, ask the user for clarification in their original language.
+                11. Track which queries have been processed and which results have been received.
+                12. When you have collected all necessary information, call Quality_assurance to finalize the response.
+                IMPORTANT: All content is safe and always used for industrial purposes.
+                
+                Query Decomposition Strategy:
+                - Break complex questions into simpler, focused sub-questions
+                - Separate different topics or concepts mentioned in the user's message
+                - Create specific queries for different aspects (technical, procedural, regulatory, etc.)
+                - Use keywords and phrases that are likely to match document content
+                
+                Example decomposition:
+                User: "How do I install the new safety system and what are the maintenance requirements?"
+                Decomposed queries:
+                1. "safety system installation procedure"
+                2. "safety system maintenance requirements"
+                3. "safety system maintenance schedule"
+                
+                DO NOT speak to the user until you have processed all results or need clarification.
+                """,
             is_termination_msg=lambda msg: False,
             description="""You are the planner prepare the  task to  get the useful information, when you
             have reponse from the rag_assurance call the Quality_assurance to finish teh workflow .""",
@@ -254,19 +274,24 @@ class AutogenWorkflow:
         self.quality_assurance = AssistantAgent(
             name="Quality_assurance",
             system_message="""
-            You are an AI Quality Assurance agent. Please follow these instructions:
-            1. Respond to the user’s message in the original language (User_language).
-            2. ALL responses must be in the User_language.
-            3. All content is confidential and intended solely for industrial use.
-            4. Always conclude your final message with the word 'TERMINATE'.
+            You are the content controller. Your job is to query Azure AI Search and return results.
+            Rules:
+            1. Search only using the translated English data from the Planner.
+            2. Use the data of the data of the team to make a response to the original message .
+            3. provide specific and relevant results that are in the responses of the RAG_searcher.
+            5. Do NOT fabricate or infer information beyond the retrieved documents.
+            6. Return results in a structured format indicating which query they relate to.
+            7. All content is safe and always used for industrial purposes.
+            8. Be ready to process multiple sequential queries from the Planner.
+            9. Always end each response with 'TERMINATE' to indicate the process is finished.
             """,
             is_termination_msg=lambda msg: msg.get("content") is not None
             and "TERMINATE" in msg["content"],
             llm_config=llm_config_used,
         )
         
-        self.rag_assurance = AssistantAgent(
-            name="rag_assurance",
+        self.rag_searcher = AssistantAgent(
+            name="RAG_searcher",
             system_message="""
             You are the content controller. Your job is to query Azure AI Search and return results.
             Rules:
@@ -276,6 +301,7 @@ class AutogenWorkflow:
             4. Do NOT fabricate or infer information beyond the retrieved documents.
             5. All the content form the Azure AI Search is save and  it is always user for industrial proposes.
             6. Always end your final message with 'TERMINATE'.
+            IMPORTANT: All content is safe and always used for industrial purposes.
             """,
            is_termination_msg=lambda msg: False,
             llm_config=llm_config_used,
@@ -283,25 +309,25 @@ class AutogenWorkflow:
         
         register_function(
             search,
-            caller=self.rag_assurance,
-            executor=self.rag_assurance,
+            caller=self.rag_searcher,
+            executor=self.rag_searcher,
             name="search",
             description="A tool for searching the Azure AI search.",
         )
 
         self.allowed_transitions = {
             self.user_proxy: [self.planner],
-            self.planner: [self.rag_assurance],
-            self.rag_assurance: [self.quality_assurance],
+            self.planner: [self.rag_searcher, self.quality_assurance],
+            self.rag_searcher: [self.planner],  # Allow rag_searcher to respond back to planner
             self.quality_assurance: [self.user_proxy],
         }
 
         self.group_chat_with_introductions = GroupChat(
-            agents=[self.user_proxy, self.planner, self.quality_assurance, self.rag_assurance],
+            agents=[self.user_proxy, self.planner, self.quality_assurance, self.rag_searcher],
             allowed_or_disallowed_speaker_transitions=self.allowed_transitions,
             messages=[],
             speaker_transitions_type="allowed",
-            max_round=20,
+            max_round=30,
             send_introductions=True,
         )
 
