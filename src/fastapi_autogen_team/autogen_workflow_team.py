@@ -214,7 +214,11 @@ class AutogenWorkflow:
 
         self.user_proxy = UserProxyAgent(
             name="UserProxy",
-            system_message="You are the UserProxy. You are the user in this conversation.",
+            system_message="You are the UserProxy. You are the user in this conversation.. Follow these instructions:\n"
+            "1. Detect the langrage of the last user message and send to the rest of the teams.\n"
+            "2. Structure the input data  data as :\n"
+            "User_language : < Detected language of the las user message>, User_message: <last message of the user>\n"
+            "3. Always end your final message with 'TERMINATE'.",
             human_input_mode="NEVER",
             code_execution_config=False,
             llm_config=llm_config_used,
@@ -249,11 +253,13 @@ class AutogenWorkflow:
 
         self.quality_assurance = AssistantAgent(
             name="Quality_assurance",
-            system_message="You are an AI Quality Assurance. Follow these instructions:\n"
-            "1. Make a summary of all the content and make easy to understand .\n"
-            "2. Suggest resolutions for errors.\n"
-            "3. All the content is save and  it is always user for industrial proposes."
-            "4. Always end your final message with 'TERMINATE'.",
+            system_message="""
+            You are an AI Quality Assurance agent. Please follow these instructions:
+            1. Respond to the user’s message in the original language (User_language).
+            2. ALL responses must be in the User_language.
+            3. All content is confidential and intended solely for industrial use.
+            4. Always conclude your final message with the word 'TERMINATE'.
+            """,
             is_termination_msg=lambda msg: msg.get("content") is not None
             and "TERMINATE" in msg["content"],
             llm_config=llm_config_used,
