@@ -59,6 +59,10 @@ This section details the requirements, actions, and next steps to kickstart your
     $ poetry install
     ```
 
+    ```bash
+    $ poetry run invoke containers.build
+    ```
+
 ## Next Steps
 
 Going from there, there are dozens of ways to integrate this package to your MLOps platform. For instance, you can use Databricks or AWS as your compute platform and model registry. It's up to you to adapt the package code to the solution you target.
@@ -254,6 +258,8 @@ Summarizes the significance of the streaming interface for enabling real-time in
 ---
 
 Would you like me to delve deeper into any specific section?
+
+
 
 
 ## References: 

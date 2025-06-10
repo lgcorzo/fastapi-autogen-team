@@ -162,6 +162,7 @@ def test_autogen_workflow_run_without_streaming(mock_manager, mock_group_chat, m
         MagicMock(name="developer"),
         MagicMock(name="planner"),
         MagicMock(name="quality_assurance"),
+        MagicMock(name="rag_assurance"),
     ]
 
     # Create and run workflow

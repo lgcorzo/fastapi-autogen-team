@@ -1,6 +1,8 @@
-name: python_3_11
+name: fastapi_autogen_env
 channels:
   - conda-forge
 dependencies:
   - python=3.11
-  - pip
+  - pip=24.0
+  - pip: 
+      - poetry

@@ -57,7 +57,7 @@ def test_input_valid():
     assert input_data.top_p == 1
     assert input_data.presence_penalty == 0
     assert input_data.frequency_penalty == 0
-    assert input_data.stream
+    assert not input_data.stream
 
 
 def test_input_custom_values():

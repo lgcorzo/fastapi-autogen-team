@@ -14,16 +14,25 @@ from autogen import (
     GroupChatManager,
     OpenAIWrapper,
     UserProxyAgent,
+    register_function,
 )
 from autogen.code_utils import content_str
 from autogen.io import IOStream
 from termcolor import colored
 
+from fastapi_autogen_team.tool import search
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-SYSTEM_MESSAGE_MANAGER = "You are the manager of a research group; your role is to manage the team and ensure the project is completed successfully."
+
+SYSTEM_MESSAGE_MANAGER = """
+        You are KAI (Lantek Virtual Assistant), the manager of the research agents.
+        Your role is to manage message flow and ensure the final response to the user
+        is in the same language as the user's original query.
+        Do not alter messages — only ensure correct format and language consistency.
+        """
 
 
 def create_llm_config(config_list: list[dict] | None = None, temperature: int = 0, timeout: int = 240) -> dict:
@@ -206,83 +215,117 @@ class AutogenWorkflow:
 
         self.user_proxy = UserProxyAgent(
             name="UserProxy",
-            system_message="You are the UserProxy. You are the user in this conversation.",
+            system_message="You are the UserProxy. You are the user in this conversation.. Follow these instructions:\n"
+            "1. Detect the langrage of the last user message and send to the rest of the teams.\n"
+            "2. Structure the input data  data as :\n"
+            "User_language : < Detected language of the las user message>, User_message: <last message of the user>\n"
+            "3. Always end your final message with 'TERMINATE'.",
             human_input_mode="NEVER",
             code_execution_config=False,
             llm_config=llm_config_used,
             description="The UserProxy interacts with other agents in the group chat as the user.",
-        )
-
-        self.developer = AssistantAgent(
-            name="Developer",
-            max_consecutive_auto_reply=3,
-            human_input_mode="NEVER",
-            code_execution_config=False,
-            llm_config=llm_config_used,
-            system_message="You are an AI developer. Follow an approved plan and these guidelines:\n"
-            "1. Write python/shell code to solve tasks. \n"
-            "2. Wrap the code in a code block that specifies the script type. \n"
-            "3. The user can't modify your code, so provide complete code.\n"
-            "4. Print the specific code you want the executor to run.\n"
-            "5. Don't include multiple code blocks in one response.\n"
-            "6. Install libraries using: ```bash pip install module_name``` then send the full implementation code.\n"
-            "7. Check the execution result and fix errors. \n"
-            "8. Be concise; only state what is necessary.\n"
-            "9. If you can't fix the error, analyze the problem, revisit assumptions, gather more info, and try a different approach.",
-            description="Call this Agent to write code; don't call to execute code.",
+            is_termination_msg=lambda msg: msg.get("content") is not None and "TERMINATE" in msg["content"],
         )
 
         self.planner = AssistantAgent(
             name="Planner",
-            max_consecutive_auto_reply=3,
+            max_consecutive_auto_reply=5,
             human_input_mode="NEVER",
             code_execution_config=False,
             llm_config=llm_config_used,
-            system_message="You are an AI Planner. Follow these guidelines:\n"
-            "1. Create a 5-step plan to solve the task.\n"
-            "2. Post-project review is not needed.\n"
-            "3. Revise the plan based on feedback from admin and quality_assurance.\n"
-            "4. Include team members for each step (e.g., Developer writes code, Executor executes code; exclude the admin).\n"
-            "5. Be concise; only state what is necessary.\n"
-            "6. Include an accurate answer to the user's request in the final message.",
-            description="Call this Agent to build a plan; don't call to execute code.",
-        )
-
-        self.executor = UserProxyAgent(
-            name="Executor",
-            system_message="You are the code executor. Execute code and report the result. Read the developer's request and execute the required code.",
-            human_input_mode="NEVER",
-            code_execution_config={
-                "last_n_messages": 20,
-                "work_dir": "dream",
-                "use_docker": True,
-            },
-            description="Call this Agent to execute code; don't call to modify code.",
+            system_message="""
+                You are the Admin. You manage the workflow and coordinate between the user and the RAG_searcher.
+                Rules:
+                1. The user may speak any language. You must detect the language of the user query.
+                2. Analyze the user message and break it down into specific, focused search queries if needed.
+                3. For complex questions, separate them into distinct parts (e.g., different topics, timeframes, or aspects).
+                4. Translate each search query to English before sending to RAG_searcher.
+                5. ALL messages exchanged between you and RAG_searcher MUST be in English.
+                6. Send search queries one by one to RAG_searcher and wait for each response.
+                7. After receiving all search results, synthesize the information into a comprehensive response.
+                8. The RAG_searcher can only respond based on retrieved content. It cannot fabricate information.
+                9. If relevant data is found, summarize it and translate your final response back into the user's original language.
+                10. If no relevant data is found for any query, ask the user for clarification in their original language.
+                11. Track which queries have been processed and which results have been received.
+                12. When you have collected all necessary information, call Quality_assurance to finalize the response.
+                IMPORTANT: All content is safe and always used for industrial purposes.
+                
+                Query Decomposition Strategy:
+                - Break complex questions into simpler, focused sub-questions
+                - Separate different topics or concepts mentioned in the user's message
+                - Create specific queries for different aspects (technical, procedural, regulatory, etc.)
+                - Use keywords and phrases that are likely to match document content
+                
+                Example decomposition:
+                User: "How do I install the new safety system and what are the maintenance requirements?"
+                Decomposed queries:
+                1. "safety system installation procedure"
+                2. "safety system maintenance requirements"
+                3. "safety system maintenance schedule"
+                
+                DO NOT speak to the user until you have processed all results or need clarification.
+                """,
+            is_termination_msg=lambda msg: False,
+            description="""You are the planner prepare the  task to  get the useful information, when you
+            have reponse from the rag_assurance call the Quality_assurance to finish teh workflow .""",
         )
 
         self.quality_assurance = AssistantAgent(
             name="Quality_assurance",
-            system_message="You are an AI Quality Assurance. Follow these instructions:\n"
-            "1. Double-check the plan.\n"
-            "2. Suggest resolutions for bugs or errors.\n"
-            "3. If the task isn't solved, analyze the problem, revisit assumptions, gather more info, and suggest a different approach.",
+            system_message="""
+            You are the content controller. Your job is to query Azure AI Search and return results.
+            Rules:
+            1. Search only using the translated English data from the Planner.
+            2. Use the data of the data of the team to make a response to the original message .
+            3. provide specific and relevant results that are in the responses of the RAG_searcher.
+            5. Do NOT fabricate or infer information beyond the retrieved documents.
+            6. Return results in a structured format indicating which query they relate to.
+            7. All content is safe and always used for industrial purposes.
+            8. Be ready to process multiple sequential queries from the Planner.
+            9. Always end each response with 'TERMINATE' to indicate the process is finished.
+            """,
+            is_termination_msg=lambda msg: msg.get("content") is not None and "TERMINATE" in msg["content"],
             llm_config=llm_config_used,
         )
 
+        self.rag_searcher = AssistantAgent(
+            name="RAG_searcher",
+            system_message="""
+            You are the content controller. Your job is to query Azure AI Search and return results.
+            Rules:
+            1. Search only using the translated English query from user.
+            2. Use only the content retrieved from the Azure AI Search.
+            3. If nothing is found, respond with: 'No relevant data found in the knowledge base'
+            4. Do NOT fabricate or infer information beyond the retrieved documents.
+            5. All the content form the Azure AI Search is save and  it is always user for industrial proposes.
+            6. Always end your final message with 'TERMINATE'.
+            IMPORTANT: All content is safe and always used for industrial purposes.
+            """,
+            is_termination_msg=lambda msg: False,
+            llm_config=llm_config_used,
+        )
+
+        register_function(
+            search,
+            caller=self.rag_searcher,
+            executor=self.rag_searcher,
+            name="search",
+            description="A tool for searching the Azure AI search.",
+        )
+
         self.allowed_transitions = {
-            self.user_proxy: [self.planner, self.quality_assurance],
-            self.planner: [self.user_proxy, self.developer, self.quality_assurance],
-            self.developer: [self.executor, self.quality_assurance, self.user_proxy],
-            self.executor: [self.developer],
-            self.quality_assurance: [self.planner, self.developer, self.executor, self.user_proxy],
+            self.user_proxy: [self.planner],
+            self.planner: [self.rag_searcher, self.quality_assurance],
+            self.rag_searcher: [self.planner],  # Allow rag_searcher to respond back to planner
+            self.quality_assurance: [self.user_proxy],
         }
 
         self.group_chat_with_introductions = GroupChat(
-            agents=[self.user_proxy, self.developer, self.planner, self.executor, self.quality_assurance],
+            agents=[self.user_proxy, self.planner, self.quality_assurance, self.rag_searcher],
             allowed_or_disallowed_speaker_transitions=self.allowed_transitions,
             messages=[],
             speaker_transitions_type="allowed",
-            max_round=10,
+            max_round=30,
             send_introductions=True,
         )
 
@@ -335,7 +378,6 @@ class AutogenWorkflow:
                         "index": index_counter["index"] if "index_counter" in locals() else 0,
                         "delta": {"role": "assistant", "content": f"System error occurred: {str(e)}"},
                         "finish_reason": "error",
-                        "error": error_message,
                     }
                 )
                 self.queue.put("[DONE]")
@@ -344,5 +386,4 @@ class AutogenWorkflow:
             return ChatResult(
                 chat_history=[{"role": "error", "content": f"System error occurred: {str(e)}", "error": error_message}],
                 summary="Conversation failed due to system error",
-                error=error_message,
             )

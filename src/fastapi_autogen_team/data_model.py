@@ -27,7 +27,7 @@ class Input(BaseModel):
     top_p: float = 1
     presence_penalty: float = 0
     frequency_penalty: float = 0
-    stream: bool = True
+    stream: bool = False
 
 
 class Output(BaseModel):
