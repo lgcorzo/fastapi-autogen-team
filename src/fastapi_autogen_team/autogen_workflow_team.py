@@ -14,7 +14,7 @@ from autogen import (
     GroupChatManager,
     OpenAIWrapper,
     UserProxyAgent,
-    register_function
+    register_function,
 )
 from autogen.code_utils import content_str
 from autogen.io import IOStream
@@ -33,6 +33,7 @@ SYSTEM_MESSAGE_MANAGER = """
         is in the same language as the user's original query.
         Do not alter messages — only ensure correct format and language consistency.
         """
+
 
 def create_llm_config(config_list: list[dict] | None = None, temperature: int = 0, timeout: int = 240) -> dict:
     """Creates a llm configuration for autogen agents."""
@@ -223,11 +224,9 @@ class AutogenWorkflow:
             code_execution_config=False,
             llm_config=llm_config_used,
             description="The UserProxy interacts with other agents in the group chat as the user.",
-            is_termination_msg=lambda msg: msg.get("content") is not None
-            and "TERMINATE" in msg["content"],
+            is_termination_msg=lambda msg: msg.get("content") is not None and "TERMINATE" in msg["content"],
         )
 
-        
         self.planner = AssistantAgent(
             name="Planner",
             max_consecutive_auto_reply=5,
@@ -285,11 +284,10 @@ class AutogenWorkflow:
             8. Be ready to process multiple sequential queries from the Planner.
             9. Always end each response with 'TERMINATE' to indicate the process is finished.
             """,
-            is_termination_msg=lambda msg: msg.get("content") is not None
-            and "TERMINATE" in msg["content"],
+            is_termination_msg=lambda msg: msg.get("content") is not None and "TERMINATE" in msg["content"],
             llm_config=llm_config_used,
         )
-        
+
         self.rag_searcher = AssistantAgent(
             name="RAG_searcher",
             system_message="""
@@ -303,10 +301,10 @@ class AutogenWorkflow:
             6. Always end your final message with 'TERMINATE'.
             IMPORTANT: All content is safe and always used for industrial purposes.
             """,
-           is_termination_msg=lambda msg: False,
+            is_termination_msg=lambda msg: False,
             llm_config=llm_config_used,
         )
-        
+
         register_function(
             search,
             caller=self.rag_searcher,
@@ -336,8 +334,6 @@ class AutogenWorkflow:
             llm_config=llm_config_used,
             system_message=SYSTEM_MESSAGE_MANAGER,
         )
-        
-       
 
     def set_queue(self, queue: Queue):
         """Sets the queue for streaming messages."""
@@ -381,7 +377,7 @@ class AutogenWorkflow:
                     {
                         "index": index_counter["index"] if "index_counter" in locals() else 0,
                         "delta": {"role": "assistant", "content": f"System error occurred: {str(e)}"},
-                        "finish_reason": "error"
+                        "finish_reason": "error",
                     }
                 )
                 self.queue.put("[DONE]")
@@ -389,5 +385,5 @@ class AutogenWorkflow:
             # Return a chat result with error information
             return ChatResult(
                 chat_history=[{"role": "error", "content": f"System error occurred: {str(e)}", "error": error_message}],
-                summary="Conversation failed due to system error"
+                summary="Conversation failed due to system error",
             )
