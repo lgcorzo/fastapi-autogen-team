@@ -55,8 +55,6 @@ cover/
 *.mo
 *.pot
 
-# poetry
-*.lock
 
 # Django stuff:
 *.log
