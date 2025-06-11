@@ -261,7 +261,7 @@ class AutogenWorkflow:
             Rules:\n
             1. Receive all search results from the Planner.\n
             2. Synthesize the information into a comprehensive, coherent response.\n
-            3. Translate your final response back into the user's original language (detected by UserProxy).\n
+            3. Translate your final response back into the user's original language defined in the variable <User_language>.\n
             4. If no relevant data is found for any query, ask the user for clarification in their original language.\n
             5. Use only the information retrieved by the RAG_searcher to answer the question.\n
             6. Do NOT fabricate, assume, or infer any information that is not explicitly present in the retrieved documents.\n
@@ -271,10 +271,10 @@ class AutogenWorkflow:
             10. Always end each response with the word: TERMINATE \n
 
             Response Structure:\n
-            - Provide a clear, comprehensive answer based on retrieved information\n
+            - Provide a clear, comprehensive answer based on retrieved information in lenguaje User_language \n
             - Acknowledge if information is partial or if more details are needed\n
-            - Maintain the original language of the user's question\n
-            - Include relevant details from the search results\n""",
+            - Include relevant details from the search results\n 
+            TERMINATE""",
             is_termination_msg=lambda msg: msg.get("content") is not None and "TERMINATE" in msg["content"],
             llm_config=llm_config_used,
             description="The Quality_assurance agent synthesizes information and provides the final response to the user.",
@@ -316,7 +316,6 @@ class AutogenWorkflow:
             self.user_proxy: [self.planner],
             self.planner: [self.rag_searcher, self.quality_assurance],
             self.rag_searcher: [self.planner],
-            self.quality_assurance: [self.user_proxy],
         }
 
         self.group_chat_with_introductions = GroupChat(
