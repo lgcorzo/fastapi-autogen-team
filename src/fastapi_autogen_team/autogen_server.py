@@ -38,8 +38,16 @@ def serve_autogen(inp: Input) -> StreamingResponse | dict:
         model_dump = inp.model_dump()
         model_messages = model_dump["messages"]
         workflow = AutogenWorkflow()
-        # last_message = model_messages[-1]
-        full_prompt = "\n".join([f"{m['role'].capitalize()}: {m['content']}" for m in model_messages])
+
+        full_prompt = "\n".join([
+            f"{m['role'].capitalize()}: {c['text']}"
+            for m in model_messages
+            if isinstance(m['content'], str)  # caso simple
+            or any(c['type'] == 'text' for c in m['content'])  # hay texto entre los objetos
+            for c in (m['content'] if isinstance(m['content'], list) else [{'type': 'text', 'text': m['content']}])
+            if c['type'] == 'text'
+        ])
+
         if inp.stream:
             queue: Queue = Queue()
             workflow.set_queue(queue)
