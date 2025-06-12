@@ -13,9 +13,9 @@ from autogen import (
     GroupChat,
     GroupChatManager,
     OpenAIWrapper,
-    UserProxyAgent,
     register_function,
 )
+from autogen.agentchat.contrib.multimodal_conversable_agent import MultimodalConversableAgent
 from autogen.code_utils import content_str
 from autogen.io import IOStream
 from termcolor import colored
@@ -205,13 +205,16 @@ class AutogenWorkflow:
         llm_config_used = llm_config if llm_config is not None else create_llm_config()
         self.queue: Queue | None = None
 
-        self.user_proxy = UserProxyAgent(
+        
+        self.user_proxy = MultimodalConversableAgent(
             name="UserProxy",
             system_message="""You are the UserProxy. You are the user in this conversation. Follow these instructions: \n
             1. Detect the language of the last user message and send it to the rest of the team. \n
+            2. Extract the content of the image to text and pass only the text of the image to the planner
             2. Structure the input data as: \n
                 - User_language: <Detected language of the last user message> \n
                 - User_message: <last message of the user> \n
+                - Image_context: <las image text with the image explanation> \n
             3. Pass this structured information to the Planner for processing. \n""",
             human_input_mode="NEVER",
             code_execution_config=False,
