@@ -208,17 +208,13 @@ class AutogenWorkflow:
         
         self.user_proxy = MultimodalConversableAgent(
             name="UserProxy",
-            system_message="""You are the UserProxy. You are the user in this conversation. Follow these instructions: \n
-            1. Detect the language of the last user message and send it to the rest of the team. \n
-            2. Extract the content of the image to text and pass only the text of the image to the planner
-            2. Structure the input data as: \n
-                - User_language: <Detected language of the last user message> \n
-                - User_message: <last message of the user> \n
-                - Image_context: <las image text with the image explanation> \n
-            3. Pass this structured information to the Planner for processing. \n""",
+            system_message="""You are the UserProxy. You are the user in this conversation. Follow these instructions:\n
+            1. Detect the language from the text after the REQUEST: and send it to the rest of the team.\n
+            3. Pass this structured information to the Planner for processing.\n""",
             human_input_mode="NEVER",
             code_execution_config=False,
             llm_config=llm_config_used,
+            is_termination_msg=lambda msg: msg.get("content") is not None and "TERMINATE" in msg["content"],
             description="The UserProxy interacts with other agents in the group chat as the user.",
         )
 
@@ -228,23 +224,35 @@ class AutogenWorkflow:
             human_input_mode="NEVER",
             code_execution_config=False,
             llm_config=llm_config_used,
-            system_message="""You are the Planner. You manage the workflow and coordinate between the user and the RAG_searcher.\n
+            system_message="""You are the Planner. You manage the workflow and coordinate between
+            the user, the RAG_searcher and Quality_assurance.\n
             Rules:\n
             1. The user may speak any language. Detect the language of the user query from the UserProxy.\n
-            2. Analyze the user message and break it down into specific, focused search queries if needed.\n
-            3. For complex questions, separate them into distinct parts (e.g., different topics, timeframes, or aspects).\n
-            4. Translate each search query to English before sending to RAG_searcher.\n
-            5. ALL messages exchanged between you and RAG_searcher MUST be in English.\n
-            6. Send search queries one by one to RAG_searcher and wait for each response.\n
-            7. After receiving all search results, collect and organize the information.\n
-            8. Once you have all necessary information, pass it to Quality_assurance for final processing.\n
-            9. Track the progress of each query and ensure comprehensive coverage.\n
+            2. Structure the input data as: \n
+                - Last_message_language: <Detected language from REQUEST: not form the HISTORICS:>\n
+                - User_message: <last user message of the user REQUEST:> \n
+                - historic_message: <Summary of the assistant messages of the SHORT_MEMORY:> \n
+            3. Analyze the user message and break it down into specific, focused search queries if needed.\n
+                - If the is enougth information to complete the task in the historic_message send all to the
+                  Quality_assurance.\n
+                - if it is needed more inforamtion limit the queries to 2 calls to RAG_searcher.\n
+                - The lat task MUST send the informatiion to Quality_assurance.\n      
+            4. For complex questions, separate them into distinct parts
+            (e.g., different topics, timeframes, or aspects).\n
+            5. Translate each search query to English before sending to RAG_searcher.\n
+            6. ALL messages exchanged between you and RAG_searcher MUST be in English.\n
+            7. Send search queries one by one to RAG_searcher and wait for each response.\n
+            8. After receiving all search results, collect and organize the information.\n
+            9. Once you have all necessary information, pass it to Quality_assurance for final processing.\n
+            10. Track the progress of each query and ensure comprehensive coverage.\n
 
             Query Decomposition Strategy:\n
-                - Break complex questions into simpler, focused sub-questions\n
+                - Break complex questions into simpler maximun two, focused sub-questions\n
                 - Separate different topics or concepts mentioned in the user's message\n
                 - Create specific queries for different aspects (technical, procedural, regulatory, etc.)\n
                 - Use keywords and phrases that are likely to match document content\n
+                - call Quality_assurance\n
+                - Reduce to the minimun the calls to the RAG_searcher\n
 
             Example decomposition:\n
             User: "How do I install the new safety system and what are the maintenance requirements?"\n
@@ -260,23 +268,27 @@ class AutogenWorkflow:
 
         self.quality_assurance = AssistantAgent(
             name="Quality_assurance",
-            system_message="""You are the Quality_assurance agent. Your role is to ensure the quality and integrity of the final response.\n
+             system_message="""You are the Quality_assurance agent. Your role is to ensure the quality and integrity
+             of the final response.\n
             Rules:\n
-            1. Receive all search results from the Planner.\n
-            2. Synthesize the information into a comprehensive, coherent response.\n
-            3. Translate your final response back into the user's original language defined in the variable <User_language>.\n
-            4. If no relevant data is found for any query, ask the user for clarification in their original language.\n
+            1. ALWAYS USE THE Last_message_language value leanguage.\n
+            2. Receive all search results from the Planner.\n
+            3. Synthesize the information into a comprehensive, coherent response asnwering the concept of the problem of the
+            user.\n
+            4. If no relevant data to genererate a concept is found, ask the user for clarification.\n
             5. Use only the information retrieved by the RAG_searcher to answer the question.\n
-            6. Do NOT fabricate, assume, or infer any information that is not explicitly present in the retrieved documents.\n
+            6. Do NOT fabricate, assume, or infer any information that is not explicitly present in the retrieved
+            documents.\n
             7. All responses must be directly related to the industrial software/tools being discussed.\n
-            8. If the retrieved data is insufficient, politely ask the user for more details in their original language.\n
+            8. If the retrieved data is insufficient,
+            politely ask the user for more details in their original language.\n
             9. Ensure the response is complete, accurate, and helpful.\n
             10. Always end each response with the word: TERMINATE \n
 
             Response Structure:\n
-            - Provide a clear, comprehensive answer based on retrieved information in lenguaje User_language \n
+            - Provide a clear, comprehensive answer to the original  based on retrieved information\n
             - Acknowledge if information is partial or if more details are needed\n
-            - Include relevant details from the search results\n 
+            - Include relevant details from the search results NEVER URL only the name of the documents\n
             TERMINATE""",
             is_termination_msg=lambda msg: msg.get("content") is not None and "TERMINATE" in msg["content"],
             llm_config=llm_config_used,
@@ -285,8 +297,8 @@ class AutogenWorkflow:
 
         self.rag_searcher = AssistantAgent(
             name="RAG_searcher",
-            system_message="""You are the RAG_searcher. Your job is to query Azure AI Search and return accurate results.\n
-
+            system_message="""You are the RAG_searcher. Your job is to query Azure AI Search and return accurate
+            results.\n
             Rules:\n
             1. Search only using the English queries provided by the Planner.\n
             2. Use only the content retrieved from the Azure AI Search.\n
