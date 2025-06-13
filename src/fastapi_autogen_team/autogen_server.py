@@ -32,21 +32,70 @@ def handle_response(response: Output) -> dict:
         raise HTTPException(status_code=500, detail=f"Serialization error: {e}") from e
 
 
+def normalize_input_messages(inp: Input) -> str:
+    """Normalizes the input messages."""
+    model_dump = inp.model_dump()
+    model_messages = model_dump["messages"]
+
+    # Normalizamos los mensajes en bloques de texto plano
+    normalized_messages = []
+    for m in model_messages:
+        if m["role"] not in ("user", "assistant", "system"):
+            continue
+        if isinstance(m["content"], list):
+            content_blocks = m["content"]
+        elif isinstance(m["content"], str):
+            content_blocks = [{"type": "text", "text": m["content"]}]
+        else:
+            content_blocks = [m["content"]]
+
+        for c in content_blocks:
+            if c.get("type") == "text":
+                normalized_messages.append({"role": m["role"].capitalize(), "text": c["text"]})
+
+    # Extraer mensajes según rol
+    system_messages = [m for m in normalized_messages if m["role"] == "System"]
+    user_messages = [m for m in normalized_messages if m["role"] == "User"]
+
+    if not user_messages:
+        full_prompt = (
+            "'SHORT_MEMORY':{\n NO user message detected, finish the workflow  \n},\n" "'REQUEST':{\n TERMINATE \n}"
+        )
+
+        return full_prompt
+
+    last_user_index = max(i for i, m in enumerate(normalized_messages) if m["role"] == "User")
+    last_message = normalized_messages[last_user_index]
+    historic_messages = normalized_messages[:last_user_index]
+
+    # Construcción del prompt final
+    short_memory = "\n".join(f"{m['role']}: {m['text']}" for m in historic_messages if m["role"] != "System")
+
+    system_message = "\n".join(f"{m['role']}: {m['text']}" for m in system_messages if m["role"] != "System")
+    request = f"{last_message['role']}: {last_message['text']}"
+
+    full_prompt = (
+        "'SYSTEM_INFO':{\n" + system_message + "\n},\n"
+        "'SHORT_MEMORY':{\n" + short_memory + "\n},\n"
+        "'REQUEST':{\n" + request + "\n}"
+    )
+
+    return full_prompt
+
+
 def serve_autogen(inp: Input) -> StreamingResponse | dict:
     """Serves the autogen workflow based on the input (streaming or non-streaming)."""
     try:
-        model_dump = inp.model_dump()
-        model_messages = model_dump["messages"]
         workflow = AutogenWorkflow()
-        # last_message = model_messages[-1]
-        full_prompt = "\n".join([f"{m['role'].capitalize()}: {m['content']}" for m in model_messages])
+        norm_message = normalize_input_messages(inp)
+
         if inp.stream:
             queue: Queue = Queue()
             workflow.set_queue(queue)
-            Thread(target=workflow.run, args=(full_prompt, inp.stream)).start()
+            Thread(target=workflow.run, args=(norm_message, inp.stream)).start()
             return StreamingResponse(generate_streaming_response(inp, queue), media_type="text/event-stream")
         else:
-            result = workflow.run(message=str(full_prompt), stream=False)
+            result = workflow.run(message=str(norm_message), stream=False)
             # handle generator output
             if hasattr(result, "__next__"):
                 result = next(result)

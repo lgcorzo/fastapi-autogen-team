@@ -1,7 +1,17 @@
 import time
-from typing import List, Optional
+from typing import List, Optional, Dict, Literal, Union
 
 from pydantic import BaseModel
+
+
+class ContentImage(BaseModel):
+    type: Literal["image_url"]
+    image_url: Dict[str, str]  # {"url": "data:image/png;base64,..."}
+
+
+class ContentText(BaseModel):
+    type: Literal["text"]
+    text: str
 
 
 class ModelInformation(BaseModel):
@@ -17,7 +27,7 @@ class ModelInformation(BaseModel):
 
 class Message(BaseModel):
     role: str
-    content: str
+    content: Union[str, List[Union[ContentText, ContentImage]]]
 
 
 class Input(BaseModel):
