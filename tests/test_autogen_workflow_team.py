@@ -147,7 +147,7 @@ def test_handle_regular_message(mock_tool_calls, mock_function_call, mock_functi
     assert result == "Updated message 3"
 
 
-@patch("fastapi_autogen_team.autogen_workflow_team.UserProxyAgent")
+@patch("fastapi_autogen_team.autogen_workflow_team.MultimodalConversableAgent")
 @patch("fastapi_autogen_team.autogen_workflow_team.AssistantAgent")
 @patch("fastapi_autogen_team.autogen_workflow_team.GroupChat")
 @patch("fastapi_autogen_team.autogen_workflow_team.GroupChatManager")
@@ -159,10 +159,10 @@ def test_autogen_workflow_run_without_streaming(mock_manager, mock_group_chat, m
     mock_user_proxy.return_value = mock_user
 
     mock_assistant.side_effect = [
-        MagicMock(name="developer"),
+        MagicMock(name="UserProxy"),
         MagicMock(name="planner"),
         MagicMock(name="quality_assurance"),
-        MagicMock(name="rag_assurance"),
+        MagicMock(name="rag_searcher"),
     ]
 
     # Create and run workflow

@@ -205,7 +205,6 @@ class AutogenWorkflow:
         llm_config_used = llm_config if llm_config is not None else create_llm_config()
         self.queue: Queue | None = None
 
-        
         self.user_proxy = MultimodalConversableAgent(
             name="UserProxy",
             system_message="""You are the UserProxy. You are the user in this conversation. Follow these instructions:\n
@@ -268,7 +267,7 @@ class AutogenWorkflow:
 
         self.quality_assurance = AssistantAgent(
             name="Quality_assurance",
-             system_message="""You are the Quality_assurance agent. Your role is to ensure the quality and integrity
+            system_message="""You are the Quality_assurance agent. Your role is to ensure the quality and integrity
              of the final response.\n
             Rules:\n
             1. ALWAYS USE THE Last_message_language value leanguage.\n

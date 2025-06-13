@@ -51,9 +51,7 @@ def normalize_input_messages(inp: Input) -> str:
 
         for c in content_blocks:
             if c.get("type") == "text":
-                normalized_messages.append(
-                    {"role": m["role"].capitalize(), "text": c["text"]}
-                )
+                normalized_messages.append({"role": m["role"].capitalize(), "text": c["text"]})
 
     # Extraer mensajes según rol
     system_messages = [m for m in normalized_messages if m["role"] == "System"]
@@ -61,26 +59,19 @@ def normalize_input_messages(inp: Input) -> str:
 
     if not user_messages:
         full_prompt = (
-            "'SHORT_MEMORY':{\n NO user message detected, finish the workflow  \n},\n"
-            "'REQUEST':{\n TERMINATE \n}"
+            "'SHORT_MEMORY':{\n NO user message detected, finish the workflow  \n},\n" "'REQUEST':{\n TERMINATE \n}"
         )
 
         return full_prompt
 
-    last_user_index = max(
-        i for i, m in enumerate(normalized_messages) if m["role"] == "User"
-    )
+    last_user_index = max(i for i, m in enumerate(normalized_messages) if m["role"] == "User")
     last_message = normalized_messages[last_user_index]
     historic_messages = normalized_messages[:last_user_index]
 
     # Construcción del prompt final
-    short_memory = "\n".join(
-        f"{m['role']}: {m['text']}" for m in historic_messages if m["role"] != "System"
-    )
-    
-    system_message = "\n".join(
-        f"{m['role']}: {m['text']}" for m in system_messages if m["role"] != "System"
-    )
+    short_memory = "\n".join(f"{m['role']}: {m['text']}" for m in historic_messages if m["role"] != "System")
+
+    system_message = "\n".join(f"{m['role']}: {m['text']}" for m in system_messages if m["role"] != "System")
     request = f"{last_message['role']}: {last_message['text']}"
 
     full_prompt = (
@@ -95,11 +86,9 @@ def normalize_input_messages(inp: Input) -> str:
 def serve_autogen(inp: Input) -> StreamingResponse | dict:
     """Serves the autogen workflow based on the input (streaming or non-streaming)."""
     try:
-        
         workflow = AutogenWorkflow()
         norm_message = normalize_input_messages(inp)
 
-        
         if inp.stream:
             queue: Queue = Queue()
             workflow.set_queue(queue)
