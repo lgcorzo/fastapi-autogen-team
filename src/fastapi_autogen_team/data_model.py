@@ -1,7 +1,7 @@
 import time
 from typing import List, Optional, Dict, Literal, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ContentImage(BaseModel):
@@ -28,10 +28,12 @@ class ModelInformation(BaseModel):
 class Message(BaseModel):
     role: str
     content: Union[str, List[Union[ContentText, ContentImage]]]
+    name: Optional[str] = None
 
 
 class Input(BaseModel):
-    model: str
+    model: str 
+    user: Optional[str] = "autogen_rag"
     messages: List[Message]
     temperature: float = 1
     top_p: float = 1
@@ -43,7 +45,7 @@ class Input(BaseModel):
 class Output(BaseModel):
     id: str
     object: str = "chat.completion"
-    created: int = int(time.time())
+    created: int = Field(default_factory=lambda: int(time.time()))
     model: str
     choices: List
     usage: dict

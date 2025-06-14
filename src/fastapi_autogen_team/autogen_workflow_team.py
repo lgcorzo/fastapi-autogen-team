@@ -27,8 +27,11 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
-def create_llm_config(config_list: list[dict] | None = None, temperature: int = 0, timeout: int = 240) -> dict:
-    """Creates a llm configuration for autogen agents."""
+def create_llm_config(config_list: list[dict] | None = None,
+                      user:str = "autogen_rag",
+                      temperature: int = 0,
+                      timeout: int = 240) -> dict:
+    """Creates a llm configuration for autogen agents with user tracking."""
     config_list_used = (
         config_list
         if config_list is not None
@@ -37,6 +40,10 @@ def create_llm_config(config_list: list[dict] | None = None, temperature: int = 
                 "model": "azure-gpt",
                 "api_key": "sk-12345",
                 "base_url": "http://litellm:4000",  # Your LiteLLM URL
+                "default_headers": {
+                    "x-openwebui-user-id": user
+                },
+                "tags": [user],
             },
         ]
     )
@@ -200,9 +207,9 @@ def handle_suggested_tool_calls(tool_calls: list[dict], iostream: IOStream, stre
 class AutogenWorkflow:
     """A class for managing an Autogen workflow with multiple agents."""
 
-    def __init__(self, llm_config: dict | None = None):
+    def __init__(self, llm_config: dict | None = None, user: str | None = None):
         """Initializes the AutogenWorkflow with default agents and configurations."""
-        llm_config_used = llm_config if llm_config is not None else create_llm_config()
+        llm_config_used = llm_config if llm_config is not None else create_llm_config(user=user)
         self.queue: Queue | None = None
 
         self.user_proxy = MultimodalConversableAgent(
