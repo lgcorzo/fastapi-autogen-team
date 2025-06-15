@@ -13,8 +13,10 @@ from fastapi_autogen_team.main import (
 
 class MockRequest:
     """Mock FastAPI Request with optional headers."""
+
     def __init__(self, headers=None):
         self.headers = headers or {}
+
 
 @pytest.fixture
 def mock_app():
