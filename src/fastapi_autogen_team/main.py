@@ -2,7 +2,7 @@ import os
 import logging
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from starlette.responses import RedirectResponse
 from apscheduler.schedulers.background import BackgroundScheduler
 from opentelemetry import metrics, trace
@@ -153,9 +153,15 @@ async def get_models() -> dict:
 
 
 @app.post(API_PREFIX + "/chat/completions")
-async def route_query(model_input: Input) -> dict:
+async def route_query(model_input: Input, request: Request) -> dict:
     """Handles chat completion requests."""
-    log_with_trace(f"Chat completion request for model: {model_input.model}")
+    header_user_id = request.headers.get("x-openwebui-user-id")
+
+    # Overwrite model_input.user if header value is provided
+    if header_user_id:
+        model_input.user = header_user_id
+
+    log_with_trace(f"Chat completion request for model: {model_input.model}, user: {model_input.user}")
     model_services = {model_info.name: serve_autogen}
     service = model_services.get(model_input.model)
 

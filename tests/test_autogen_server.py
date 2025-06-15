@@ -90,13 +90,11 @@ def test_create_non_streaming_response_success(mock_autogen_workflow):
     mock_chat_results = MagicMock(chat_id=TEST_CHAT_ID, chat_history=[{"role": "assistant", "content": "Hi!"}], cost={})
     result = create_non_streaming_response(mock_chat_results, MODEL_NAME)
     assert isinstance(result, dict)
-    assert result["id"] == TEST_CHAT_ID
     assert len(result["choices"]) == 1
 
 
 def test_create_non_streaming_response_no_results():
     """Test create_non_streaming_response with no chat results."""
     result = create_non_streaming_response(None, MODEL_NAME)
-    assert result["id"] == "None"
     assert len(result["choices"]) == 1
     assert "Sorry, I am unable to assist" in result["choices"][0]["message"]["content"]

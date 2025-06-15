@@ -11,6 +11,13 @@ from fastapi_autogen_team.main import (
 )
 
 
+class MockRequest:
+    """Mock FastAPI Request with optional headers."""
+
+    def __init__(self, headers=None):
+        self.headers = headers or {}
+
+
 @pytest.fixture
 def mock_app():
     """Fixture to mock FastAPI app and dependencies."""
@@ -84,57 +91,31 @@ async def test_get_models(mock_app):
 
 
 @pytest.mark.asyncio
-async def test_route_query_valid_model(mock_app):
-    """Test that the route_query function calls serve_autogen with a valid model."""
-    (
-        mock_app,
-        mock_scheduler,
-        MockFastAPI,
-        MockBackgroundScheduler,
-        MockInstrumentApp,
-        MockOTLPSpanExporter,
-        MockBatchSpanProcessor,
-        MockTracerProvider,
-        MockPeriodicExportingMetricReader,
-        MockOTLPMetricExporter,
-        MockMeterProvider,
-        MockSetMeterProvider,
-        MockLoggingBasicConfig,
-        MockTraceSetTracerProvider,
-        MockLoadDotenv,
-        MockGetEnv,
-    ) = mock_app
+async def test_route_query_valid_model():
+    """Test that route_query calls serve_autogen with a valid model."""
+    test_input = Input(model="internal-gpt", messages=[{"role": "user", "content": "Hello"}])
+    mock_request = MockRequest(headers={"x-openwebui-user-id": "test-user"})
 
-    with patch("fastapi_autogen_team.main.serve_autogen") as MockServeAutogen:
-        test_input = Input(model="internal-gpt", messages=[{"role": "user", "content": "Hello"}])
-        await route_query(test_input)
-        MockServeAutogen.assert_called_once_with(test_input)
+    with patch("fastapi_autogen_team.main.serve_autogen", return_value={"result": "ok"}) as mock_serve:
+        with patch("fastapi_autogen_team.main.log_with_trace") as mock_log:
+            result = await route_query(test_input, mock_request)
+
+    mock_serve.assert_called_once_with(test_input)
+    mock_log.assert_called_once()
+    assert result == {"result": "ok"}
+    assert test_input.user == "test-user"
 
 
 @pytest.mark.asyncio
-async def test_route_query_invalid_model(mock_app):
-    """Test that route_query raises an HTTPException when an invalid model is specified."""
-    (
-        mock_app,
-        mock_scheduler,
-        MockFastAPI,
-        MockBackgroundScheduler,
-        MockInstrumentApp,
-        MockOTLPSpanExporter,
-        MockBatchSpanProcessor,
-        MockTracerProvider,
-        MockPeriodicExportingMetricReader,
-        MockOTLPMetricExporter,
-        MockMeterProvider,
-        MockSetMeterProvider,
-        MockLoggingBasicConfig,
-        MockTraceSetTracerProvider,
-        MockLoadDotenv,
-        MockGetEnv,
-    ) = mock_app
-    with pytest.raises(HTTPException) as exc_info:
-        test_input = Input(model="invalid_model", messages=[{"role": "user", "content": "Hello"}])
-        await route_query(test_input)
+async def test_route_query_invalid_model():
+    """Test that route_query raises HTTPException when an invalid model is passed."""
+    test_input = Input(model="nonexistent-model", messages=[{"role": "user", "content": "Hello"}])
+    mock_request = MockRequest()
+
+    with patch("fastapi_autogen_team.main.log_with_trace"):
+        with pytest.raises(HTTPException) as exc_info:
+            await route_query(test_input, mock_request)
+
     assert exc_info.value.status_code == 404
     assert "Model not found" in exc_info.value.detail
 
