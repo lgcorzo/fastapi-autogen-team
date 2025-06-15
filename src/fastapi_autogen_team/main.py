@@ -155,7 +155,7 @@ async def get_models() -> dict:
 @app.post(API_PREFIX + "/chat/completions")
 async def route_query(model_input: Input) -> dict:
     """Handles chat completion requests."""
-    log_with_trace(f"Chat completion request for model: {model_input.model}")
+    log_with_trace(f"Chat completion request for model: {model_input.model}, {model_input.user}")
     model_services = {model_info.name: serve_autogen}
     service = model_services.get(model_input.model)
 
