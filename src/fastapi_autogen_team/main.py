@@ -160,7 +160,7 @@ async def route_query(model_input: Input, request: Request) -> dict:
     # Overwrite model_input.user if header value is provided
     if header_user_id:
         model_input.user = header_user_id
-        
+
     log_with_trace(f"Chat completion request for model: {model_input.model}, user: {model_input.user}")
     model_services = {model_info.name: serve_autogen}
     service = model_services.get(model_input.model)

@@ -32,7 +32,7 @@ class Message(BaseModel):
 
 
 class Input(BaseModel):
-    model: str 
+    model: str
     user: Optional[str] = "autogen_rag"
     messages: List[Message]
     temperature: float = 1
