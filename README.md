@@ -210,9 +210,57 @@ The   project  want  to  create  a streaming interface for OpenAI-compatible mod
 ### 3. **Project Structure**
    - **Main Files:**
      - `src/fastapi_autogen_team/main.py`: Entry point for the FastAPI application; handles environment variables and routes.
-     - `src/fastapi_autogen_teamdata_model.py`: Defines request/response models using Pydantic (compatible with OpenAI).
-     - `src/fastapi_autogen_teamautogen_workflow.py`: Contains logic for the AutoGen workflows and interactions.
-     - `src/fastapi_autogen_teamautogen_server.py`: Implements handling of streaming and non-streaming client requests.
+     - `src/fastapi_autogen_team/data_model.py`: Defines request/response models using Pydantic (compatible with OpenAI).
+     - `src/fastapi_autogen_team/autogen_workflow_team.py`: Contains logic for the AutoGen workflows and interactions.
+     - `src/fastapi_autogen_team/autogen_server.py`: Implements handling of streaming and non-streaming client requests.
+
+```mermaid
+classDiagram
+    class Input {
+        messages: list[Message]
+        model: str
+        stream: bool
+    }
+    class Message {
+        role: str
+        content: str
+    }
+    class Output {
+        choices: list[dict]
+    }
+    class ModelInformation {
+        id: str
+        name: str
+    }
+    class AutogenWorkflow {
+        llm_config: dict
+        user: str
+        queue: Queue
+        run(message: str, stream: bool) : ChatResult
+    }
+
+    Input -- Message : contains
+    Output -- dict : contains
+    AutogenWorkflow -- Queue : uses
+```
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant FastAPI
+    participant autogen_server.py
+    participant autogen_workflow_team.py
+    participant AutoGen Agent
+
+    Client->>FastAPI: POST /chat/completions
+    FastAPI->>autogen_server.py: serve_autogen(Input)
+    autogen_server.py->>autogen_workflow_team.py: AutogenWorkflow.run(message, stream)
+    autogen_workflow_team.py->>AutoGen Agent: Send message
+    AutoGen Agent-->>autogen_workflow_team.py: Receive response
+    autogen_workflow_team.py-->>autogen_server.py: Return response
+    autogen_server.py-->>FastAPI: Return response
+    FastAPI-->>Client: Return response
+```
 
 ---
 
