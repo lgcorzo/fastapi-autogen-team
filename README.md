@@ -185,7 +185,7 @@ The   project  want  to  create  a streaming interface for OpenAI-compatible mod
 ### 2. **Project Setup**
    - **Installation:** 
      - Steps include cloning a GitHub repository and setting up a Python environment (with Python 3.11 and Poetry).
-     - Key dependencies are `FastAPI` and `pyautogen`.
+     - Key dependencies are `FastAPI` and `ag2`.
 
    - **Environment Variables:** 
      - An OpenAI API key is required, which should be stored in environment variables or an `.env` file.
