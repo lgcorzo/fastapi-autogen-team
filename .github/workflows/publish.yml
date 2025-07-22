@@ -45,7 +45,6 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: fastapi-autoge-team-env
-      url: https://hub.docker.com/u/lgcorzo
     permissions:
       contents: read
       id-token: write
