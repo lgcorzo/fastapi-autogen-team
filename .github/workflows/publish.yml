@@ -43,7 +43,12 @@ jobs:
   packages:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    environment: fastapi-autoge-team-env
+    environment:
+      name: fastapi-autoge-team-env
+      url: https://hub.docker.com/u/lgcorzo  # Opcional, para mostrar info en la UI
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Checkout repository
