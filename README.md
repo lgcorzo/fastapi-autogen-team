@@ -32,6 +32,15 @@ The package leverages several tools and tips to make your MLOps experience as fl
     - [7. **Testing**](#7-testing)
     - [8. **Conclusion**](#8-conclusion)
   - [References:](#references)
+- [📘 RAG with Confluence (AutoGen v2)](#-rag-with-confluence-autogen-v2)
+  - [🎯 Objective](#-objective)
+  - [🔐 Prerequisites](#-prerequisites)
+  - [🧱 `confluence_search_tool.py`: AutoGen Tool Example](#-confluence_search_toolpy-autogen-tool-example)
+  - [🤖 Integrating with an AutoGen Agent](#-integrating-with-an-autogen-agent)
+  - [🧪 Example Usage](#-example-usage)
+  - [🧠 CQL Translator Prompt Template (Agent)](#-cql-translator-prompt-template-agent)
+    - [Usage Example](#usage-example)
+  - [✅ Next Steps](#-next-steps)
 
 # Install
 
@@ -201,9 +210,57 @@ The   project  want  to  create  a streaming interface for OpenAI-compatible mod
 ### 3. **Project Structure**
    - **Main Files:**
      - `src/fastapi_autogen_team/main.py`: Entry point for the FastAPI application; handles environment variables and routes.
-     - `src/fastapi_autogen_teamdata_model.py`: Defines request/response models using Pydantic (compatible with OpenAI).
-     - `src/fastapi_autogen_teamautogen_workflow.py`: Contains logic for the AutoGen workflows and interactions.
-     - `src/fastapi_autogen_teamautogen_server.py`: Implements handling of streaming and non-streaming client requests.
+     - `src/fastapi_autogen_team/data_model.py`: Defines request/response models using Pydantic (compatible with OpenAI).
+     - `src/fastapi_autogen_team/autogen_workflow_team.py`: Contains logic for the AutoGen workflows and interactions.
+     - `src/fastapi_autogen_team/autogen_server.py`: Implements handling of streaming and non-streaming client requests.
+
+```mermaid
+classDiagram
+    class Input {
+        messages: list[Message]
+        model: str
+        stream: bool
+    }
+    class Message {
+        role: str
+        content: str
+    }
+    class Output {
+        choices: list[dict]
+    }
+    class ModelInformation {
+        id: str
+        name: str
+    }
+    class AutogenWorkflow {
+        llm_config: dict
+        user: str
+        queue: Queue
+        run(message: str, stream: bool) : ChatResult
+    }
+
+    Input -- Message : contains
+    Output -- dict : contains
+    AutogenWorkflow -- Queue : uses
+```
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant FastAPI
+    participant autogen_server.py
+    participant autogen_workflow_team.py
+    participant AutoGen Agent
+
+    Client->>FastAPI: POST /chat/completions
+    FastAPI->>autogen_server.py: serve_autogen(Input)
+    autogen_server.py->>autogen_workflow_team.py: AutogenWorkflow.run(message, stream)
+    autogen_workflow_team.py->>AutoGen Agent: Send message
+    AutoGen Agent-->>autogen_workflow_team.py: Receive response
+    autogen_workflow_team.py-->>autogen_server.py: Return response
+    autogen_server.py-->>FastAPI: Return response
+    FastAPI-->>Client: Return response
+```
 
 ---
 
@@ -265,3 +322,231 @@ Would you like me to delve deeper into any specific section?
 ## References: 
 https://newsletter.victordibia.com/p/integrating-autogen-agents-into-your
 https://medium.com/@moustafa.abdelbaky/building-an-openai-compatible-streaming-interface-using-server-sent-events-with-fastapi-and-8f014420bca7
+
+Here is the **restructured, ordered, and translated version** of your document in **clear English**, organized into logical sections for better readability and production readiness:
+
+---
+
+# 📘 RAG with Confluence (AutoGen v2)
+
+The goal is to retrieve relevant content from **Confluence Cloud** using its REST API and **CQL (Confluence Query Language)**. This enables real-time information access for RAG (Retrieval-Augmented Generation) applications.
+
+We will implement an **AutoGen v2 (ag2) tool** that queries Confluence using CQL and returns clean page content to be used by a conversational agent.
+
+---
+
+## 🎯 Objective
+
+Build a tool named `confluence_search_tool` that:
+
+1. Queries the **Confluence Cloud REST API** using CQL.
+2. Returns relevant content from pages, cleaned of HTML.
+3. Can be called by an AutoGen agent in a RAG system as an external knowledge source.
+
+---
+
+## 🔐 Prerequisites
+
+To connect to Confluence, you'll need:
+
+* ✅ A **Confluence Cloud** account.
+* ✅ An **API token** from your Atlassian account:
+  [https://id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
+* ✅ Your **Atlassian email address**.
+* ✅ The base domain of your Confluence instance (e.g. `https://yourcompany.atlassian.net/wiki`).
+
+---
+
+## 🧱 `confluence_search_tool.py`: AutoGen Tool Example
+
+```python
+import requests
+from autogen import Tool
+import base64
+from bs4 import BeautifulSoup
+
+class ConfluenceSearchTool(Tool):
+    def __init__(self, confluence_base_url, email, api_token, space_key=None):
+        super().__init__(name="confluence_search_tool", description="Searches Confluence pages using CQL")
+        self.base_url = confluence_base_url
+        self.email = email
+        self.api_token = api_token
+        self.space_key = space_key
+
+        token_bytes = f"{email}:{api_token}".encode("utf-8")
+        self.auth_header = {
+            "Authorization": f"Basic {base64.b64encode(token_bytes).decode('utf-8')}",
+            "Accept": "application/json"
+        }
+
+    def cql_search(self, query):
+        url = f"{self.base_url}/rest/api/content/search"
+        params = {
+            "cql": query,
+            "expand": "body.storage,version"
+        }
+        response = requests.get(url, headers=self.auth_header, params=params)
+        response.raise_for_status()
+        return response.json()
+
+    def parse_html(self, html):
+        soup = BeautifulSoup(html, "html.parser")
+        return soup.get_text(separator="\n")
+
+    def run(self, query: str) -> str:
+        cql = f'type="page" AND text~"{query}"'
+        if self.space_key:
+            cql += f' AND space="{self.space_key}"'
+
+        try:
+            results = self.cql_search(cql)
+            pages = results.get("results", [])
+            if not pages:
+                return "No relevant results found in Confluence."
+
+            output = []
+            for page in pages[:3]:
+                title = page["title"]
+                content_html = page["body"]["storage"]["value"]
+                content_text = self.parse_html(content_html)
+                snippet = content_text[:1000] + ("..." if len(content_text) > 1000 else "")
+                url = f"{self.base_url}/spaces/{page['space']['key']}/pages/{page['id']}"
+                output.append(f"📄 **{title}**\n{snippet}\n🔗 {url}")
+
+            return "\n\n".join(output)
+
+        except Exception as e:
+            return f"Error querying Confluence: {str(e)}"
+```
+
+---
+
+## 🤖 Integrating with an AutoGen Agent
+
+```python
+from autogen import ConversableAgent
+from confluence_search_tool import ConfluenceSearchTool
+
+confluence_tool = ConfluenceSearchTool(
+    confluence_base_url="https://yourcompany.atlassian.net/wiki",
+    email="you@yourcompany.com",
+    api_token="your_token",
+    space_key="DOCS"  # Optional
+)
+
+rag_agent = ConversableAgent(
+    name="RAG_searcher",
+    llm_config={"config_list": config_list},
+    tools=[confluence_tool]
+)
+```
+
+---
+
+## 🧪 Example Usage
+
+Ask your agent:
+
+> What documentation exists about the auto-nesting module in version 2024?
+
+The agent will:
+
+* Trigger `confluence_search_tool`
+* Search for pages matching `"auto-nesting"` in the `DOCS` space
+* Return up to 3 relevant results with clean snippets and URLs
+
+---
+
+## 🧠 CQL Translator Prompt Template (Agent)
+
+You can also create a helper agent that **transforms natural language into CQL queries**:
+
+```python
+cql_prompt = """
+You are a CQL (Confluence Query Language) expert. Your task is to convert natural language questions into valid CQL queries to retrieve content from Confluence Cloud.
+
+## Rules:
+- Always return only the raw CQL query string, nothing else.
+- The default content type is "page".
+- Use `text ~ "..."` to match content.
+- If the user asks about labels, versions, or categories, use `label = "..."` or `label in (...)`.
+- If the user mentions a specific space, use `space = "..."`.
+- If a date range is included, use `lastmodified >=` or `created >=` (ISO 8601 format: YYYY-MM-DD).
+- When appropriate, combine multiple conditions with AND/OR.
+
+## Examples:
+
+### User:
+Find documentation about microjoints issues
+
+### CQL:
+type = "page" AND text ~ "microjoints" AND text ~ "issue"
+
+---
+
+### User:
+Tickets related to nesting failures in the DOCS space
+
+### CQL:
+space = "DOCS" AND type = "page" AND text ~ "nesting" AND text ~ "failure"
+
+---
+
+### User:
+Pages labeled with cutting or laser in engineering space
+
+### CQL:
+space = "ENGINEERING" AND label in ("cutting", "laser") AND type = "page"
+
+---
+
+### User:
+All pages mentioning bending created after January 1, 2024
+
+### CQL:
+type = "page" AND text ~ "bending" AND created >= "2024-01-01"
+
+---
+
+Now process this user query:
+
+{query}
+"""
+```
+
+---
+
+### Usage Example
+
+```python
+from autogen import ConversableAgent
+
+CQL_translator = ConversableAgent(
+    name="CQL_Translator",
+    llm_config={
+        "config_list": config_list,
+        "temperature": 0,
+        "system_message": "You are an expert in transforming text into CQL queries."
+    },
+    prompt_template=cql_prompt
+)
+```
+
+Then use it like this:
+
+```python
+query = "Show me documents about laser failures in the MANUALS space"
+CQL_translator.generate_reply(messages=[{"role": "user", "content": query}])
+```
+
+---
+
+## ✅ Next Steps
+
+Would you like help with:
+
+1. A production-grade version (with retries, logging, pagination)?
+2. Combining this tool with your Azure AI Search vector index?
+3. Integrating it into your current `ManualsRAGnWorkflow` flow?
+
+Let me know what you'd like to prioritize.
