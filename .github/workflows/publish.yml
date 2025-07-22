@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: fastapi-autoge-team-env
-      url: https://hub.docker.com/u/lgcorzo  # Opcional, para mostrar info en la UI
+      url: https://hub.docker.com/u/lgcorzo
     permissions:
       contents: read
       id-token: write
@@ -66,6 +66,7 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
+          registry: docker.io
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
           
