@@ -19,8 +19,7 @@ jobs:
   pages:
     name: Deploy Docs to GitHub Pages
     runs-on: ubuntu-latest
-    environment:
-      name: fastapi-autoge-team-env
+    environment: fastapi-autoge-team-env
 
     steps:
       - name: Checkout repository
@@ -45,8 +44,7 @@ jobs:
   packages:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    environment:
-      name: fastapi-autoge-team-env
+    environment: fastapi-autoge-team-env
 
     steps:
       - name: Checkout repository
