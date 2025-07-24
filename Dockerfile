@@ -1,5 +1,5 @@
 # https://docs.docker.com/engine/reference/builder/
-FROM python:3.11
+FROM python:3.11-slim
 COPY dist/*.whl .
 RUN pip install *.whl
 # Ejecuta la función main() del módulo controller.kafka_app
