@@ -75,6 +75,3 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha
           tags: ${{ env.DOCKER_IMAGE }}:latest,${{ env.DOCKER_IMAGE }}:${{ github.ref_name }}
-
-      - name: Show image tags
-        run: 'echo "Published tags: latest and ${''{{ github.ref_name }}''}"'
