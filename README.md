@@ -61,11 +61,13 @@ This section details the requirements, actions, and next steps to kickstart your
     or https
     $ git clone https://github.com/lgcorzo/fastapi-autogen-team
     ```
-2.  Run the project installation with poetry
+2.  Run the project installation with poetry ( install poetry in the base  env )
 
     ```bash
     $ cd fastapi-autogen-team/
+    $ poetry env use $(which python)
     $ poetry install
+    $ poetry env activate
     ```
 
     ```bash
