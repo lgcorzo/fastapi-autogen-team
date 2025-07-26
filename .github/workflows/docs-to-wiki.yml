@@ -6,7 +6,7 @@ on:
       - master
       - main
     paths:
-      - "documentation/**"
+      - "wiki/**"
   repository_dispatch:
     types: [docs]
   workflow_dispatch:
@@ -27,7 +27,7 @@ jobs:
       - name: Sync docs folder to wiki
         uses: newrelic/wiki-sync-action@v1.0.1
         with:
-          source: docs
+          source: wiki
           destination: wiki
           token: ${{ secrets.WIKI_SYNC_SECRET }}
           gitAuthorName: ${{ env.GIT_AUTHOR_NAME }}
