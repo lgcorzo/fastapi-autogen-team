@@ -13,9 +13,10 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Sync docs to wiki
-        uses: devops-infra/github-docs-to-wiki@v1.5.0
+
+      - name: github-docs-to-wiki
+        uses: cmbrose/github-docs-to-wiki@v0.20
         with:
-          path: docs
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit_message: "Sync docs to wiki"
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          rootDocsFolder: documentation
+          convertRootReadmeToHomePage: true
