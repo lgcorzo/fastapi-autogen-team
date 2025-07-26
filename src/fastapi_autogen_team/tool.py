@@ -24,7 +24,7 @@ def search(query: str):
     try:
         # Ejecuta un nuevo event loop y espera a que termine
         return asyncio.run(async_search(query))
-    except RuntimeError as e:
+    except RuntimeError:
         # Si ya hay un event loop corriendo (p.ej., si se llama dentro de otro loop)
         # Usa el loop existente pero espera el resultado sincrónicamente
         logger.warning("Event loop ya en ejecución. Usando alternativa con create_task y threading.")
