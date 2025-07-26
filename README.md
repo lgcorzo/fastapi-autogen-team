@@ -313,7 +313,8 @@ Would you like me to delve deeper into any specific section?
 
 
 
-## References: 
+## References:
+https://github.com/lgcorzo/fastapi-autogen-team.wiki.git
 https://newsletter.victordibia.com/p/integrating-autogen-agents-into-your
 https://medium.com/@moustafa.abdelbaky/building-an-openai-compatible-streaming-interface-using-server-sent-events-with-fastapi-and-8f014420bca7
 
