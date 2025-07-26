@@ -1,5 +1,5 @@
 # https://python-poetry.org/docs/configuration/
 
 [virtualenvs]
-in-project = false
+in-project = true
 prefer-active-python = true
