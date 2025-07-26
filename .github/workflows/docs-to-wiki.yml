@@ -1,0 +1,21 @@
+name: Sync Docs to Wiki
+
+on:
+  push:
+    paths:
+      - 'documentation/**'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Sync docs to wiki
+        uses: docker://ghcr.io/devops-infra/github-docs-to-wiki:latest
+        env:
+          GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WIKI_PUSH_MESSAGE: "Sync docs to wiki"
+          DOCS_FOLDER: docs
