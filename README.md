@@ -1,4 +1,3 @@
-
 # Fastapi-Autogen-team Python Package
 
 [![check.yml](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/check.yml/badge.svg)](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/check.yml)
@@ -8,11 +7,9 @@
 [![Release](https://img.shields.io/github/v/release/lgcorzo/fastapi-autogen-team)](https://github.com/lgcorzo/fastapi-autogen-team/releases)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lgcorzo/fastapi-autogen-team)
 
-**This repository contains a Python codebase with best practices designed to support your MLOps initiatives if the project fasyapi-autogen-teams**
+**This repository contains a Python codebase designed as an MLOps template application using FastAPI and Microsoft AutoGen. It focuses on creating a streaming interface for OpenAI-compatible models, enabling real-time interactions suitable for applications like LiteLLM and other OpenAI-compatible apps.**
 
-The package leverages several tools and tips to make your MLOps experience as flexible, robust, and productive as possible. You can use this package as part of your MLOps toolkit or platform (e.g., Model Registry, Experiment Tracking, Realtime Inference).
-
-
+The package leverages several tools and best practices to make your MLOps experience as flexible, robust, and productive as possible. You can use this package as part of your MLOps toolkit or platform (e.g., Model Registry, Experiment Tracking, Realtime Inference).
 
 # Table of Contents
 
@@ -22,6 +19,9 @@ The package leverages several tools and tips to make your MLOps experience as fl
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Next Steps](#next-steps)
+  - [Usage](#usage)
+    - [Example Request](#example-request)
+    - [Expected Response](#expected-response)
   - [Automation](#automation)
   - [Workflows](#workflows)
     - [1. **Project Purpose**](#1-project-purpose)
@@ -53,7 +53,7 @@ This section details the requirements, actions, and next steps to kickstart your
     or https
     $ git clone https://github.com/lgcorzo/fastapi-autogen-team
     ```
-2.  Run the project installation with poetry ( install poetry in the base  env )
+2.  Run the project installation with poetry (install poetry in the base environment)
 
     ```bash
     $ cd fastapi-autogen-team/
@@ -68,7 +68,7 @@ This section details the requirements, actions, and next steps to kickstart your
 
 ## Next Steps
 
-Going from there, there are dozens of ways to integrate this package to your MLOps platform. For instance, you can use Databricks or AWS as your compute platform and model registry. It's up to you to adapt the package code to the solution you target.
+Going from there, there are dozens of ways to integrate this package into your MLOps platform. For instance, you can use Databricks or AWS as your compute platform and model registry. It's up to you to adapt the package code to the solution you target.
 
 Debugging in VS Code is possible with the following configuration:
 
@@ -97,10 +97,36 @@ In production, you can build, ship, and run the project as a Python package:
 poetry build
 poetry publish # optional
 python -m pip install [package]
-[package] confs/inference.yaml
 
-## added mocogpt for integration test if you need to simualte a chatgpt call
+## added mocogpt for integration test if you need to simulate a chatgpt call
 poetry add --group checks "mocogpt[cli]@git+https://github.com/lgcorzo/mocogpt.git"
+```
+
+## Usage
+
+To use the application, send requests to the FastAPI server. Here are some example requests:
+
+### Example Request
+```bash
+curl -X POST "http://localhost:8000/chat/completions" -H "Content-Type: application/json" -d '{
+  "messages": [{"role": "user", "content": "Hello!"}],
+  "model": "gpt-3.5-turbo",
+  "stream": true
+}'
+```
+
+### Expected Response
+```json
+{
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "Hello! How can I assist you today?"
+      }
+    }
+  ]
+}
 ```
 
 ## Automation
@@ -169,6 +195,17 @@ $ inv --list
 *   **projects.requirements** - Export the project requirements file.
 
 ## Workflows
+This package supports two GitHub Workflows in `.github/workflows`:
+
+*   `check.yml`: Validate the quality of the package on each Pull Request
+*   `publish.yml`: Build and publish the docs and packages on code release.
+*   `docs-to-wiki.yml`:publish the docs and packages on the wiki.
+
+The GitHub Actions pipelines automate the following tasks:
+- **Continuous Integration (CI)**: The `check.yml` workflow runs on every pull request to ensure that the code meets quality standards. It includes linting, testing, and type checking.
+- **Continuous Deployment (CD)**: The `publish.yml` workflow triggers on releases, automatically building and publishing the documentation and packages to the appropriate repositories.
+
+You can use and extend these workflows to automate repetitive package management tasks.
 
 This package supports two GitHub Workflows in `.github/workflows`:
 
@@ -177,9 +214,8 @@ This package supports two GitHub Workflows in `.github/workflows`:
 
 You can use and extend these workflows to automate repetitive package management tasks.
 
-
 ### 1. **Project Purpose**
-The   project  want  to  create  a streaming interface for OpenAI-compatible models using **FastAPI** and **Microsoft AutoGen**. It uses **Server-Sent Events (SSE)** to enable real-time updates for client-server communication, suitable for applications like **LiteLLM** and **openai compatibel apps**.
+The project aims to create a streaming interface for OpenAI-compatible models using **FastAPI** and **Microsoft AutoGen**. It uses **Server-Sent Events (SSE)** to enable real-time updates for client-server communication, suitable for applications like **LiteLLM** and **OpenAI-compatible apps**.
 
 ![1743105581333](image/README/1743105581333.png)
 
@@ -191,12 +227,12 @@ The   project  want  to  create  a streaming interface for OpenAI-compatible mod
      - Key dependencies are `FastAPI` and `pyautogen`.
 
    - **Environment Variables:** 
-     - An OpenAI API key is required, which should be stored in environment variables or an `.env` file.
+Litellm gateway      - A API key is required, which should be stored in environment variables or an `.env` file.
 
    - **Running the Server:** 
      - Instructions include running a script (`run.sh`) to start the FastAPI server.
    - **Deploy the image**:  
-     - generated qith the poetry run invoke containers.build command
+     - generated with the poetry run invoke containers.build command
    
 
 ---
@@ -291,7 +327,7 @@ sequenceDiagram
 ---
 
 ### 6. **Performance Optimization**
- -  the project use   **uvicorn** for improved scalability and efficiency, enabling multi-worker setups for FastAPI applications.
+ -  The project uses **uvicorn** for improved scalability and efficiency, enabling multi-worker setups for FastAPI applications.
 
 ---
 
@@ -308,14 +344,7 @@ Summarizes the significance of the streaming interface for enabling real-time in
 
 ---
 
-Would you like me to delve deeper into any specific section?
-
-
-
-
 ## References:
 https://github.com/lgcorzo/fastapi-autogen-team.wiki.git
 https://newsletter.victordibia.com/p/integrating-autogen-agents-into-your
 https://medium.com/@moustafa.abdelbaky/building-an-openai-compatible-streaming-interface-using-server-sent-events-with-fastapi-and-8f014420bca7
-
-Here is the **restructured, ordered, and translated version** of your document in **clear English**, organized into logical sections for better readability and production readiness:
