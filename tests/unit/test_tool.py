@@ -23,6 +23,9 @@ async def test_async_search():
 @pytest.mark.asyncio
 async def test_get_r2r_results():
     with patch("fastapi_autogen_team.tool.R2RClient") as MockR2RClient:
+        os.environ["R2R_USER"] = "test_user"
+        os.environ["R2R_PWD"] = "mock_pwd"
+        os.environ["R2R_URL"] = "http://test:7272"
         mock_client = MockR2RClient.return_value
         mock_client.users.login = AsyncMock()
         mock_client.retrieval.rag = AsyncMock(return_value={"key": "r2r_result"})
