@@ -34,6 +34,7 @@ def search(query: str):
             result.append(asyncio.run(async_search(query)))
 
         import threading
+
         t = threading.Thread(target=runner)
         t.start()
         t.join()
