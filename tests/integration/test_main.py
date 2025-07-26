@@ -16,25 +16,25 @@ def client():
         yield c
 
 
-@pytest.mark.skip(reason="waiting to develop a full llm simulator for a interation test in CI pipeline")
+# @pytest.mark.skip(reason="waiting to develop a full llm simulator for a interation test in CI pipeline")
 def test_chat_nonstream_completion_success(client):
     test_input = {
         "model": "internal-gpt",
         "stream": False,
         "messages": [
-            {"role": "user", "content": "¿Qué es el leadin en lantek expert?"},
+            {"role": "user", "content": "¿Qué es  el MLOPS?"},
             {
                 "role": "assistant",
-                "content": "Expert es uno de los programas de lantek",
+                "content": "MLOPS esun proces agile ppara desarrollo de software",
             },
-            {"role": "user", "content": "Translate to english"},
+            {"role": "user", "content": "haz un listado con los pasos necesarios"},
         ],
     }
     headers = {
         "x-ssl-dn": "CN=aBZ23Npql5ywVeMdqKPLHg== 92tkoPLVmB\\+/SbrqKzmtLf==.epc",
         "x-kai-user-id": "dev_integration_test",
     }
-    response = client.post("/manuals-rag/api/v1beta1/chat/completions", headers=headers, json=test_input)
+    response = client.post("/autogen/api/v1beta/chat/completions", headers=headers, json=test_input)
 
     assert response.status_code == status.HTTP_200_OK
     response_json = response.json()
@@ -42,18 +42,18 @@ def test_chat_nonstream_completion_success(client):
     assert "choices" in response_json or "data" in response_json
 
 
-@pytest.mark.skip(reason="waiting to develop a full llm simulator for a interation test in CI pipeline")
+# @pytest.mark.skip(reason="waiting to develop a full llm simulator for a interation test in CI pipeline")
 def test_chat_stream_completion_success(client):
     test_input = {
         "model": "internal-gpt",
         "stream": True,
         "messages": [
-            {"role": "user", "content": "¿Qué es el leadin en lantek expert?"},
+            {"role": "user", "content": "¿Qué es  el MLOPS?"},
             {
                 "role": "assistant",
-                "content": "Expert es uno de los programas de lantek",
+                "content": "MLOPS es un proces agile ppara desarrollo de software",
             },
-            {"role": "user", "content": "Zer dauka berria Lantek V44 bertsioan"},
+            {"role": "user", "content": "haz un listado con los pasos necesarios"},
         ],
     }
     headers = {
@@ -61,28 +61,5 @@ def test_chat_stream_completion_success(client):
         "x-kai-user-id": "dev_integration_test",
     }
 
-    response = client.post("/manuals-rag/api/v1beta1/chat/completions", headers=headers, json=test_input)
-    assert response.status_code == status.HTTP_200_OK
-
-
-@pytest.mark.skip(reason="waiting to develop a full llm simulator for a interation test in CI pipeline")
-def test_chat_stream_completion_system_message(client):
-    test_input = {
-        "model": "internal-gpt",
-        "stream": True,
-        "messages": [
-            {"role": "system", "content": "QUERY: Translate to english"},
-            {"role": "user", "content": "¿Qué es el leadin en lantek expert?"},
-            {
-                "role": "assistant",
-                "content": "Expert es uno de los programas de lantek",
-            },
-            {"role": "user", "content": "Translate to english"},
-        ],
-    }
-    headers = {
-        "x-ssl-dn": "CN=aBZ23Npql5ywVeMdqKPLHg== 92tkoPLVmB\\+/SbrqKzmtLf==.epc",
-        "x-kai-user-id": "dev_integration_test",
-    }
-    response = client.post("/manuals-rag/api/v1beta1/chat/completions", headers=headers, json=test_input)
+    response = client.post("/autogen/api/v1beta/chat/completions", headers=headers, json=test_input)
     assert response.status_code == status.HTTP_200_OK
