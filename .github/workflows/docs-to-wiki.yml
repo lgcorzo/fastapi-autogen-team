@@ -46,7 +46,7 @@ jobs:
         id: safe
         run: |
           # to check if the Home.md file exists locally already, is so we can assume a sync has been done, and bidirection can now run safely.
-          INDEX_EXISTS=$(find docs/* -name "Home.md")
+          INDEX_EXISTS=$(find wiki/* -name "Home.md")
           
           if [ ! -z $INDEX_EXISTS ] 
           then
