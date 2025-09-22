@@ -29,6 +29,7 @@ classDiagram
         +openapi_url: str
         +docs_url: str
         +redoc_url: str
+<!-- [MermaidChart: 954377b5-7d95-4c9d-9ea3-3a2f7be322a2] -->
     }
 
     class RedirectResponse {

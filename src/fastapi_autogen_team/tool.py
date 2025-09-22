@@ -41,15 +41,26 @@ def search(query: str):
         return result[0]
 
 
-async def async_search(query: str):
+async def async_search(query: str, timeout: float = 10.0):
     logger.info(f"Ejecutando búsqueda para: {query}")
 
     try:
         r2r_task = asyncio.to_thread(safe_get_r2r_results, query)
         jira_task = asyncio.to_thread(safe_get_jira_results, query)
-        results = await asyncio.gather(r2r_task, jira_task)
+
+        results = await asyncio.gather(
+            asyncio.wait_for(r2r_task, timeout=timeout),
+            asyncio.wait_for(jira_task, timeout=timeout),
+            return_exceptions=True,  # evita que falle todo si una tarea da error/timeout
+        )
+
+        # Manejo de timeouts o errores
+        r2r_result = results[0] if not isinstance(results[0], Exception) else f"R2R timeout/error: {results[0]}"
+        jira_result = results[1] if not isinstance(results[1], Exception) else f"Jira timeout/error: {results[1]}"
+
         logger.info("Búsqueda completada")
-        return {"r2r": results[0], "jira": results[1]}
+        return {"r2r": r2r_result, "jira": jira_result}
+
     except Exception as e:
         logger.error(f"Error en async_search: {e}")
         return {"r2r": [], "jira": []}
