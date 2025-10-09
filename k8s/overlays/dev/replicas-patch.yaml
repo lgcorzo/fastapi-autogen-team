@@ -1,0 +1,6 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-autogen-team  # Update the name here as well!
+spec:
+  replicas: 2

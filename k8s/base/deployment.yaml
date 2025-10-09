@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-autogen-team
+  labels:
+    app: fastapi-autogen-team
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-autogen-team
+  template:
+    metadata:
+      labels:
+        app: fastapi-autogen-team
+    spec:
+      containers:
+      - name: fastapi-autogen-team
+        image: lgcorzo/fastapi-autogen-team:v1.0.0
+        ports:
+        - containerPort: 8000 # Assuming your FastAPI app listens on port 8000
