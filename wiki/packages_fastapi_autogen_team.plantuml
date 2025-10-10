@@ -1,0 +1,20 @@
+@startuml packages_fastapi_autogen_team
+set namespaceSeparator none
+package "fastapi_autogen_team" as fastapi_autogen_team {
+}
+package "fastapi_autogen_team.autogen_server" as fastapi_autogen_team.autogen_server {
+}
+package "fastapi_autogen_team.autogen_workflow_team" as fastapi_autogen_team.autogen_workflow_team {
+}
+package "fastapi_autogen_team.data_model" as fastapi_autogen_team.data_model {
+}
+package "fastapi_autogen_team.main" as fastapi_autogen_team.main {
+}
+package "fastapi_autogen_team.tool" as fastapi_autogen_team.tool {
+}
+fastapi_autogen_team.autogen_server --> fastapi_autogen_team.autogen_workflow_team
+fastapi_autogen_team.autogen_server --> fastapi_autogen_team.data_model
+fastapi_autogen_team.autogen_workflow_team --> fastapi_autogen_team.tool
+fastapi_autogen_team.main --> fastapi_autogen_team.autogen_server
+fastapi_autogen_team.main --> fastapi_autogen_team.data_model
+@enduml
