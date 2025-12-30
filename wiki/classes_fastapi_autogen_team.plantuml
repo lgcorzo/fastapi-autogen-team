@@ -1,0 +1,92 @@
+@startuml classes_fastapi_autogen_team
+set namespaceSeparator none
+class "AutogenWorkflow" as fastapi_autogen_team.autogen_workflow_team.AutogenWorkflow {
+  allowed_transitions : dict
+  group_chat_manager_with_intros : GroupChatManager
+  group_chat_with_introductions : GroupChat
+  planner : AssistantAgent
+  quality_assurance : AssistantAgent
+  queue : Queue | None
+  rag_searcher : AssistantAgent
+  user_proxy : MultimodalConversableAgent
+  run(message: str, stream: bool) -> ChatResult
+  set_queue(queue: Queue)
+}
+class "BaseModel" as pydantic.main.BaseModel {
+  model_computed_fields : ClassVar[dict[str, ComputedFieldInfo]]
+  model_config : ClassVar[ConfigDict]
+  model_extra
+  model_fields : ClassVar[dict[str, FieldInfo]]
+  model_fields_set
+  construct(_fields_set: set[str] | None) -> Self
+  copy() -> Self
+  dict() -> Dict[str, Any]
+  from_orm(obj: Any) -> Self
+  json() -> str
+  model_construct(_fields_set: set[str] | None) -> Self
+  model_copy() -> Self
+  model_dump() -> dict[str, Any]
+  model_dump_json() -> str
+  model_json_schema(by_alias: bool, ref_template: str, schema_generator: type[GenerateJsonSchema], mode: JsonSchemaMode) -> dict[str, Any]
+  model_parametrized_name(params: tuple[type[Any], ...]) -> str
+  {abstract}model_post_init(__context: Any) -> None
+  model_rebuild() -> bool | None
+  model_validate(obj: Any) -> Self
+  model_validate_json(json_data: str | bytes | bytearray) -> Self
+  model_validate_strings(obj: Any) -> Self
+  parse_file(path: str | Path) -> Self
+  parse_obj(obj: Any) -> Self
+  parse_raw(b: str | bytes) -> Self
+  schema(by_alias: bool, ref_template: str) -> Dict[str, Any]
+  schema_json() -> str
+  update_forward_refs() -> None
+  validate(value: Any) -> Self
+}
+class "ContentImage" as fastapi_autogen_team.data_model.ContentImage {
+  image_url : Dict[str, str]
+  type : Literal['image_url']
+}
+class "ContentText" as fastapi_autogen_team.data_model.ContentText {
+  text : str
+  type : Literal['text']
+}
+class "Input" as fastapi_autogen_team.data_model.Input {
+  frequency_penalty : float
+  messages : List[Message]
+  model : str
+  presence_penalty : float
+  stream : bool
+  temperature : float
+  top_p : float
+  user : Optional[str]
+}
+class "Message" as fastapi_autogen_team.data_model.Message {
+  content : Union[str, List[Union[ContentText, ContentImage]]]
+  name : Optional[str]
+  role : str
+}
+class "ModelInformation" as fastapi_autogen_team.data_model.ModelInformation {
+  architecture : dict
+  context_length : int
+  description : str
+  id : str
+  name : str
+  per_request_limits : Optional[dict]
+  pricing : dict
+  top_provider : dict
+}
+class "Output" as fastapi_autogen_team.data_model.Output {
+  choices : List
+  created : int
+  id : str
+  model : str
+  object : str
+  usage : dict
+}
+fastapi_autogen_team.data_model.ContentImage --|> pydantic.main.BaseModel
+fastapi_autogen_team.data_model.ContentText --|> pydantic.main.BaseModel
+fastapi_autogen_team.data_model.Input --|> pydantic.main.BaseModel
+fastapi_autogen_team.data_model.Message --|> pydantic.main.BaseModel
+fastapi_autogen_team.data_model.ModelInformation --|> pydantic.main.BaseModel
+fastapi_autogen_team.data_model.Output --|> pydantic.main.BaseModel
+@enduml

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 import types
 import logging
 from functools import partial
@@ -38,7 +40,7 @@ def create_llm_config(
             {
                 "model": "azure-gpt",
                 "api_key": "sk-12345",
-                "base_url": "http://litellm:4000",  # Your LiteLLM URL
+                "base_url": os.getenv("LITELLM_BASE_URL", "http://litellm:4000"),  # Your LiteLLM URL
                 "default_headers": {"x-openwebui-user-id": user},
                 "tags": [user],
             },
@@ -412,4 +414,5 @@ class AutogenWorkflow:
             return ChatResult(
                 chat_history=[{"role": "error", "content": f"System error occurred: {str(e)}", "error": error_message}],
                 summary="Conversation failed due to system error",
+                cost={"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
             )

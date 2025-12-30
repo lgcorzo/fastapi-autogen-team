@@ -151,7 +151,7 @@ def create_non_streaming_response(chat_results, model: str):
                 id=str(uuid.uuid4()),
                 choices=choices,
                 created=int(time.time()),
-                usage=chat_results.cost,
+                usage=getattr(chat_results, "cost", None) or EMPTY_USAGE,
                 object="chat.completion",
                 model=model,
             )

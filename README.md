@@ -19,6 +19,9 @@ The package leverages several tools and best practices to make your MLOps experi
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Next Steps](#next-steps)
+  - [Development in Kubernetes](#development-in-kubernetes)
+    - [Prerequisites](#prerequisites-1)
+    - [Start Developing](#start-developing)
   - [Usage](#usage)
     - [Example Request](#example-request)
     - [Expected Response](#expected-response)
@@ -32,6 +35,13 @@ The package leverages several tools and best practices to make your MLOps experi
     - [6. **Performance Optimization**](#6-performance-optimization)
     - [7. **Testing**](#7-testing)
     - [8. **Conclusion**](#8-conclusion)
+- [Docker Image Build and Okteto Deployment Walkthrough](#docker-image-build-and-okteto-deployment-walkthrough)
+  - [Changes Made](#changes-made)
+    - [build](#build)
+  - [Verification Results](#verification-results)
+    - [Build Verification](#build-verification)
+    - [Deployment Verification](#deployment-verification)
+  - [How to use](#how-to-use)
   - [References:](#references)
 
 # Install
@@ -40,8 +50,8 @@ This section details the requirements, actions, and next steps to kickstart your
 
 ## Prerequisites
 
-*   Python>=3.11: to benefit from the latest features and performance improvements
-*   Poetry>=1.8.2: to initialize the project virtual environment and its dependencies
+- Python>=3.11: to benefit from the latest features and performance improvements
+- Poetry>=1.8.2: to initialize the project virtual environment and its dependencies
 
 ## Installation
 
@@ -53,6 +63,7 @@ This section details the requirements, actions, and next steps to kickstart your
     or https
     $ git clone https://github.com/lgcorzo/fastapi-autogen-team
     ```
+
 2.  Run the project installation with poetry (install poetry in the base environment)
 
     ```bash
@@ -74,20 +85,20 @@ Debugging in VS Code is possible with the following configuration:
 
 ```json
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Poetry evaluations Debug",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/fastapi_autogen_team/main.py", // Adjust the entry point path
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}", // Set the working directory to the project root
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}/src"
-            } // Ensure module discovery
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Poetry evaluations Debug",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/fastapi_autogen_team/main.py", // Adjust the entry point path
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}", // Set the working directory to the project root
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      } // Ensure module discovery
+    }
+  ]
 }
 ```
 
@@ -102,11 +113,37 @@ python -m pip install [package]
 poetry add --group checks "mocogpt[cli]@git+https://github.com/lgcorzo/mocogpt.git"
 ```
 
+## Development in Kubernetes
+
+To develop directly inside your Kubernetes cluster, we use [Okteto](https://www.okteto.com/docs/) and VS Code Dev Containers. This ensures your development environment matches production.
+
+### Prerequisites
+
+- An active Kubernetes cluster
+- `kubectl` configured to talk to your cluster
+- [Okteto CLI](https://www.okteto.com/docs/getting-started/) installed
+- VS Code with [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) and [Okteto](https://marketplace.visualstudio.com/items?itemName=okteto.remote-kubernetes) extensions.
+
+### Start Developing
+
+1.  **Deploy the application** to your cluster (if not already running).
+2.  **Start Development Mode**:
+    ```bash
+    okteto up
+    ```
+    Select the `fastapi-autogen-team` deployment if prompted.
+3.  **Connect VS Code**:
+    - Okteto will automatically sync your files and perform port forwarding.
+    - You can open the remote folder in VS Code to get full IntelliSense and debugging support inside the cluster.
+
+This setup uses the configuration in `okteto.yaml` and `.devcontainer/`.
+
 ## Usage
 
 To use the application, send requests to the FastAPI server. Here are some example requests:
 
 ### Example Request
+
 ```bash
 curl -X POST "http://localhost:8000/chat/completions" -H "Content-Type: application/json" -d '{
   "messages": [{"role": "user", "content": "Hello!"}],
@@ -116,6 +153,7 @@ curl -X POST "http://localhost:8000/chat/completions" -H "Content-Type: applicat
 ```
 
 ### Expected Response
+
 ```json
 {
   "choices": [
@@ -144,64 +182,66 @@ $ inv --list
 
 **Available tasks**:
 
-*   **checks.all (checks)** - Run all check tasks.
-*   **checks.code** - Check the codes with ruff.
-*   **checks.coverage** - Check the coverage with coverage.
-*   **checks.format** - Check the formats with ruff.
-*   **checks.poetry** - Check poetry config files.
-*   **checks.security** - Check the security with bandit.
-*   **checks.test** - Check the tests with pytest.
-*   **checks.type** - Check the types with mypy.
-*   **cleans.all (cleans)** - Run all tools and folders tasks.
-*   **cleans.cache** - Clean the cache folder.
-*   **cleans.coverage** - Clean the coverage tool.
-*   **cleans.dist** - Clean the dist folder.
-*   **cleans.docs** - Clean the docs folder.
-*   **cleans.environment** - Clean the project environment file.
-*   **cleans.folders** - Run all folders tasks.
-*   **cleans.mypy** - Clean the mypy tool.
-*   **cleans.outputs** - Clean the outputs folder.
-*   **cleans.poetry** - Clean poetry lock file.
-*   **cleans.pytest** - Clean the pytest tool.
-*   **cleans.projects** - Run all projects tasks.
-*   **cleans.python** - Clean python caches and bytecodes.
-*   **cleans.requirements** - Clean the project requirements file.
-*   **cleans.reset** - Run all tools, folders, and sources tasks.
-*   **cleans.ruff** - Clean the ruff tool.
-*   **cleans.sources** - Run all sources tasks.
-*   **cleans.tools** - Run all tools tasks.
-*   **cleans.venv** - Clean the venv folder.
-*   **commits.all (commits)** - Run all commit tasks.
-*   **commits.bump** - Bump the version of the package.
-*   **commits.commit** - Commit all changes with a message.
-*   **commits.info** - Print a guide for messages.
-*   **containers.all (containers)** - Run all container tasks.
-*   **containers.build** - Build the container image with the given tag.
-*   **containers.compose** - Start up docker compose.
-*   **containers.run** - Run the container image with the given tag.
-*   **docs.all (docs)** - Run all docs tasks.
-*   **docs.api** - Document the API with pdoc using the given format and output directory.
-*   **docs.serve** - Serve the API docs with pdoc using the given format and computer port.
-*   **formats.all** - (formats) Run all format tasks.
-*   **formats.imports** - Format python imports with ruff.
-*   **formats.sources** - Format python sources with ruff.
-*   **installs.all (installs)** - Run all install tasks.
-*   **installs.poetry** - Install poetry packages.
-*   **installs.pre-commit** - Install pre-commit hooks on git.
-*   **packages.all (packages)** - Run all package tasks.
-*   **packages.build** - Build a python package with the given format.
-*   **projects.all (projects)** - Run all project tasks.
-*   **projects.environment** - Export the project environment file.
-*   **projects.requirements** - Export the project requirements file.
+- **checks.all (checks)** - Run all check tasks.
+- **checks.code** - Check the codes with ruff.
+- **checks.coverage** - Check the coverage with coverage.
+- **checks.format** - Check the formats with ruff.
+- **checks.poetry** - Check poetry config files.
+- **checks.security** - Check the security with bandit.
+- **checks.test** - Check the tests with pytest.
+- **checks.type** - Check the types with mypy.
+- **cleans.all (cleans)** - Run all tools and folders tasks.
+- **cleans.cache** - Clean the cache folder.
+- **cleans.coverage** - Clean the coverage tool.
+- **cleans.dist** - Clean the dist folder.
+- **cleans.docs** - Clean the docs folder.
+- **cleans.environment** - Clean the project environment file.
+- **cleans.folders** - Run all folders tasks.
+- **cleans.mypy** - Clean the mypy tool.
+- **cleans.outputs** - Clean the outputs folder.
+- **cleans.poetry** - Clean poetry lock file.
+- **cleans.pytest** - Clean the pytest tool.
+- **cleans.projects** - Run all projects tasks.
+- **cleans.python** - Clean python caches and bytecodes.
+- **cleans.requirements** - Clean the project requirements file.
+- **cleans.reset** - Run all tools, folders, and sources tasks.
+- **cleans.ruff** - Clean the ruff tool.
+- **cleans.sources** - Run all sources tasks.
+- **cleans.tools** - Run all tools tasks.
+- **cleans.venv** - Clean the venv folder.
+- **commits.all (commits)** - Run all commit tasks.
+- **commits.bump** - Bump the version of the package.
+- **commits.commit** - Commit all changes with a message.
+- **commits.info** - Print a guide for messages.
+- **containers.all (containers)** - Run all container tasks.
+- **containers.build** - Build the container image with the given tag.
+- **containers.compose** - Start up docker compose.
+- **containers.run** - Run the container image with the given tag.
+- **docs.all (docs)** - Run all docs tasks.
+- **docs.api** - Document the API with pdoc using the given format and output directory.
+- **docs.serve** - Serve the API docs with pdoc using the given format and computer port.
+- **formats.all** - (formats) Run all format tasks.
+- **formats.imports** - Format python imports with ruff.
+- **formats.sources** - Format python sources with ruff.
+- **installs.all (installs)** - Run all install tasks.
+- **installs.poetry** - Install poetry packages.
+- **installs.pre-commit** - Install pre-commit hooks on git.
+- **packages.all (packages)** - Run all package tasks.
+- **packages.build** - Build a python package with the given format.
+- **projects.all (projects)** - Run all project tasks.
+- **projects.environment** - Export the project environment file.
+- **projects.requirements** - Export the project requirements file.
 
 ## Workflows
+
 This package supports two GitHub Workflows in `.github/workflows`:
 
-*   `check.yml`: Validate the quality of the package on each Pull Request
-*   `publish.yml`: Build and publish the docs and packages on code release.
-*   `docs-to-wiki.yml`:publish the docs and packages on the wiki.
+- `check.yml`: Validate the quality of the package on each Pull Request
+- `publish.yml`: Build and publish the docs and packages on code release.
+- `docs-to-wiki.yml`:publish the docs and packages on the wiki.
 
 The GitHub Actions pipelines automate the following tasks:
+
 - **Continuous Integration (CI)**: The `check.yml` workflow runs on every pull request to ensure that the code meets quality standards. It includes linting, testing, and type checking.
 - **Continuous Deployment (CD)**: The `publish.yml` workflow triggers on releases, automatically building and publishing the documentation and packages to the appropriate repositories.
 
@@ -209,12 +249,13 @@ You can use and extend these workflows to automate repetitive package management
 
 This package supports two GitHub Workflows in `.github/workflows`:
 
-*   `check.yml`: Validate the quality of the package on each Pull Request
-*   `publish.yml`: Build and publish the docs and packages on code release.
+- `check.yml`: Validate the quality of the package on each Pull Request
+- `publish.yml`: Build and publish the docs and packages on code release.
 
 You can use and extend these workflows to automate repetitive package management tasks.
 
 ### 1. **Project Purpose**
+
 The project aims to create a streaming interface for OpenAI-compatible models using **FastAPI** and **Microsoft AutoGen**. It uses **Server-Sent Events (SSE)** to enable real-time updates for client-server communication, suitable for applications like **LiteLLM** and **OpenAI-compatible apps**.
 
 ![1743105581333](image/README/1743105581333.png)
@@ -222,27 +263,29 @@ The project aims to create a streaming interface for OpenAI-compatible models us
 ---
 
 ### 2. **Project Setup**
-   - **Installation:** 
-     - Steps include cloning a GitHub repository and setting up a Python environment (with Python 3.11 and Poetry).
-     - Key dependencies are `FastAPI` and `ag2`.
 
-   - **Environment Variables:** 
-Litellm gateway      - A API key is required, which should be stored in environment variables or an `.env` file.
+- **Installation:**
 
-   - **Running the Server:** 
-     - Instructions include running a script (`run.sh`) to start the FastAPI server.
-   - **Deploy the image**:  
-     - generated with the poetry run invoke containers.build command
-   
+  - Steps include cloning a GitHub repository and setting up a Python environment (with Python 3.11 and Poetry).
+  - Key dependencies are `FastAPI` and `pyautogen`.
+
+- **Environment Variables:**
+  Litellm gateway - A API key is required, which should be stored in environment variables or an `.env` file.
+
+- **Running the Server:**
+  - Instructions include running a script (`run.sh`) to start the FastAPI server.
+- **Deploy the image**:
+  - generated with the poetry run invoke containers.build command
 
 ---
 
 ### 3. **Project Structure**
-   - **Main Files:**
-     - `src/fastapi_autogen_team/main.py`: Entry point for the FastAPI application; handles environment variables and routes.
-     - `src/fastapi_autogen_team/data_model.py`: Defines request/response models using Pydantic (compatible with OpenAI).
-     - `src/fastapi_autogen_team/autogen_workflow_team.py`: Contains logic for the AutoGen workflows and interactions.
-     - `src/fastapi_autogen_team/autogen_server.py`: Implements handling of streaming and non-streaming client requests.
+
+- **Main Files:**
+  - `src/fastapi_autogen_team/main.py`: Entry point for the FastAPI application; handles environment variables and routes.
+  - `src/fastapi_autogen_team/data_model.py`: Defines request/response models using Pydantic (compatible with OpenAI).
+  - `src/fastapi_autogen_team/autogen_workflow_team.py`: Contains logic for the AutoGen workflows and interactions.
+  - `src/fastapi_autogen_team/autogen_server.py`: Implements handling of streaming and non-streaming client requests.
 
 ```mermaid
 classDiagram
@@ -295,56 +338,113 @@ sequenceDiagram
 ---
 
 ### 4. **Implementing the Streaming Interface**
-   - **FastAPI Application:**
-     - Routes are defined for features like redirecting to documentation (`GET /`), returning model information (`GET /models`), and handling chat completions (`POST /chat/completions`).
 
-   - **Data Models:** 
-     - Uses Pydantic to define:
-       - `ModelInformation`: Stores model details.
-       - `Input`: Represents an OpenAI-compatible request.
-       - `Output`: Represents the response.
-       - `Message`: A message in the request.
+- **FastAPI Application:**
 
-   - **AutoGen Workflow:**
-     - Defines an interaction pattern between agents, such as `UserProxy` and AI agents like fictional comedians. Messages are processed via queues for streaming.
+  - Routes are defined for features like redirecting to documentation (`GET /`), returning model information (`GET /models`), and handling chat completions (`POST /chat/completions`).
 
-   - **Queue Management:**
-     - Ensures real-time response by queueing intermediate messages for streaming to the client.
+- **Data Models:**
 
-   - **Streaming Logic:** 
-     - Uses **monkey patching** to modify the behavior of functions to stream responses.
+  - Uses Pydantic to define:
+    - `ModelInformation`: Stores model details.
+    - `Input`: Represents an OpenAI-compatible request.
+    - `Output`: Represents the response.
+    - `Message`: A message in the request.
+
+- **AutoGen Workflow:**
+
+  - Defines an interaction pattern between agents, such as `UserProxy` and AI agents like fictional comedians. Messages are processed via queues for streaming.
+
+- **Queue Management:**
+
+  - Ensures real-time response by queueing intermediate messages for streaming to the client.
+
+- **Streaming Logic:**
+  - Uses **monkey patching** to modify the behavior of functions to stream responses.
 
 ---
 
 ### 5. **Request Handling**
-   - **Serve Autogen:**
-     - Processes client requests, creating AutoGen workflows for streaming or non-streaming responses.
-   - **Streaming Response:** 
-     - Server-Sent Events (SSE) are implemented to send real-time updates for streaming requests.
-   - **Non-Streaming Response:** 
-     - A full response is returned in a single payload.
+
+- **Serve Autogen:**
+  - Processes client requests, creating AutoGen workflows for streaming or non-streaming responses.
+- **Streaming Response:**
+  - Server-Sent Events (SSE) are implemented to send real-time updates for streaming requests.
+- **Non-Streaming Response:**
+  - A full response is returned in a single payload.
 
 ---
 
 ### 6. **Performance Optimization**
- -  The project uses **uvicorn** for improved scalability and efficiency, enabling multi-worker setups for FastAPI applications.
+
+- The project uses **uvicorn** for improved scalability and efficiency, enabling multi-worker setups for FastAPI applications.
 
 ---
 
 ### 7. **Testing**
-   - **Testing the Server:** 
-     - Includes examples using `curl` to query the server for chat completions.
-   - **Response Format:**
-     - Outputs data in a format compatible with OpenAI, supporting real-time updates for agent interactions.
+
+- **Testing the Server:**
+  - Includes examples using `curl` to query the server for chat completions.
+- **Response Format:**
+  - Outputs data in a format compatible with OpenAI, supporting real-time updates for agent interactions.
 
 ---
 
 ### 8. **Conclusion**
+
 Summarizes the significance of the streaming interface for enabling real-time interaction with OpenAI-compatible APIs. Links to additional resources like GitHub, AutoGen documentation, and FastAPI guides are provided.
 
 ---
 
+# Docker Image Build and Okteto Deployment Walkthrough
+
+Successfully built the `fastapi-autogen-team` Docker image and deployed it to the `llm-apps` namespace using Okteto.
+
+## Changes Made
+
+### build
+
+- Updated `okteto.yaml` to use the image `localhost:32000/fastapi-autogen-team:latest`.
+- Used `poetry run invoke containers.build` to build the Python package and Docker image.
+- Tagged and pushed the image to the local MicroK8s registry.
+
+## Verification Results
+
+### Build Verification
+
+The image was successfully built and pushed:
+
+```bash
+docker images | grep fastapi-autogen-team
+localhost:32000/fastapi-autogen-team   latest               97643934a37a   2 minutes ago   810MB
+```
+
+### Deployment Verification
+
+The pod is running in the `llm-apps` namespace:
+
+```bash
+kubectl get pods -n llm-apps | grep fastapi-autogen-team
+fastapi-autogen-team-okteto-767ffb6bbc-492dz   1/1     Running   0              2m
+```
+
+The development environment is active with port forwarding:
+
+- **Port Forwarding**: 8000 -> 8000 (Note: The app may need to be started manually in the Okteto shell or `okteto.yaml` updated to auto-start).
+
+## How to use
+
+Run `okteto up` to enter the development environment. Inside the shell, you can start the application:
+
+```bash
+python -m fastapi_autogen_team.main
+```
+
+Or use the provided `run.sh` if environment variables are set.
+
+
 ## References:
+
 https://github.com/lgcorzo/fastapi-autogen-team.wiki.git
 https://newsletter.victordibia.com/p/integrating-autogen-agents-into-your
 https://medium.com/@moustafa.abdelbaky/building-an-openai-compatible-streaming-interface-using-server-sent-events-with-fastapi-and-8f014420bca7

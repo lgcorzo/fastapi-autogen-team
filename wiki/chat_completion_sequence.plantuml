@@ -1,0 +1,68 @@
+@startuml
+actor User
+
+participant "FastAPI (main.py)" as FastAPI
+participant "AutogenServer (autogen_server.py)" as AutogenServer
+participant "AutogenWorkflow (autogen_workflow_team.py)" as AutogenWorkflow
+participant "GroupChatManager" as GroupChatManager
+participant "UserProxy" as UserProxy
+participant "Planner" as Planner
+participant "RAGSearcher" as RAGSearcher
+participant "QualityAssurance" as QualityAssurance
+participant "Search Tool" as SearchTool
+
+User -> FastAPI: POST /autogen/api/v1beta/chat/completions
+activate FastAPI
+
+FastAPI -> AutogenServer: serve_autogen(input)
+activate AutogenServer
+
+AutogenServer -> AutogenWorkflow: create AutogenWorkflow
+activate AutogenWorkflow
+
+AutogenServer -> AutogenWorkflow: run(message)
+
+AutogenWorkflow -> GroupChatManager: initiate_chat(message)
+activate GroupChatManager
+
+GroupChatManager -> UserProxy: send_message(message)
+activate UserProxy
+
+UserProxy -> Planner: send_message(message)
+deactivate UserProxy
+activate Planner
+
+Planner -> RAGSearcher: send_message(search_query)
+deactivate Planner
+activate RAGSearcher
+
+RAGSearcher -> SearchTool: search(query)
+activate SearchTool
+
+SearchTool --> RAGSearcher: search_results
+deactivate SearchTool
+
+RAGSearcher --> Planner: send_message(search_results)
+deactivate RAGSearcher
+activate Planner
+
+Planner -> QualityAssurance: send_message(collected_info)
+deactivate Planner
+activate QualityAssurance
+
+QualityAssurance --> GroupChatManager: send_message(final_response, "TERMINATE")
+deactivate QualityAssurance
+
+GroupChatManager --> AutogenWorkflow: chat_result
+deactivate GroupChatManager
+
+AutogenWorkflow --> AutogenServer: chat_result
+deactivate AutogenWorkflow
+
+AutogenServer --> FastAPI: response
+deactivate AutogenServer
+
+FastAPI --> User: HTTP Response
+deactivate FastAPI
+
+@enduml
