@@ -77,6 +77,11 @@ async def test_get_jira_results():
 @pytest.mark.asyncio
 async def test_get_jira_results_no_results():
     with patch("fastapi_autogen_team.tool.Jira") as MockJira:
+        # Simula entorno
+        os.environ["JIRA_INSTANCE_URL"] = "http://example.jira.com"
+        os.environ["JIRA_USERNAME"] = "mock_user"
+        os.environ["JIRA_API_TOKEN"] = "mock_token"
+
         mock_jira_instance = MagicMock()
         MockJira.return_value = mock_jira_instance
         mock_jira_instance.jql.return_value = {"issues": []}
