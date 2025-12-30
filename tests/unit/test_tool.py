@@ -1,5 +1,6 @@
 import pytest
 import os
+import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from fastapi_autogen_team import tool
@@ -39,49 +40,47 @@ async def test_get_r2r_results():
 
 @pytest.mark.asyncio
 async def test_get_jira_results():
-    with (
-        patch("fastapi_autogen_team.tool.JiraAPIWrapper") as MockJiraAPIWrapper,
-        patch("fastapi_autogen_team.tool.ChatLiteLLM") as MockChatLiteLLM,
-        patch("fastapi_autogen_team.tool.initialize_agent") as MockInitializeAgent,
-        patch("fastapi_autogen_team.tool.JiraToolkit") as MockJiraToolkit,
-    ):
+    with patch("fastapi_autogen_team.tool.Jira") as MockJira:
         # Simula entorno
         os.environ["JIRA_INSTANCE_URL"] = "http://example.jira.com"
-        os.environ["JIRA_CLOUD"] = "true"
-        os.environ["JIRA_API_TOKEN"] = "mock_token"
         os.environ["JIRA_USERNAME"] = "mock_user"
+        os.environ["JIRA_API_TOKEN"] = "mock_token"
+        os.environ["JIRA_CLOUD"] = "true"
 
-        os.environ["LITELLM_MODEL"] = "test_model"
-        os.environ["LITELLM_PWD"] = "mock_pwd"
-        os.environ["LITELLM_URL"] = "http://test:4000"
+        # Mock de la clase Jira
+        mock_jira_instance = MagicMock()
+        MockJira.return_value = mock_jira_instance
 
-        # Mocks de clases
-        mock_jira_wrapper = MagicMock()
-        mock_toolkit = MagicMock()
-        mock_tools = ["tool1", "tool2"]
-
-        mock_llm = MagicMock()
-        mock_agent = AsyncMock()
-        mock_agent.run.return_value = "mock_result"
-
-        # Configura lo que devuelven los mocks
-        MockJiraAPIWrapper.return_value = mock_jira_wrapper
-        MockJiraToolkit.from_jira_api_wrapper.return_value = mock_toolkit
-        MockJiraToolkit.get_tools.return_value = mock_tools
-
-        MockChatLiteLLM.return_value = mock_llm
-        MockInitializeAgent.return_value = mock_agent
+        # Mock del resultado de jql
+        mock_jira_instance.jql.return_value = {
+            "issues": [
+                {"key": "PROJ-1", "fields": {"summary": "Issue summary 1"}},
+                {"key": "PROJ-2", "fields": {"summary": "Issue summary 2"}},
+            ]
+        }
 
         # Ejecutar
-        result = await tool.get_jira_results("test_query")
+        result = await asyncio.to_thread(tool.get_jira_results, "test_query")
 
         # Verificaciones
-        MockJiraAPIWrapper.assert_called_once()
-        mock_toolkit.get_tools.assert_called_once()
-        MockChatLiteLLM.assert_called_once_with(
-            model="test_model", api_base="http://test:4000", api_key="mock_pwd", temperature=0
+        MockJira.assert_called_once_with(
+            url="http://example.jira.com",
+            username="mock_user",
+            password="mock_token",
+            cloud=True,
         )
-        MockInitializeAgent.assert_called_once()
-        mock_agent.run.assert_called_once_with("test_query")
+        mock_jira_instance.jql.assert_called_once()
+        assert "[PROJ-1] Issue summary 1" in result
+        assert "[PROJ-2] Issue summary 2" in result
 
-        assert result == "mock_result"
+
+@pytest.mark.asyncio
+async def test_get_jira_results_no_results():
+    with patch("fastapi_autogen_team.tool.Jira") as MockJira:
+        mock_jira_instance = MagicMock()
+        MockJira.return_value = mock_jira_instance
+        mock_jira_instance.jql.return_value = {"issues": []}
+
+        result = await asyncio.to_thread(tool.get_jira_results, "test_query")
+
+        assert result == "No se encontraron resultados en Jira."

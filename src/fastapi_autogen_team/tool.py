@@ -2,10 +2,7 @@ import os
 import asyncio
 import logging
 from r2r import R2RClient
-from langchain_community.utilities.jira import JiraAPIWrapper
-from langchain_community.agent_toolkits.jira.toolkit import JiraToolkit
-from langchain.agents import initialize_agent, AgentType
-from langchain_litellm import ChatLiteLLM
+from atlassian import Jira
 from dotenv import load_dotenv
 
 # Cargar variables de entorno
@@ -98,26 +95,34 @@ def get_r2r_results(query: str):
 
 
 def get_jira_results(query: str):
-    litellm_model = os.getenv("LITELLM_MODEL", "openai/azure-gpt")
-    litellm_pwd = os.getenv("LITELLM_PWD", "sk-12345")
-    litellm_url = os.getenv("LITELLM_URL", "http://litellm:4000/")
+    url = os.getenv("JIRA_INSTANCE_URL")
+    username = os.getenv("JIRA_USERNAME")
+    password = os.getenv("JIRA_API_TOKEN")
+    cloud = os.getenv("JIRA_CLOUD", "true").lower() == "true"
 
-    if not litellm_pwd:
-        raise ValueError("Falta la clave LiteLLM (LITELLM_PWD)")
+    if not url or not username or not password:
+        raise ValueError("Faltan credenciales Jira (JIRA_INSTANCE_URL, JIRA_USERNAME, JIRA_API_TOKEN)")
 
-    llm = ChatLiteLLM(
-        model=litellm_model,
-        api_base=litellm_url,
-        api_key=litellm_pwd,
-        temperature=0,
+    jira = Jira(
+        url=url,
+        username=username,
+        password=password,
+        cloud=cloud,
     )
 
-    jira = JiraAPIWrapper()
-    toolkit = JiraToolkit.from_jira_api_wrapper(jira)
+    logger.info(f"Ejecutando consulta Jira JQL para: {query}")
+    # Búsqueda simple por texto en el resumen o descripción
+    jql = f'summary ~ "{query}" OR description ~ "{query}"'
+    issues = jira.jql(jql)
 
-    agent = initialize_agent(toolkit.get_tools(), llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
+    result_list = []
+    if issues and isinstance(issues, dict):
+        for issue in issues.get("issues", []):
+            key = issue.get("key")
+            summary = issue.get("fields", {}).get("summary")
+            result_list.append(f"[{key}] {summary}")
 
-    logger.info("Ejecutando consulta Jira con LLM...")
-    result = agent.run(query)
-    logger.info("Consulta Jira completada.")
-    return result
+    if not result_list:
+        return "No se encontraron resultados en Jira."
+
+    return "\n".join(result_list)
