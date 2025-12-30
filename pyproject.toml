@@ -87,7 +87,7 @@ omit = ["__main__.py"]
 [tool.mypy]
 pretty = true
 strict = false
-python_version = "3.12"
+python_version = "3.11"
 check_untyped_defs = false
 ignore_missing_imports = true
 disable_error_code = ["return-value"]
@@ -102,7 +102,7 @@ pythonpath = ["src"]
 fix = true
 indent-width = 4
 line-length = 120
-target-version = "py312"
+target-version = "py311"
 
 [tool.ruff.format]
 docstring-code-format = true

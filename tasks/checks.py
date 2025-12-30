@@ -44,7 +44,7 @@ def security(ctx: Context) -> None:
     ctx.run("poetry run bandit --recursive --configfile=pyproject.toml src/")
 
 
-@task
+@task(pre=[test])
 def coverage(ctx: Context) -> None:
     """Check the coverage with coverage."""
     ctx.run("poetry run pytest --numprocesses='auto' --cov=src/ --cov-fail-under=80 tests/unit")
