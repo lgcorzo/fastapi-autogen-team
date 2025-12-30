@@ -1,0 +1,45 @@
+# Version Control
+.git
+.gitignore
+.github/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+.venv
+.poetry
+.cache
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+*.tar
+
+# Dist - ignore everything but keep wheels for the build
+dist/*
+!dist/*.whl
+
+# IDEs
+.vscode/
+.idea/
+
+# Project Specific
+logs/
+tests/
+docs/
+experiments/
+wiki/
+image/
+tasks/
+Settings/
+Tests/
+Notebooks/
+Scripts/
+Pipelines/
+Documentation/
+dockerignore
+.stignore
+okteto.yaml

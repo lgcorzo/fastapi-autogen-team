@@ -17,8 +17,8 @@ packages = [{ include = "fastapi_autogen_team", from = "src" }]
 [tool.poetry.dependencies]
 python = "3.11.*"
 fastapi = "^0.115.11"
-ag2 = {extras = ["openai", "retrievechat"], version = "^0.8.3"}
-flaml = {extras = ["automl"], version = "^2.3.4"}
+ag2 = {extras = ["openai"], version = "^0.8.3"}
+flaml = "^2.3.4"
 opentelemetry-api = "^1.31.1"
 opentelemetry-sdk = "^1.31.1"
 opentelemetry-instrumentation-fastapi = "^0.52b1"
@@ -32,8 +32,8 @@ uvicorn = "^0.34.0"
 openai = "1.97.1"
 r2r = "^3.5.16"
 atlassian-python-api = "^4.0.4"
-langchain-community = "^0.3.27"
-langchain-litellm = "^0.2.2"
+# langchain-community removed
+# langchain-litellm removed
 cryptography = "^46.0.1"
 email-validator = "^2.3.0"
 python-multipart = "^0.0.20"

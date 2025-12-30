@@ -18,4 +18,4 @@ spec:
       - name: fastapi-autogen-team
         image: lgcorzo/fastapi-autogen-team:v1.0.0
         ports:
-        - containerPort: 4100 
+        - containerPort: 8000 

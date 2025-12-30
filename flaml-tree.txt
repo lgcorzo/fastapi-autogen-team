@@ -1,0 +1,25 @@
+flaml 2.3.6 A fast library for automated machine learning and tuning
+├── lightgbm >=2.3.1
+│   ├── numpy >=1.17.0 
+│   └── scipy * 
+│       └── numpy >=1.23.5,<2.5 (circular dependency aborted here)
+├── numpy >=1.17
+├── pandas >=1.1.4
+│   ├── numpy >=1.23.2 
+│   ├── python-dateutil >=2.8.2 
+│   │   └── six >=1.5 
+│   ├── pytz >=2020.1 
+│   └── tzdata >=2022.7 
+├── scikit-learn >=1.0.0
+│   ├── joblib >=1.2.0 
+│   ├── numpy >=1.22.0 
+│   ├── scipy >=1.8.0 
+│   │   └── numpy >=1.23.5,<2.5 (circular dependency aborted here)
+│   └── threadpoolctl >=3.1.0 
+├── scipy >=1.4.1
+│   └── numpy >=1.23.5,<2.5 
+└── xgboost >=0.90,<3.0.0
+    ├── numpy * 
+    ├── nvidia-nccl-cu12 * 
+    └── scipy * 
+        └── numpy >=1.23.5,<2.5 (circular dependency aborted here)

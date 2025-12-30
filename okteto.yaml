@@ -1,0 +1,19 @@
+
+dev:
+  fastapi-autogen-team:
+    autocreate: true
+    image: localhost:32000/fastapi-autogen-team:latest
+    # Use the dev container Dockerfile for a better dev experience
+    # build: .devcontainer/Dockerfile
+    environment:
+      - LITELLM_BASE_URL=http://litellm.llm-apps:80
+    command: ["bash"]
+    workdir: /app
+    sync:
+      - .:/app
+    forward:
+      - 8000:8000
+    volumes:
+      - /root/.cache/pip
+      - /root/.cache/pypoetry
+      - /app/.venv
