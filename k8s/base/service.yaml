@@ -7,8 +7,9 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 4100
-    protocol: TCP
-    targetPort: 4100  # Ensure this matches the container's exposed port
+    - name: http
+      port: 4100
+      protocol: TCP
+      targetPort: 4100 # Ensure this matches the container's exposed port
   selector:
     app: fastapi-autogen-team
