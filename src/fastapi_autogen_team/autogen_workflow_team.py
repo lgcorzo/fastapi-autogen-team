@@ -17,7 +17,7 @@ from autogen import (
     OpenAIWrapper,
     register_function,
 )
-from autogen.agentchat.contrib.multimodal_conversable_agent import MultimodalConversableAgent
+from autogen import UserProxyAgent
 from autogen.code_utils import content_str
 from autogen.io import IOStream
 from termcolor import colored
@@ -211,7 +211,7 @@ class AutogenWorkflow:
         llm_config_used = llm_config if llm_config is not None else create_llm_config(user=user)
         self.queue: Queue | None = None
 
-        self.user_proxy = MultimodalConversableAgent(
+        self.user_proxy = UserProxyAgent(
             name="UserProxy",
             system_message="""You are the UserProxy. You are the user in this conversation. Follow these instructions:\n
             1. Detect the language from the text after the REQUEST: and send it to the rest of the team.\n
