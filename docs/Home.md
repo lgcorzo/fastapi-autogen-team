@@ -25,7 +25,6 @@ The foundational components of the system that ensure efficient functionality ac
 
 - **[US: Schemas](Schemas_stories.md)**: Define structured data formats for input, output, and intermediate processes, ensuring consistency and validation throughout the pipeline.
 
-
 ### **FE: Tasks for CI/CD**
 
 Break down operational processes into manageable, modular tasks
@@ -40,15 +39,13 @@ Break down operational processes into manageable, modular tasks
 - **US: MLFlow**: Integrate with MLFlow for experiment tracking, model registry, and deployment workflows.
 - **US: Packages**: Organize and manage Python or other language packages for modularized codebases.
 - **US: Projects**: Create and maintain projects, ensuring that each has the structure, configuration, and tools needed for success.
+- **[GitOps Deployment](gitops_deployment.md)**: Detailed guide on how to deploy this project using FluxCD and how to manage the `GITOPS_TOKEN`.
 
 ## UML packages relations
 
-
-
-
 ---
 
-# 📘 RAG with Confluence (AutoGen v2)
+## 📘 RAG with Confluence (AutoGen v2)
 
 The goal is to retrieve relevant content from **Confluence Cloud** using its REST API and **CQL (Confluence Query Language)**. This enables real-time information access for RAG (Retrieval-Augmented Generation) applications.
 
@@ -70,11 +67,11 @@ Build a tool named `confluence_search_tool` that:
 
 To connect to Confluence, you'll need:
 
-* ✅ A **Confluence Cloud** account.
-* ✅ An **API token** from your Atlassian account:
+- ✅ A **Confluence Cloud** account.
+- ✅ An **API token** from your Atlassian account:
   [https://id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens)
-* ✅ Your **Atlassian email address**.
-* ✅ The base domain of your Confluence instance (e.g. `https://yourcompany.atlassian.net/wiki`).
+- ✅ Your **Atlassian email address**.
+- ✅ The base domain of your Confluence instance (e.g. `https://yourcompany.atlassian.net/wiki`).
 
 ---
 
@@ -172,9 +169,9 @@ Ask your agent:
 
 The agent will:
 
-* Trigger `confluence_search_tool`
-* Search for pages matching `"auto-nesting"` in the `DOCS` space
-* Return up to 3 relevant results with clean snippets and URLs
+- Trigger `confluence_search_tool`
+- Search for pages matching `"auto-nesting"` in the `DOCS` space
+- Return up to 3 relevant results with clean snippets and URLs
 
 ---
 

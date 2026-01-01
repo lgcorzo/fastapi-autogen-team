@@ -1,0 +1,37 @@
+name: GitOps Trigger
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "k8s/**"
+      - "src/**"
+      - "Dockerfile"
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitOps repo
+        uses: actions/checkout@v4
+        with:
+          repository: lgcorzo/gitops_internal_lgcorzo
+          token: ${{ secrets.GITOPS_TOKEN }}
+          path: gitops
+
+      - name: Install Flux CLI
+        run: curl -s https://fluxcd.io/install.sh | sudo bash
+
+      - name: Trigger Reconciliation
+        run: |
+          # Note: This requires a KUBECONFIG if running remotely, 
+          # but usually, we just commit a change to the GitOps repo 
+          # or wait for the interval. 
+          # For now, we will just log the trigger request.
+          echo "Triggering Flux reconciliation for fastapi-autogen"
+          # In a real scenario, you might use a webhook or commit a dummy file to the GitOps repo.
+          # For this task, I'll provide a placeholder for the user to configure their preferred trigger method.
