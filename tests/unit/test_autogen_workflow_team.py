@@ -147,7 +147,7 @@ def test_handle_regular_message(mock_tool_calls, mock_function_call, mock_functi
     assert result == "Updated message 3"
 
 
-@patch("fastapi_autogen_team.autogen_workflow_team.MultimodalConversableAgent")
+@patch("fastapi_autogen_team.autogen_workflow_team.UserProxyAgent")
 @patch("fastapi_autogen_team.autogen_workflow_team.AssistantAgent")
 @patch("fastapi_autogen_team.autogen_workflow_team.GroupChat")
 @patch("fastapi_autogen_team.autogen_workflow_team.GroupChatManager")
