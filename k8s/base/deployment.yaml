@@ -19,3 +19,6 @@ spec:
           image: lgcorzo/fastapi-autogen-team:v1.1.0
           ports:
             - containerPort: 4100
+          envFrom:
+            - secretRef:
+                name: fastapi-autogen-secrets
