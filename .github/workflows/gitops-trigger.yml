@@ -9,6 +9,9 @@ on:
       - "src/**"
       - "Dockerfile"
 
+permissions:
+  contents: read
+
 jobs:
   reconcile:
     runs-on: ubuntu-latest
