@@ -60,7 +60,7 @@ def normalize_input_messages(inp: Input) -> str:
 
     if not user_messages:
         full_prompt = (
-            "'SHORT_MEMORY':{\n NO user message detected, finish the workflow  \n},\n" "'REQUEST':{\n TERMINATE \n}"
+            "'SHORT_MEMORY':{\n NO user message detected, finish the workflow  \n},\n'REQUEST':{\n TERMINATE \n}"
         )
 
         return full_prompt
