@@ -113,7 +113,8 @@ def get_jira_results(query: str):
     logger.info(f"Ejecutando consulta Jira JQL para: {query}")
     # Búsqueda simple por texto en el resumen o descripción
     # Sanitize query to prevent JQL injection
-    sanitized_query = query.replace('\\', '\\\\').replace('"', '\\"')
+    # Escape backslashes first, then quotes to prevent injection
+    sanitized_query = query.replace("\\", "\\\\").replace('"', '\\"')
     jql = f'summary ~ "{sanitized_query}" OR description ~ "{sanitized_query}"'
     issues = jira.jql(jql)
 
