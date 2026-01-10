@@ -39,7 +39,7 @@ def create_llm_config(
         else [
             {
                 "model": "azure-gpt",
-                "api_key": os.getenv("LITELLM_API_KEY", "sk-12345"),
+                "api_key": os.getenv("LITELLM_API_KEY"),
                 "base_url": os.getenv("LITELLM_BASE_URL", "http://litellm:4000"),  # Your LiteLLM URL
                 "default_headers": {"x-openwebui-user-id": user},
                 "tags": [user],

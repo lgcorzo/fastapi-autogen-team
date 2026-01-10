@@ -70,7 +70,7 @@ def test_create_llm_config_default():
     assert len(config["config_list"]) == 1
     assert config["config_list"][0]["model"] == "azure-gpt"
     # Default fallback when env var not set
-    assert config["config_list"][0]["api_key"] == "sk-12345"
+    assert config["config_list"][0]["api_key"] is None
     assert config["config_list"][0]["base_url"] == "http://litellm:4000"
 
 

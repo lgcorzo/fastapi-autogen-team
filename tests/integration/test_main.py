@@ -10,10 +10,14 @@ from fastapi_autogen_team.main import app
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
+import os
+from unittest.mock import patch
+
 @pytest.fixture
 def client():
-    with TestClient(app) as c:
-        yield c
+    with patch.dict(os.environ, {"LITELLM_API_KEY": "sk-test-key"}):
+        with TestClient(app) as c:
+            yield c
 
 
 # @pytest.mark.skip(reason="waiting to develop a full llm simulator for a interation test in CI pipeline")
