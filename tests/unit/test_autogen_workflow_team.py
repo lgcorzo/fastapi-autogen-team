@@ -69,8 +69,16 @@ def test_create_llm_config_default():
     assert config["timeout"] == 240
     assert len(config["config_list"]) == 1
     assert config["config_list"][0]["model"] == "azure-gpt"
+    # Default fallback when env var not set
     assert config["config_list"][0]["api_key"] == "sk-12345"
     assert config["config_list"][0]["base_url"] == "http://litellm:4000"
+
+
+def test_create_llm_config_from_env():
+    """Test create_llm_config reading API key from environment"""
+    with patch.dict("os.environ", {"LITELLM_API_KEY": "sk-env-test-key"}):
+        config = create_llm_config()
+        assert config["config_list"][0]["api_key"] == "sk-env-test-key"
 
 
 def test_create_llm_config_custom():
