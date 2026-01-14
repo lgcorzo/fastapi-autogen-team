@@ -11,7 +11,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 
 
 @pytest.fixture
-def client():
+def client(monkeypatch):
+    monkeypatch.setenv("LITELLM_API_KEY", "sk-integration-test")
     with TestClient(app) as c:
         yield c
 
