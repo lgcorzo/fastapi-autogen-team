@@ -404,7 +404,7 @@ class AutogenWorkflow:
                 self.queue.put(
                     {
                         "index": index_counter["index"] if "index_counter" in locals() else 0,
-                        "delta": {"role": "assistant", "content": f"System error occurred: {str(e)}"},
+                        "delta": {"role": "assistant", "content": "An internal error occurred."},
                         "finish_reason": "error",
                     }
                 )
