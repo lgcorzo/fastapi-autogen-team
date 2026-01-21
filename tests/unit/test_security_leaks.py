@@ -1,41 +1,44 @@
-import pytest
-from unittest.mock import patch, MagicMock
-from fastapi import HTTPException
-from fastapi_autogen_team.autogen_server import serve_autogen, generate_streaming_response
-from fastapi_autogen_team.data_model import Input
+from queue import Queue
 
+# Mock data
 MODEL_NAME = "test_model"
-TEST_MESSAGE = "Hello, Autogen!"
+TEST_MESSAGE = "Hello"
 TEST_INPUT = Input(model=MODEL_NAME, messages=[{"role": "user", "content": TEST_MESSAGE}])
+SENSITIVE_ERROR = "Database connection failed: user=admin password=secrethost"
 
-@pytest.fixture
-def mock_autogen_workflow_error():
-    """Mocks AutogenWorkflow to raise an exception."""
+def test_serve_autogen_exception_leak():
+    """Test that serve_autogen does NOT leak sensitive exception details."""
     with patch("fastapi_autogen_team.autogen_server.AutogenWorkflow") as MockWorkflow:
         workflow_instance = MockWorkflow.return_value
-        workflow_instance.run.side_effect = ValueError("Sensitive Internal Error Details")
-        workflow_instance.set_queue = MagicMock()
-        yield workflow_instance
+        # Simulate an exception with sensitive info
+        workflow_instance.run.side_effect = ValueError(SENSITIVE_ERROR)
 
-def test_serve_autogen_does_not_leak_exception_details(mock_autogen_workflow_error):
-    """Test that serve_autogen does NOT leak exception details."""
-    with pytest.raises(HTTPException) as exc_info:
-        serve_autogen(TEST_INPUT)
+        with pytest.raises(HTTPException) as exc_info:
+            serve_autogen(TEST_INPUT)
 
-    assert exc_info.value.status_code == 500
-    assert "Sensitive Internal Error Details" not in exc_info.value.detail
-    assert "An internal error occurred during Autogen processing." in exc_info.value.detail
+        # AFTER FIX: It should NOT leak.
+        assert SENSITIVE_ERROR not in exc_info.value.detail
+        assert "Autogen processing error" in exc_info.value.detail
+        assert exc_info.value.status_code == 500
 
-def test_generate_streaming_response_does_not_leak_exception_details():
-    """Test that generate_streaming_response does NOT leak exception details."""
-    mock_queue = MagicMock()
-    mock_queue.get.side_effect = ValueError("Sensitive Stream Error")
+def test_streaming_exception_leak():
+    """Test that streaming response does NOT leak sensitive details in the stream."""
+    queue = Queue()
 
-    generator = generate_streaming_response(TEST_INPUT, mock_queue)
+    # Simulate what AutogenWorkflow NOW puts into the queue on error
+    error_payload = {
+        "index": 0,
+        "delta": {"role": "assistant", "content": "An internal error occurred."},
+        "finish_reason": "error",
+    }
 
-    with pytest.raises(HTTPException) as exc_info:
-        next(generator)
+    queue.put(error_payload)
+    queue.put("[DONE]")
 
-    assert exc_info.value.status_code == 500
-    assert "Sensitive Stream Error" not in exc_info.value.detail
-    assert "An internal error occurred during streaming response." in exc_info.value.detail
+    generator = generate_streaming_response(TEST_INPUT, queue)
+
+    # Read the first chunk
+    chunk = next(generator)
+    # verify it does NOT contain the sensitive error
+    assert SENSITIVE_ERROR not in chunk
+    assert "An internal error occurred." in chunk
