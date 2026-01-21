@@ -396,15 +396,15 @@ class AutogenWorkflow:
 
         except Exception as e:
             # Handle any other exceptions
-            error_message = {"error": "Workflow Error", "details": str(e), "type": "system_error"}
+            logger.error(f"Workflow error: {str(e)}", exc_info=True)
 
-            logger.error(f"Workflow error: {str(e)}")
+            error_message = {"error": "Workflow Error", "details": "An internal error occurred", "type": "system_error"}
 
             if stream and self.queue is not None:
                 self.queue.put(
                     {
                         "index": index_counter["index"] if "index_counter" in locals() else 0,
-                        "delta": {"role": "assistant", "content": f"System error occurred: {str(e)}"},
+                        "delta": {"role": "assistant", "content": "System error occurred."},
                         "finish_reason": "error",
                     }
                 )
@@ -412,7 +412,7 @@ class AutogenWorkflow:
 
             # Return a chat result with error information
             return ChatResult(
-                chat_history=[{"role": "error", "content": f"System error occurred: {str(e)}", "error": error_message}],
+                chat_history=[{"role": "error", "content": "System error occurred.", "error": error_message}],
                 summary="Conversation failed due to system error",
                 cost={"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
             )
