@@ -60,31 +60,34 @@ def mock_sender():
 
 
 # Test create_llm_config function
-def test_create_llm_config_default():
-    """Test create_llm_config with default parameters"""
-    config = create_llm_config()
-
-    assert config["cache_seed"] is None
-    assert config["temperature"] == 0
-    assert config["timeout"] == 240
-    assert len(config["config_list"]) == 1
-    assert config["config_list"][0]["model"] == "azure-gpt"
-    # Default fallback when env var not set
-    assert config["config_list"][0]["api_key"] == "sk-12345"
-    assert config["config_list"][0]["base_url"] == "http://litellm:4000"
+def test_create_llm_config_no_env():
+    """Test create_llm_config raises ValueError when API key is missing"""
+    # Ensure env var is not set
+    with patch.dict("os.environ", {}, clear=True):
+        with pytest.raises(ValueError, match="LITELLM_API_KEY environment variable is required"):
+            create_llm_config()
 
 
 def test_create_llm_config_from_env():
     """Test create_llm_config reading API key from environment"""
     with patch.dict("os.environ", {"LITELLM_API_KEY": "sk-env-test-key"}):
         config = create_llm_config()
+        assert config["cache_seed"] is None
+        assert config["temperature"] == 0
+        assert config["timeout"] == 240
+        assert len(config["config_list"]) == 1
+        assert config["config_list"][0]["model"] == "azure-gpt"
         assert config["config_list"][0]["api_key"] == "sk-env-test-key"
+
+        assert config["config_list"][0]["base_url"] == "http://litellm:4000"
 
 
 def test_create_llm_config_custom():
     """Test create_llm_config with custom parameters"""
     custom_config = [{"model": "test-model", "api_key": "test-key"}]
-    config = create_llm_config(config_list=custom_config, temperature=0.7, timeout=120)
+    # We still need the env var set because create_llm_config checks it at start
+    with patch.dict("os.environ", {"LITELLM_API_KEY": "dummy"}):
+        config = create_llm_config(config_list=custom_config, temperature=0.7, timeout=120)
 
     assert config["cache_seed"] is None
     assert config["temperature"] == 0.7
@@ -174,8 +177,9 @@ def test_autogen_workflow_run_without_streaming(mock_manager, mock_group_chat, m
     ]
 
     # Create and run workflow
-    workflow = AutogenWorkflow()
-    result = workflow.run("Test message")
+    with patch.dict("os.environ", {"LITELLM_API_KEY": "sk-test-key"}):
+        workflow = AutogenWorkflow()
+        result = workflow.run("Test message")
 
     # Verify chat was initiated with correct parameters
     mock_user.initiate_chat.assert_called_once()

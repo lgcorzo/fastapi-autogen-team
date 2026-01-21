@@ -27,3 +27,38 @@ spec:
               value: "http://opentelemetry-collector.monitoring.svc.cluster.local:4318/v1"
             - name: DEFAULT_HOST
               value: "0.0.0.0"
+            - name: JIRA_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: fastapi-autogen-secrets
+                  key: JIRA_API_TOKEN
+            - name: JIRA_CLOUD
+              valueFrom:
+                secretKeyRef:
+                  name: fastapi-autogen-secrets
+                  key: JIRA_CLOUD
+            - name: JIRA_INSTANCE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: fastapi-autogen-secrets
+                  key: JIRA_INSTANCE_URL
+            - name: JIRA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: fastapi-autogen-secrets
+                  key: JIRA_USERNAME
+            - name: R2R_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: fastapi-autogen-secrets
+                  key: R2R_PWD
+            - name: R2R_URL
+              valueFrom:
+                secretKeyRef:
+                  name: fastapi-autogen-secrets
+                  key: R2R_URL
+            - name: R2R_USER
+              valueFrom:
+                secretKeyRef:
+                  name: fastapi-autogen-secrets
+                  key: R2R_USER
