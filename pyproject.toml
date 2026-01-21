@@ -15,7 +15,7 @@ packages = [{ include = "fastapi_autogen_team", from = "src" }]
 # DEPENDENCIES
 
 [tool.poetry.dependencies]
-python = "3.11.*"
+python = ">=3.12,<3.13"
 fastapi = "^0.115.11"
 ag2 = {extras = ["openai"], version = "^0.8.3"}
 flaml = "^2.3.4"
@@ -85,7 +85,7 @@ omit = ["__main__.py"]
 [tool.mypy]
 pretty = true
 strict = false
-python_version = "3.11"
+python_version = "3.12"
 check_untyped_defs = false
 ignore_missing_imports = true
 disable_error_code = ["return-value"]
@@ -100,7 +100,7 @@ pythonpath = ["src"]
 fix = true
 indent-width = 4
 line-length = 120
-target-version = "py311"
+target-version = "py312"
 
 [tool.ruff.format]
 docstring-code-format = true
