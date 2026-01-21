@@ -60,11 +60,11 @@ def mock_sender():
 
 
 # Test create_llm_config function
-def test_create_llm_config_raises_error_without_env_var():
-    """Test create_llm_config raises ValueError when LITELLM_API_KEY is not set"""
-    # Ensure environment variable is not set
+def test_create_llm_config_no_env():
+    """Test create_llm_config raises ValueError when API key is missing"""
+    # Ensure env var is not set
     with patch.dict("os.environ", {}, clear=True):
-        with pytest.raises(ValueError, match="LITELLM_API_KEY environment variable is not set"):
+        with pytest.raises(ValueError, match="LITELLM_API_KEY environment variable is required"):
             create_llm_config()
 
 
@@ -72,12 +72,13 @@ def test_create_llm_config_from_env():
     """Test create_llm_config reading API key from environment"""
     with patch.dict("os.environ", {"LITELLM_API_KEY": "sk-env-test-key"}):
         config = create_llm_config()
-        assert config["config_list"][0]["api_key"] == "sk-env-test-key"
         assert config["cache_seed"] is None
         assert config["temperature"] == 0
         assert config["timeout"] == 240
         assert len(config["config_list"]) == 1
         assert config["config_list"][0]["model"] == "azure-gpt"
+        assert config["config_list"][0]["api_key"] == "sk-env-test-key"
+
         assert config["config_list"][0]["base_url"] == "http://litellm:4000"
 
 
@@ -176,8 +177,7 @@ def test_autogen_workflow_run_without_streaming(mock_manager, mock_group_chat, m
     ]
 
     # Create and run workflow
-    # Mock environment variable for API key
-    with patch.dict("os.environ", {"LITELLM_API_KEY": "dummy"}):
+    with patch.dict("os.environ", {"LITELLM_API_KEY": "sk-test-key"}):
         workflow = AutogenWorkflow()
         result = workflow.run("Test message")
 

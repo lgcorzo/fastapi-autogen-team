@@ -33,14 +33,14 @@ def create_llm_config(
     config_list: list[dict] | None = None, user: str = "autogen_rag", temperature: int = 0, timeout: int = 240
 ) -> dict:
     """Creates a llm configuration for autogen agents with user tracking."""
-    api_key = os.getenv("LITELLM_API_KEY")
-    if not api_key:
-        raise ValueError("LITELLM_API_KEY environment variable is not set")
+    if config_list is not None:
+        config_list_used = config_list
+    else:
+        api_key = os.getenv("LITELLM_API_KEY")
+        if not api_key:
+            raise ValueError("LITELLM_API_KEY environment variable is required")
 
-    config_list_used = (
-        config_list
-        if config_list is not None
-        else [
+        config_list_used = [
             {
                 "model": "azure-gpt",
                 "api_key": api_key,
@@ -49,7 +49,6 @@ def create_llm_config(
                 "tags": [user],
             },
         ]
-    )
 
     return {
         "cache_seed": None,  # change the cache_seed for different trials
