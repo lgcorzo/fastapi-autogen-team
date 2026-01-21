@@ -10,6 +10,9 @@ from fastapi_autogen_team.main import app
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
+import os
+from unittest.mock import patch
+
 @pytest.fixture
 def client(monkeypatch):
     monkeypatch.setenv("LITELLM_API_KEY", "sk-integration-test")
