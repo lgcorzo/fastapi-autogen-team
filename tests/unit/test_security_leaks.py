@@ -1,3 +1,8 @@
+import pytest
+from unittest.mock import patch, MagicMock
+from fastapi import HTTPException
+from fastapi_autogen_team.autogen_server import serve_autogen, generate_streaming_response
+from fastapi_autogen_team.data_model import Input
 from queue import Queue
 
 # Mock data
@@ -18,7 +23,7 @@ def test_serve_autogen_exception_leak():
 
         # AFTER FIX: It should NOT leak.
         assert SENSITIVE_ERROR not in exc_info.value.detail
-        assert "Autogen processing error" in exc_info.value.detail
+        assert "An internal error occurred during Autogen processing." in exc_info.value.detail
         assert exc_info.value.status_code == 500
 
 def test_streaming_exception_leak():
