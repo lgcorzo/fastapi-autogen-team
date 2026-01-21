@@ -50,7 +50,7 @@ This section details the requirements, actions, and next steps to kickstart your
 
 ## Prerequisites
 
-- Python>=3.11: to benefit from the latest features and performance improvements
+- Python>=3.12: to benefit from the latest features and performance improvements
 - Poetry>=1.8.2: to initialize the project virtual environment and its dependencies
 
 ## Installation
