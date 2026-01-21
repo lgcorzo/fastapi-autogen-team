@@ -62,3 +62,13 @@ spec:
                 secretKeyRef:
                   name: fastapi-autogen-secrets
                   key: R2R_USER
+            - name: LITELLM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: fastapi-autogen-secrets
+                  key: LITELLM_API_KEY
+            - name: LITELLM_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: fastapi-autogen-secrets
+                  key: LITELLM_BASE_URL
