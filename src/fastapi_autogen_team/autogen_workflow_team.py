@@ -400,7 +400,11 @@ class AutogenWorkflow:
         except Exception as e:
             # Handle any other exceptions
             # Don't leak exception details to the client, but log them
-            error_message = {"error": "Workflow Error", "details": "An internal system error occurred.", "type": "system_error"}
+            error_message = {
+                "error": "Workflow Error",
+                "details": "An internal system error occurred.",
+                "type": "system_error",
+            }
 
             logger.error(f"Workflow error: {str(e)}", exc_info=True)
 

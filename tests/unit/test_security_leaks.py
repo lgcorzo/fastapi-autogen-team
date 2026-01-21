@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from fastapi import HTTPException
 from fastapi_autogen_team.autogen_server import serve_autogen, generate_streaming_response
 from fastapi_autogen_team.data_model import Input
@@ -10,6 +10,7 @@ MODEL_NAME = "test_model"
 TEST_MESSAGE = "Hello"
 TEST_INPUT = Input(model=MODEL_NAME, messages=[{"role": "user", "content": TEST_MESSAGE}])
 SENSITIVE_ERROR = "Database connection failed: user=admin password=secrethost"
+
 
 def test_serve_autogen_exception_leak():
     """Test that serve_autogen does NOT leak sensitive exception details."""
@@ -25,6 +26,7 @@ def test_serve_autogen_exception_leak():
         assert SENSITIVE_ERROR not in exc_info.value.detail
         assert "An internal error occurred during Autogen processing." in exc_info.value.detail
         assert exc_info.value.status_code == 500
+
 
 def test_streaming_exception_leak():
     """Test that streaming response does NOT leak sensitive details in the stream."""
