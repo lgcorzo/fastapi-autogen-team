@@ -416,7 +416,7 @@ class AutogenWorkflow:
 
             # Return a chat result with error information
             return ChatResult(
-                chat_history=[{"role": "error", "content": "System error occurred.", "error": error_message}],
+                chat_history=[{"role": "error", "content": "An internal error occurred.", "error": error_message}],
                 summary="Conversation failed due to system error",
                 cost={"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
             )
