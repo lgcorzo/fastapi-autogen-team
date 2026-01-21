@@ -30,7 +30,7 @@ def handle_response(response: Output) -> dict:
         return response.model_dump()
     except Exception as e:
         logger.error(f"Failed to serialize response: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Serialization error") from e
+        raise HTTPException(status_code=500, detail="An internal error occurred during serialization.") from e
 
 
 def normalize_input_messages(inp: Input) -> str:
@@ -107,7 +107,7 @@ def serve_autogen(inp: Input) -> StreamingResponse | dict:
 
     except Exception as e:
         logger.error(f"Error processing Autogen request: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="An internal error occurred during Autogen processing") from e
+        raise HTTPException(status_code=500, detail="An internal error occurred during Autogen processing.") from e
 
 
 def generate_streaming_response(inp: Input, queue: Queue):
@@ -130,7 +130,7 @@ def generate_streaming_response(inp: Input, queue: Queue):
             queue.task_done()
     except Exception as e:
         logger.error(f"Streaming response failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Streaming error occurred") from e
+        raise HTTPException(status_code=500, detail="An internal error occurred during streaming response.") from e
 
 
 def create_non_streaming_response(chat_results, model: str):
@@ -179,4 +179,4 @@ def create_non_streaming_response(chat_results, model: str):
         return handle_response(output)
     except Exception as e:
         logger.error(f"Failed to create non-streaming response: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Response creation error") from e
+        raise HTTPException(status_code=500, detail="An internal error occurred during response creation.") from e
