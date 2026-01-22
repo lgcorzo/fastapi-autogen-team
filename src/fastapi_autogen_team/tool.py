@@ -68,7 +68,7 @@ def safe_get_r2r_results(query: str):
         return get_r2r_results(query)
     except Exception as e:
         logger.exception("Error al obtener resultados de R2R:")
-        return f"Error en R2R: {e}"
+        return "Error en R2R: Ha ocurrido un error interno al consultar R2R."
 
 
 def safe_get_jira_results(query: str):
@@ -76,7 +76,7 @@ def safe_get_jira_results(query: str):
         return get_jira_results(query)
     except Exception as e:
         logger.exception("Error al obtener resultados de Jira:")
-        return f"Error en Jira: {e}"
+        return "Error en Jira: Ha ocurrido un error interno al consultar Jira."
 
 
 def get_r2r_results(query: str):
