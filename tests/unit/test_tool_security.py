@@ -1,6 +1,6 @@
-import pytest
 from unittest.mock import patch
 from fastapi_autogen_team import tool
+
 
 def test_safe_get_r2r_results_no_leak_exception():
     """Test that safe_get_r2r_results does NOT leak the exception message."""
@@ -13,6 +13,7 @@ def test_safe_get_r2r_results_no_leak_exception():
         # New behavior: generic message
         assert sensitive_info not in result
         assert "Ha ocurrido un error interno al consultar R2R" in result
+
 
 def test_safe_get_jira_results_no_leak_exception():
     """Test that safe_get_jira_results does NOT leak the exception message."""
