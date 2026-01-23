@@ -66,17 +66,17 @@ async def async_search(query: str, timeout: float = 10.0):
 def safe_get_r2r_results(query: str):
     try:
         return get_r2r_results(query)
-    except Exception as e:
+    except Exception:
         logger.exception("Error al obtener resultados de R2R:")
-        return f"Error en R2R: {e}"
+        return "Error en R2R: An internal error occurred while retrieving results."
 
 
 def safe_get_jira_results(query: str):
     try:
         return get_jira_results(query)
-    except Exception as e:
+    except Exception:
         logger.exception("Error al obtener resultados de Jira:")
-        return f"Error en Jira: {e}"
+        return "Error en Jira: An internal error occurred while retrieving results."
 
 
 def get_r2r_results(query: str):
