@@ -23,3 +23,8 @@
 **Learning:** Even when catching exceptions, simply passing the exception string to the client is insecure. This was prevalent in both the FastAPI server handlers and the AutoGen workflow logic where error messages were manually constructed.
 **Prevention:** Always return generic error messages (e.g., "An internal error occurred") to the client. Log the full exception details server-side using `logger.exception()` or `logger.error(..., exc_info=True)` for debugging.
 >>>>>>> origin/sentinel/fix-exception-leakage-9932621092945243215
+
+## 2026-01-24 - Prevent Information Leakage in Tool Errors
+**Vulnerability:** The application was returning raw exception messages in `tool.py` (e.g., `f"Error en R2R: {e}"`). This could expose sensitive details (like database URLs or tokens) to LLM agents and subsequently to users.
+**Learning:** Even internal tools consumed by LLMs must sanitize error messages, as LLMs may faithfully relay sensitive error details to the user.
+**Prevention:** Catch exceptions in tool wrappers, log the full details with `exc_info=True`, and return generic error messages to the calling agent.
