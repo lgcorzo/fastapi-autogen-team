@@ -52,8 +52,15 @@ async def async_search(query: str, timeout: float = 10.0):
         )
 
         # Manejo de timeouts o errores
-        r2r_result = results[0] if not isinstance(results[0], Exception) else f"R2R timeout/error: {results[0]}"
-        jira_result = results[1] if not isinstance(results[1], Exception) else f"Jira timeout/error: {results[1]}"
+        r2r_result = results[0]
+        if isinstance(r2r_result, Exception):
+            logger.error(f"R2R error/timeout: {r2r_result}")
+            r2r_result = "An internal error occurred"
+
+        jira_result = results[1]
+        if isinstance(jira_result, Exception):
+            logger.error(f"Jira error/timeout: {jira_result}")
+            jira_result = "An internal error occurred"
 
         logger.info("Búsqueda completada")
         return {"r2r": r2r_result, "jira": jira_result}
@@ -68,7 +75,7 @@ def safe_get_r2r_results(query: str):
         return get_r2r_results(query)
     except Exception as e:
         logger.exception("Error al obtener resultados de R2R:")
-        return f"Error en R2R: {e}"
+        return "An internal error occurred"
 
 
 def safe_get_jira_results(query: str):
@@ -76,7 +83,7 @@ def safe_get_jira_results(query: str):
         return get_jira_results(query)
     except Exception as e:
         logger.exception("Error al obtener resultados de Jira:")
-        return f"Error en Jira: {e}"
+        return "An internal error occurred"
 
 
 def get_r2r_results(query: str):
