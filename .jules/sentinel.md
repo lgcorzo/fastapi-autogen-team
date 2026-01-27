@@ -23,3 +23,8 @@
 **Learning:** Even when catching exceptions, simply passing the exception string to the client is insecure. This was prevalent in both the FastAPI server handlers and the AutoGen workflow logic where error messages were manually constructed.
 **Prevention:** Always return generic error messages (e.g., "An internal error occurred") to the client. Log the full exception details server-side using `logger.exception()` or `logger.error(..., exc_info=True)` for debugging.
 >>>>>>> origin/sentinel/fix-exception-leakage-9932621092945243215
+
+## 2026-01-19 - Information Leakage in Tool Functions
+**Vulnerability:** The `safe_get_jira_results` and `safe_get_r2r_results` functions in `tool.py` were catching exceptions but returning the raw exception message `str(e)` to the caller. This leaked internal error details, potential secrets in URLs, or stack trace fragments.
+**Learning:** Even internal helper functions used by agents must sanitize error messages, as the agent might expose this information to the user or log it insecurely.
+**Prevention:** Catch exceptions, log full details with `exc_info=True`, and return generic error messages like "An internal error occurred" to the caller.
