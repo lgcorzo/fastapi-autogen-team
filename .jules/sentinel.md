@@ -1,6 +1,3 @@
-
-
-
 ## 2024-05-23 - Prevent Information Leakage in Error Responses
 **Vulnerability:** The application was returning raw exception messages in HTTP 500 responses in `autogen_server.py`. This could expose sensitive internal details like stack traces, database schemas, or file paths to attackers.
 **Learning:** FastAPI's `HTTPException` detail field is sent directly to the client. Developers often pass the exception string `str(e)` for convenience, not realizing it can contain sensitive info.
@@ -23,3 +20,8 @@
 **Learning:** Even when catching exceptions, simply passing the exception string to the client is insecure. This was prevalent in both the FastAPI server handlers and the AutoGen workflow logic where error messages were manually constructed.
 **Prevention:** Always return generic error messages (e.g., "An internal error occurred") to the client. Log the full exception details server-side using `logger.exception()` or `logger.error(..., exc_info=True)` for debugging.
 >>>>>>> origin/sentinel/fix-exception-leakage-9932621092945243215
+
+## 2026-02-04 - Tool Exception Leakage in Async Search
+**Vulnerability:** The `async_search`, `safe_get_r2r_results`, and `safe_get_jira_results` functions in `tool.py` were catching exceptions but returning the raw exception string (e.g., `f"Error en R2R: {e}"`). This leaked internal details like connection errors or stack trace fragments to the agent/user.
+**Learning:** Wrapper functions named `safe_` often imply safety but must be verified to ensure they sanitize output, not just prevent crashes. Async `gather` with `return_exceptions=True` returns Exception objects which must be handled explicitly.
+**Prevention:** In `safe_` wrappers and async error handling, always log the full exception with `exc_info=True` but return a static, generic error message (e.g., "An internal error occurred") to the caller.
