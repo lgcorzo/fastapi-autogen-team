@@ -4,6 +4,7 @@ from fastapi_autogen_team import tool
 
 SENSITIVE_ERROR = "Connection failed: password=supersecret host=internal-db"
 
+
 def test_safe_get_r2r_results_leak():
     """Test that safe_get_r2r_results does NOT leak sensitive exception details."""
     with patch("fastapi_autogen_team.tool.get_r2r_results") as mock_get:
@@ -13,7 +14,8 @@ def test_safe_get_r2r_results_leak():
 
         # Should return a generic error, not the sensitive one
         assert SENSITIVE_ERROR not in result
-        assert "An internal error occurred" in result or "Error" in result # Adjust based on implementation plan
+        assert "An internal error occurred" in result or "Error" in result  # Adjust based on implementation plan
+
 
 def test_safe_get_jira_results_leak():
     """Test that safe_get_jira_results does NOT leak sensitive exception details."""
@@ -25,6 +27,7 @@ def test_safe_get_jira_results_leak():
         # Should return a generic error, not the sensitive one
         assert SENSITIVE_ERROR not in result
         assert "An internal error occurred" in result or "Error" in result
+
 
 @pytest.mark.asyncio
 async def test_async_search_leak():
@@ -46,9 +49,10 @@ async def test_async_search_leak():
 
     # So we need to test that path too.
 
-    with patch("fastapi_autogen_team.tool.safe_get_r2r_results") as mock_r2r, \
-         patch("fastapi_autogen_team.tool.safe_get_jira_results") as mock_jira:
-
+    with (
+        patch("fastapi_autogen_team.tool.safe_get_r2r_results") as mock_r2r,
+        patch("fastapi_autogen_team.tool.safe_get_jira_results") as mock_jira,
+    ):
         # Simulate them raising an exception (e.g. timeout or unexpected error not caught inside them)
         mock_r2r.side_effect = ValueError(SENSITIVE_ERROR)
         mock_jira.return_value = "jira ok"
