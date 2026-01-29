@@ -1,6 +1,7 @@
 import os
 import asyncio
 import logging
+from typing import Any
 from r2r import R2RClient
 from atlassian import Jira
 from dotenv import load_dotenv
@@ -52,12 +53,14 @@ async def async_search(query: str, timeout: float = 10.0):
         )
 
         # Manejo de timeouts o errores
+        r2r_result: Any
         if isinstance(results[0], Exception):
             logger.error(f"R2R error in async_search: {results[0]}", exc_info=True)
             r2r_result = "An internal error occurred while fetching R2R results."
         else:
             r2r_result = results[0]
 
+        jira_result: Any
         if isinstance(results[1], Exception):
             logger.error(f"Jira error in async_search: {results[1]}", exc_info=True)
             jira_result = "An internal error occurred while fetching Jira results."
