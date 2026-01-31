@@ -89,3 +89,45 @@ async def test_get_jira_results_no_results():
         result = await asyncio.to_thread(tool.get_jira_results, "test_query")
 
         assert result == "No se encontraron resultados en Jira."
+
+
+@pytest.mark.asyncio
+async def test_async_search_exception_leak():
+    """
+    Test that async_search does NOT leak raw exception details in the result.
+    It should return a generic error message instead of 'R2R timeout/error: ...' with the exception string.
+    """
+    sensitive_error_msg = "Connection failed to 192.168.1.5 with password=secret"
+
+    with patch("fastapi_autogen_team.tool.get_r2r_results") as mock_get:
+        mock_get.side_effect = ValueError(sensitive_error_msg)
+
+        result = await tool.async_search("test")
+
+        # Check r2r result
+        r2r_res = result["r2r"]
+
+        # Assertions for SAFE code:
+        assert sensitive_error_msg not in r2r_res, "Vulnerability detected: Sensitive error message leaked!"
+        assert "An internal error occurred" in r2r_res, "Generic error message not found"
+
+
+@pytest.mark.asyncio
+async def test_async_search_timeout_exception_leak():
+    """
+    Test that async_search does NOT leak exception details if asyncio.gather returns an exception
+    (e.g. from wait_for timeout or other unhandled exception in the thread).
+    """
+    sensitive_error_msg = "Timeout contacting 10.0.0.1"
+
+    with patch("fastapi_autogen_team.tool.asyncio.wait_for") as mock_wait_for:
+        # Mock wait_for to raise an exception for the first call (r2r)
+        mock_wait_for.side_effect = [ValueError(sensitive_error_msg), "jira_result"]
+
+        result = await tool.async_search("test")
+
+        r2r_res = result["r2r"]
+
+        # Assertions for SAFE code:
+        assert sensitive_error_msg not in r2r_res, "Vulnerability detected in timeout case: Sensitive error message leaked!"
+        assert "An internal error occurred" in r2r_res, "Generic error message not found in timeout case"

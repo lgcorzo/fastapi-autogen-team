@@ -23,3 +23,8 @@
 **Learning:** Even when catching exceptions, simply passing the exception string to the client is insecure. This was prevalent in both the FastAPI server handlers and the AutoGen workflow logic where error messages were manually constructed.
 **Prevention:** Always return generic error messages (e.g., "An internal error occurred") to the client. Log the full exception details server-side using `logger.exception()` or `logger.error(..., exc_info=True)` for debugging.
 >>>>>>> origin/sentinel/fix-exception-leakage-9932621092945243215
+
+## 2026-02-12 - Exception Leakage in Asyncio Gather Results
+**Vulnerability:** The `async_search` function in `tool.py` was inspecting the results of `asyncio.gather(..., return_exceptions=True)` and directly including the exception string (e.g., `f"R2R timeout/error: {results[0]}"`) in the returned dictionary. This exposed raw exception details to the caller.
+**Learning:** When using `return_exceptions=True` with `asyncio.gather`, the results list contains exception objects. Converting these to strings (explicitly or implicitly) and returning them to the user leaks internal error details just like catching an exception and returning `str(e)`.
+**Prevention:** Always check if a result from `asyncio.gather` is an instance of `Exception`. If it is, log it with `exc_info=True` and replace it with a generic error message in the response.
