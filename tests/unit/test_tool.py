@@ -129,5 +129,7 @@ async def test_async_search_timeout_exception_leak():
         r2r_res = result["r2r"]
 
         # Assertions for SAFE code:
-        assert sensitive_error_msg not in r2r_res, "Vulnerability detected in timeout case: Sensitive error message leaked!"
+        assert (
+            sensitive_error_msg not in r2r_res
+        ), "Vulnerability detected in timeout case: Sensitive error message leaked!"
         assert "An internal error occurred" in r2r_res, "Generic error message not found in timeout case"
