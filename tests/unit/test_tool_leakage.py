@@ -4,12 +4,14 @@ from fastapi_autogen_team import tool
 
 SENSITIVE_ERROR = "Connection failed: user=admin password=secret"
 
+
 @pytest.mark.asyncio
 async def test_async_search_leak():
     # Patch get_r2r_results and get_jira_results to raise exceptions with sensitive info
-    with patch("fastapi_autogen_team.tool.get_r2r_results") as mock_r2r, \
-         patch("fastapi_autogen_team.tool.get_jira_results") as mock_jira:
-
+    with (
+        patch("fastapi_autogen_team.tool.get_r2r_results") as mock_r2r,
+        patch("fastapi_autogen_team.tool.get_jira_results") as mock_jira,
+    ):
         mock_r2r.side_effect = Exception(SENSITIVE_ERROR)
         mock_jira.side_effect = Exception(SENSITIVE_ERROR)
 
