@@ -24,7 +24,7 @@ async def test_safe_get_jira_results_leak_prevention():
 @pytest.mark.asyncio
 async def test_async_search_exception_handling_leak_prevention():
     # Mocking the internal results returned by gather
-    with mock.patch("asyncio.to_thread") as mock_to_thread:
+    with mock.patch("asyncio.to_thread"):
         # Simulate instances where to_thread itself might fail or return an exception if used with gather(return_exceptions=True)
         # But wait_for is what wraps to_thread in tool.py.
 

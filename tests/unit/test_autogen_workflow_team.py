@@ -70,7 +70,7 @@ def test_create_llm_config_no_env():
 
 def test_create_llm_config_from_env():
     """Test create_llm_config reading API key from environment"""
-    with patch.dict("os.environ", {"LITELLM_API_KEY": "sk-env-test-key"}):
+    with patch.dict("os.environ", {"LITELLM_API_KEY": "sk-env-test-key", "LITELLM_BASE_URL": "http://litellm:4000"}):
         config = create_llm_config()
         assert config["cache_seed"] is None
         assert config["temperature"] == 0
