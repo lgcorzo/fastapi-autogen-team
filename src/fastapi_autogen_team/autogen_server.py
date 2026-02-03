@@ -21,10 +21,12 @@ EMPTY_USAGE = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 def handle_response(response: Output) -> dict:
     """Validates and processes the response object."""
     if isinstance(response, str):
-        raise HTTPException(status_code=500, detail=f"Unexpected string response: {response}")
+        logger.error(f"Unexpected string response: {response}", exc_info=True)
+        raise HTTPException(status_code=500, detail="An internal error occurred during response validation.")
 
     if not hasattr(response, "model_dump"):
-        raise HTTPException(status_code=500, detail=f"Response object missing 'model_dump' method: {type(response)}")
+        logger.error(f"Response object missing 'model_dump' method: {type(response)}", exc_info=True)
+        raise HTTPException(status_code=500, detail="An internal error occurred during response validation.")
 
     try:
         return response.model_dump()
