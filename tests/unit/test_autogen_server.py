@@ -43,7 +43,7 @@ def test_handle_response_invalid_string():
     with pytest.raises(HTTPException) as exc_info:
         handle_response("error")
     assert exc_info.value.status_code == 500
-    assert "Unexpected string response" in exc_info.value.detail
+    assert "An internal error occurred during response validation." in exc_info.value.detail
 
 
 def test_handle_response_missing_model_dump():
@@ -55,7 +55,7 @@ def test_handle_response_missing_model_dump():
     with pytest.raises(HTTPException) as exc_info:
         handle_response(MockObject())
     assert exc_info.value.status_code == 500
-    assert "'model_dump' method" in exc_info.value.detail
+    assert "An internal error occurred during response validation." in exc_info.value.detail
 
 
 def test_serve_autogen_streaming(mock_autogen_workflow):
