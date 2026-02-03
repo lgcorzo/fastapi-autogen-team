@@ -1,3 +1,5 @@
+![Fastapi-Autogen-team Banner](image/README/banner.png)
+
 # Fastapi-Autogen-team Python Package
 
 [![check.yml](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/check.yml/badge.svg)](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/check.yml)
@@ -247,11 +249,6 @@ The GitHub Actions pipelines automate the following tasks:
 
 You can use and extend these workflows to automate repetitive package management tasks.
 
-This package supports two GitHub Workflows in `.github/workflows`:
-
-- `check.yml`: Validate the quality of the package on each Pull Request
-- `publish.yml`: Build and publish the docs and packages on code release.
-
 You can use and extend these workflows to automate repetitive package management tasks.
 
 ### 1. **Project Purpose**
@@ -265,8 +262,7 @@ The project aims to create a streaming interface for OpenAI-compatible models us
 ### 2. **Project Setup**
 
 - **Installation:**
-
-  - Steps include cloning a GitHub repository and setting up a Python environment (with Python 3.11 and Poetry).
+  - Steps include cloning a GitHub repository and setting up a Python environment (with Python 3.12 and Poetry).
   - Key dependencies are `FastAPI` and `pyautogen`.
 
 - **Environment Variables:**
@@ -286,6 +282,7 @@ The project aims to create a streaming interface for OpenAI-compatible models us
   - `src/fastapi_autogen_team/data_model.py`: Defines request/response models using Pydantic (compatible with OpenAI).
   - `src/fastapi_autogen_team/autogen_workflow_team.py`: Contains logic for the AutoGen workflows and interactions.
   - `src/fastapi_autogen_team/autogen_server.py`: Implements handling of streaming and non-streaming client requests.
+  - `src/fastapi_autogen_team/tool.py`: Orchestrates search operations (R2R, Jira) with built-in security to prevent exception leakage.
 
 ```mermaid
 classDiagram
@@ -340,11 +337,9 @@ sequenceDiagram
 ### 4. **Implementing the Streaming Interface**
 
 - **FastAPI Application:**
-
   - Routes are defined for features like redirecting to documentation (`GET /`), returning model information (`GET /models`), and handling chat completions (`POST /chat/completions`).
 
 - **Data Models:**
-
   - Uses Pydantic to define:
     - `ModelInformation`: Stores model details.
     - `Input`: Represents an OpenAI-compatible request.
@@ -352,11 +347,9 @@ sequenceDiagram
     - `Message`: A message in the request.
 
 - **AutoGen Workflow:**
-
   - Defines an interaction pattern between agents, such as `UserProxy` and AI agents like fictional comedians. Messages are processed via queues for streaming.
 
 - **Queue Management:**
-
   - Ensures real-time response by queueing intermediate messages for streaming to the client.
 
 - **Streaming Logic:**
@@ -441,7 +434,6 @@ python -m fastapi_autogen_team.main
 ```
 
 Or use the provided `run.sh` if environment variables are set.
-
 
 ## References:
 
