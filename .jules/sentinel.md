@@ -22,3 +22,8 @@
 **Vulnerability:** The `handle_response` function in `autogen_server.py` was raising `HTTPException` with details that included the raw string response or the type of the object. This leaked sensitive data or internal implementation details to the client.
 **Learning:** Even helper functions used for response processing can be a source of information leakage if they bubble up raw data in exception details.
 **Prevention:** Catch invalid states and log the specific error details (including the raw data) to the server logs, but raise an `HTTPException` with a generic, sanitized message to the client.
+
+## 2026-02-04 - Prompt Injection via Structural Delimiters
+**Vulnerability:** The application constructs LLM prompts using specific delimiters like `\n},\n'REQUEST':{\n`. Users could inject these delimiters to close the current block and open a new system block, potentially overriding instructions.
+**Learning:** Hardcoded structural delimiters in prompt templates can be exploited if user input is not sanitized against them.
+**Prevention:** Sanitize user input to break specific delimiter sequences (e.g., insert spaces) before embedding in the prompt.
