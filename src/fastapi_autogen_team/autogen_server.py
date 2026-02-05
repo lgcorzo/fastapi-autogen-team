@@ -18,6 +18,12 @@ logger = logging.getLogger(__name__)
 EMPTY_USAGE = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
 
+def sanitize_for_prompt(text: str) -> str:
+    """Sanitizes text to prevent prompt injection via structural delimiters."""
+    # Replace the structural delimiter with a safe alternative
+    return text.replace("\n},\n", "\n} ,\n")
+
+
 def handle_response(response: Output) -> dict:
     """Validates and processes the response object."""
     if isinstance(response, str):
@@ -54,7 +60,8 @@ def normalize_input_messages(inp: Input) -> str:
 
         for c in content_blocks:
             if c.get("type") == "text":
-                normalized_messages.append({"role": m["role"].capitalize(), "text": c["text"]})
+                sanitized_text = sanitize_for_prompt(c["text"])
+                normalized_messages.append({"role": m["role"].capitalize(), "text": sanitized_text})
 
     # Extraer mensajes según rol
     system_messages = [m for m in normalized_messages if m["role"] == "System"]
