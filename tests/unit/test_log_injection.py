@@ -1,8 +1,5 @@
-
 import pytest
-import asyncio
-from unittest.mock import patch, MagicMock, call
-import os
+from unittest.mock import patch, MagicMock
 
 from fastapi_autogen_team.utils import sanitize_log_input
 # Need to mock environment variables before importing modules that use them at module level?
@@ -10,9 +7,10 @@ from fastapi_autogen_team.utils import sanitize_log_input
 # But since we are testing functions, it should be fine as long as we patch what we need.
 
 from fastapi import HTTPException
-from fastapi_autogen_team.data_model import Input, Message
+from fastapi_autogen_team.data_model import Input
 from fastapi_autogen_team.main import route_query
 from fastapi_autogen_team.tool import async_search, get_jira_results
+
 
 def test_sanitize_log_input():
     assert sanitize_log_input("normal input") == "normal input"
@@ -25,6 +23,7 @@ def test_sanitize_log_input():
     # However, in python None is falsy so it returns "".
     assert sanitize_log_input(None) == ""
 
+
 @pytest.mark.asyncio
 async def test_main_log_injection_prevention():
     # Mock Request
@@ -32,18 +31,14 @@ async def test_main_log_injection_prevention():
     mock_request.headers.get.return_value = "user\ninput"
 
     # Mock Input
-    model_input = Input(
-        model="model\nname",
-        messages=[],
-        user="original_user"
-    )
+    model_input = Input(model="model\nname", messages=[], user="original_user")
 
     # Mock log_with_trace
     # We patch it where it is used. Since it is defined in main.py and used in main.py,
     # we patch 'fastapi_autogen_team.main.log_with_trace'.
     with patch("fastapi_autogen_team.main.log_with_trace") as mock_log:
         # We also need to mock serve_autogen to avoid running actual logic
-        with patch("fastapi_autogen_team.main.serve_autogen") as mock_service:
+        with patch("fastapi_autogen_team.main.serve_autogen"):
             # We also need to mock model_info because route_query accesses model_info.name
             # But model_info is imported/defined at module level.
             # It should be fine as long as we don't crash.
@@ -65,9 +60,10 @@ async def test_main_log_injection_prevention():
                 if "Chat completion request for model:" in args[0]:
                     assert "user\\ninput" in args[0]
                     assert "model\\nname" in args[0]
-                    assert "\n" not in args[0] # Should not have raw newlines
+                    assert "\n" not in args[0]  # Should not have raw newlines
                     found = True
             assert found, "Did not find the expected log message"
+
 
 @pytest.mark.asyncio
 async def test_tool_async_search_log_injection_prevention():
@@ -76,8 +72,8 @@ async def test_tool_async_search_log_injection_prevention():
     # We patch logger in tool.py
     with patch("fastapi_autogen_team.tool.logger") as mock_logger:
         # Mock the helper functions to avoid actual execution
-        with patch("fastapi_autogen_team.tool.safe_get_r2r_results") as mock_r2r:
-            with patch("fastapi_autogen_team.tool.safe_get_jira_results") as mock_jira:
+        with patch("fastapi_autogen_team.tool.safe_get_r2r_results"):
+            with patch("fastapi_autogen_team.tool.safe_get_jira_results"):
                 await async_search(query)
 
                 # Check calls to logger.info
@@ -90,15 +86,14 @@ async def test_tool_async_search_log_injection_prevention():
                         found = True
                 assert found, "Did not find the expected log message in async_search"
 
+
 def test_tool_get_jira_results_log_injection_prevention():
     query = "jira\nquery"
 
     # Need to set env vars for Jira to avoid ValueError
-    with patch.dict("os.environ", {
-        "JIRA_INSTANCE_URL": "http://jira",
-        "JIRA_USERNAME": "user",
-        "JIRA_API_TOKEN": "token"
-    }):
+    with patch.dict(
+        "os.environ", {"JIRA_INSTANCE_URL": "http://jira", "JIRA_USERNAME": "user", "JIRA_API_TOKEN": "token"}
+    ):
         with patch("fastapi_autogen_team.tool.logger") as mock_logger:
             with patch("fastapi_autogen_team.tool.Jira") as mock_jira_class:
                 mock_jira_instance = MagicMock()
