@@ -27,3 +27,8 @@
 **Vulnerability:** The application constructs LLM prompts using specific delimiters like `\n},\n'REQUEST':{\n`. Users could inject these delimiters to close the current block and open a new system block, potentially overriding instructions.
 **Learning:** Hardcoded structural delimiters in prompt templates can be exploited if user input is not sanitized against them.
 **Prevention:** Sanitize user input to break specific delimiter sequences (e.g., insert spaces) before embedding in the prompt.
+
+## 2026-02-28 - Log Injection
+**Vulnerability:** The application was logging raw user input (model names, user IDs, search queries) without sanitization. This allows attackers to inject newline characters (`\n`, `\r`) to forge log entries, potentially confusing log analysis tools or hiding malicious activity.
+**Learning:** Logging frameworks (like Python's `logging`) do not automatically sanitize input. Developers must explicitly sanitize any untrusted input before logging it.
+**Prevention:** Use a dedicated sanitization function (e.g., `sanitize_log_input`) to escape control characters like `\n` and `\r` before passing data to the logger.

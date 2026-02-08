@@ -4,6 +4,7 @@ import logging
 from r2r import R2RClient
 from atlassian import Jira
 from dotenv import load_dotenv
+from fastapi_autogen_team.utils import sanitize_log_input
 
 # Cargar variables de entorno
 load_dotenv()
@@ -39,7 +40,8 @@ def search(query: str):
 
 
 async def async_search(query: str, timeout: float = 10.0):
-    logger.info(f"Ejecutando búsqueda para: {query}")
+    safe_query = sanitize_log_input(query)
+    logger.info(f"Ejecutando búsqueda para: {safe_query}")
 
     try:
         r2r_task = asyncio.to_thread(safe_get_r2r_results, query)
@@ -114,7 +116,8 @@ def get_jira_results(query: str):
         cloud=cloud,
     )
 
-    logger.info(f"Ejecutando consulta Jira JQL para: {query}")
+    safe_query = sanitize_log_input(query)
+    logger.info(f"Ejecutando consulta Jira JQL para: {safe_query}")
     # Búsqueda simple por texto en el resumen o descripción
     # Sanitize query to prevent JQL injection
     # Escape backslashes first, then quotes to prevent injection
