@@ -1,4 +1,4 @@
-def sanitize_log_input(input_str: str) -> str:
+def sanitize_log_input(input_str: str | None) -> str:
     """Sanitizes input string for logging by escaping newlines and carriage returns.
 
     This prevents log injection attacks where an attacker can forge log entries.

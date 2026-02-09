@@ -16,7 +16,7 @@ async def test_log_injection_reproduction():
     mock_request.headers = {}
 
     # Mock dependencies
-    with patch("fastapi_autogen_team.main.serve_autogen") as mock_serve:
+    with patch("fastapi_autogen_team.main.serve_autogen"):
         with patch("fastapi_autogen_team.main.logger") as mock_logger:
             # Run the function
             await route_query(model_input, mock_request)
