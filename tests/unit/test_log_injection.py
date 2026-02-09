@@ -4,15 +4,12 @@ from fastapi_autogen_team.data_model import Input
 from fastapi_autogen_team.main import route_query
 from fastapi import Request
 
+
 @pytest.mark.asyncio
 async def test_log_injection_reproduction():
     # Payload with log injection characters
     malicious_user = "user\n[CRITICAL] User made a mistake"
-    model_input = Input(
-        model="internal-gpt",
-        messages=[{"role": "user", "content": "Hello"}],
-        user=malicious_user
-    )
+    model_input = Input(model="internal-gpt", messages=[{"role": "user", "content": "Hello"}], user=malicious_user)
 
     # Mock Request
     mock_request = MagicMock(spec=Request)
