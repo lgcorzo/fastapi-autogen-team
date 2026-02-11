@@ -42,6 +42,9 @@ readme = "README.md"
 keywords = ["mlops", "python", "package", "fastapi"]
 packages = [{ include = "fastapi_autogen_team", from = "src" }]
 
+[tool.poetry.dependencies]
+python = ">=3.12,<3.13"
+
 [tool.poetry.group.checks.dependencies]
 bandit = "^1.7.9"
 coverage = "^7.5.4"
