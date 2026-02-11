@@ -27,3 +27,8 @@
 **Vulnerability:** The application constructs LLM prompts using specific delimiters like `\n},\n'REQUEST':{\n`. Users could inject these delimiters to close the current block and open a new system block, potentially overriding instructions.
 **Learning:** Hardcoded structural delimiters in prompt templates can be exploited if user input is not sanitized against them.
 **Prevention:** Sanitize user input to break specific delimiter sequences (e.g., insert spaces) before embedding in the prompt.
+
+## 2026-02-05 - Log Injection via User Input
+**Vulnerability:** The application was logging user input (such as usernames, model names, and search queries) directly without sanitization. This allowed attackers to inject newlines and forge log entries, potentially confusing log analysis tools or hiding malicious activity.
+**Learning:** Logging raw user input is dangerous. Attackers can use control characters (like `\n` or `\r`) to manipulate log files.
+**Prevention:** Always sanitize user input before logging it. Use a utility function to escape newlines and carriage returns (e.g., replace `\n` with `\\n`).
