@@ -33,6 +33,13 @@ dependencies = [
 ]
 
 [tool.poetry]
+name = "fastapi-autogen-team"
+version = "0.1.0"
+description = "Autogen team with fastapi with opanapi compatible"
+authors = ["lgcorzo <lgcorzo@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+keywords = ["mlops", "python", "package", "fastapi"]
 packages = [{ include = "fastapi_autogen_team", from = "src" }]
 
 [tool.poetry.group.checks.dependencies]
