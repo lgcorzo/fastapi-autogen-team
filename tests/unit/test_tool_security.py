@@ -7,7 +7,7 @@ from fastapi_autogen_team import tool
 async def test_safe_get_r2r_results_leak_prevention():
     sensitive_info = "DB_PASSWORD=highly_secret"
     with mock.patch("fastapi_autogen_team.tool.get_r2r_results", side_effect=Exception(sensitive_info)):
-        result = tool.safe_get_r2r_results("query")
+        result = await tool.safe_get_r2r_results("query")
         assert sensitive_info not in result
         assert "An internal error occurred" in result
 

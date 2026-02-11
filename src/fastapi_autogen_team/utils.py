@@ -10,4 +10,6 @@ def sanitize_log_input(input_str: Any) -> str:
         return ""
     if not isinstance(input_str, str):
         input_str = str(input_str)
-    return input_str.replace("\n", "\\n").replace("\r", "\\r")
+
+    safe_str: str = input_str
+    return safe_str.replace("\n", "\\n").replace("\r", "\\r")

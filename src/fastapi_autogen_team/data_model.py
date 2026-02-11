@@ -1,5 +1,5 @@
 import time
-from typing import List, Optional, Dict, Literal, Union
+from typing import List, Optional, Dict, Literal, Union, Any
 
 from pydantic import BaseModel, Field
 
@@ -18,11 +18,11 @@ class ModelInformation(BaseModel):
     id: str
     name: str
     description: str
-    pricing: dict
+    pricing: Dict[str, Any]
     context_length: int
-    architecture: dict
-    top_provider: dict
-    per_request_limits: Optional[dict]
+    architecture: Dict[str, Any]
+    top_provider: Dict[str, Any]
+    per_request_limits: Optional[Dict[str, Any]]
 
 
 class Message(BaseModel):
@@ -47,5 +47,5 @@ class Output(BaseModel):
     object: str = "chat.completion"
     created: int = Field(default_factory=lambda: int(time.time()))
     model: str
-    choices: List
-    usage: dict
+    choices: List[Dict[str, Any]]
+    usage: Dict[str, Any]

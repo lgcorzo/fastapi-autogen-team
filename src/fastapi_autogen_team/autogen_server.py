@@ -4,6 +4,7 @@ import uuid
 import time
 from queue import Queue
 from threading import Thread
+from typing import Any, Generator, Dict
 
 from fastapi import HTTPException
 from fastapi.responses import StreamingResponse
@@ -27,7 +28,7 @@ def sanitize_for_prompt(text: str) -> str:
     return text
 
 
-def handle_response(response: Output) -> dict:
+def handle_response(response: Output) -> Dict[str, Any]:
     """Validates and processes the response object."""
     if isinstance(response, str):
         logger.error(f"Unexpected string response: {response}", exc_info=True)
@@ -96,7 +97,7 @@ def normalize_input_messages(inp: Input) -> str:
     return full_prompt
 
 
-def serve_autogen(inp: Input) -> StreamingResponse | dict:
+def serve_autogen(inp: Input) -> StreamingResponse | Dict[str, Any]:
     """Serves the autogen workflow based on the input (streaming or non-streaming)."""
     try:
         user_id = str(inp.user)
@@ -104,7 +105,7 @@ def serve_autogen(inp: Input) -> StreamingResponse | dict:
         norm_message = normalize_input_messages(inp)
 
         if inp.stream:
-            queue: Queue = Queue()
+            queue: Queue[str | Dict[str, Any]] = Queue()
             workflow.set_queue(queue)
             Thread(target=workflow.run, args=(norm_message, inp.stream)).start()
             return StreamingResponse(generate_streaming_response(inp, queue), media_type="text/event-stream")
@@ -122,7 +123,7 @@ def serve_autogen(inp: Input) -> StreamingResponse | dict:
         raise HTTPException(status_code=500, detail="An internal error occurred during Autogen processing.") from e
 
 
-def generate_streaming_response(inp: Input, queue: Queue):
+def generate_streaming_response(inp: Input, queue: Queue[str | Dict[str, Any]]) -> Generator[str, None, None]:
     """Generates a streaming response from the message queue."""
     try:
         while True:
@@ -145,7 +146,7 @@ def generate_streaming_response(inp: Input, queue: Queue):
         raise HTTPException(status_code=500, detail="An internal error occurred during streaming response.") from e
 
 
-def create_non_streaming_response(chat_results, model: str):
+def create_non_streaming_response(chat_results: Any, model: str) -> Dict[str, Any]:
     """Creates a non-streaming response from the chat results."""
     try:
         if chat_results:

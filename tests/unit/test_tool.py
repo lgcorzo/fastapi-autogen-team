@@ -9,8 +9,8 @@ from fastapi_autogen_team import tool
 @pytest.mark.asyncio
 async def test_async_search():
     with (
-        patch("fastapi_autogen_team.tool.get_r2r_results", new_callable=AsyncMock) as mock_get_r2r_results,
-        patch("fastapi_autogen_team.tool.get_jira_results", new_callable=AsyncMock) as mock_get_jira_results,
+        patch("fastapi_autogen_team.tool.safe_get_r2r_results", new_callable=AsyncMock) as mock_get_r2r_results,
+        patch("fastapi_autogen_team.tool.safe_get_jira_results", new_callable=MagicMock) as mock_get_jira_results,
     ):
         mock_get_r2r_results.return_value = {"key": "r2r_result"}
         mock_get_jira_results.return_value = "jira_result"

@@ -89,11 +89,15 @@ branch = true
 source = ["src"]
 omit = ["__main__.py"]
 
+[tool.coverage.report]
+fail_under = 94
+show_missing = true
+
 [tool.mypy]
 pretty = true
-strict = false
+strict = true
 python_version = "3.12"
-check_untyped_defs = false
+check_untyped_defs = true
 ignore_missing_imports = true
 disable_error_code = ["return-value"]
 plugins = ["pandera.mypy", "pydantic.mypy"]

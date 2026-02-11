@@ -1,5 +1,6 @@
 import os
 import logging
+from typing import Dict, Any
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
@@ -152,7 +153,7 @@ app.add_middleware(
 
 # Global Exception Handler
 @app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
+async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     logger.error(f"Global exception: {exc}", exc_info=True)
     return JSONResponse(
         status_code=500,
@@ -171,14 +172,14 @@ async def docs_redirect() -> RedirectResponse:
 
 
 @app.get(API_PREFIX + "/models")
-async def get_models() -> dict:
+async def get_models() -> Dict[str, Any]:
     """Returns available model information."""
     log_with_trace("Get models endpoint accessed")
     return {"data": {"data": model_info.dict()}}
 
 
 @app.post(API_PREFIX + "/chat/completions")
-async def route_query(model_input: Input, request: Request) -> dict:
+async def route_query(model_input: Input, request: Request) -> Dict[str, Any]:
     """Handles chat completion requests."""
     header_user_id = request.headers.get("x-openwebui-user-id")
 
