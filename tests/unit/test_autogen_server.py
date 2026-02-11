@@ -77,7 +77,8 @@ def test_serve_autogen_streaming(mock_autogen_workflow):
 def test_generate_streaming_response():
     """Test generate_streaming_response with a mock queue."""
     mock_queue = MagicMock()
-    mock_queue.get.side_effect = ["Test chunk", "[DONE]"]
+    mock_message = {"role": "assistant", "content": "Test chunk"}
+    mock_queue.get.side_effect = [mock_message, "[DONE]"]
     generator = generate_streaming_response(TEST_INPUT, mock_queue)
     chunks = [chunk for chunk in generator]
     assert len(chunks) == 2

@@ -1,6 +1,7 @@
 import os
 import asyncio
 import logging
+from typing import Dict, Any
 from r2r import R2RClient
 from atlassian import Jira
 from dotenv import load_dotenv
@@ -14,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def search(query: str):
+def search(query: str) -> Dict[str, str]:
     """
     Esta función puede ser llamada directamente por un agente LLM como herramienta sincrónica.
     Internamente ejecuta en paralelo las tareas usando asyncio y to_thread.
@@ -28,7 +29,7 @@ def search(query: str):
         logger.warning("Event loop ya en ejecución. Usando alternativa con create_task y threading.")
         result = []
 
-        def runner():
+        def runner() -> None:
             result.append(asyncio.run(async_search(query)))
 
         import threading
@@ -39,7 +40,7 @@ def search(query: str):
         return result[0]
 
 
-async def async_search(query: str, timeout: float = 10.0):
+async def async_search(query: str, timeout: float = 10.0) -> Dict[str, str]:
     safe_query = sanitize_log_input(query)
     logger.info(f"Ejecutando búsqueda para: {safe_query}")
 
@@ -62,14 +63,14 @@ async def async_search(query: str, timeout: float = 10.0):
         )
 
         logger.info("Búsqueda completada")
-        return {"r2r": r2r_result, "jira": jira_result}
+        return {"r2r": str(r2r_result), "jira": str(jira_result)}
 
     except Exception:
         logger.exception("Error en async_search:")
         return {"r2r": "An error occurred during search.", "jira": "An error occurred during search."}
 
 
-async def safe_get_r2r_results(query: str):
+async def safe_get_r2r_results(query: str) -> Any:
     try:
         return await get_r2r_results(query)
     except Exception:
@@ -77,7 +78,7 @@ async def safe_get_r2r_results(query: str):
         return "An internal error occurred while searching R2R."
 
 
-def safe_get_jira_results(query: str):
+def safe_get_jira_results(query: str) -> str:
     try:
         return get_jira_results(query)
     except Exception:
@@ -85,7 +86,7 @@ def safe_get_jira_results(query: str):
         return "An internal error occurred while searching Jira."
 
 
-async def get_r2r_results(query: str):
+async def get_r2r_results(query: str) -> Any:
     user = os.getenv("R2R_USER")
     pwd = os.getenv("R2R_PWD")
     base_url = os.getenv("R2R_URL", "http://r2r:7272")
@@ -100,7 +101,7 @@ async def get_r2r_results(query: str):
     return response
 
 
-def get_jira_results(query: str):
+def get_jira_results(query: str) -> str:
     url = os.getenv("JIRA_INSTANCE_URL")
     username = os.getenv("JIRA_USERNAME")
     password = os.getenv("JIRA_API_TOKEN")

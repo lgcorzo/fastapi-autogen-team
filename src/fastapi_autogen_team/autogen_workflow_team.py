@@ -6,7 +6,7 @@ import types
 import logging
 from functools import partial
 from queue import Queue
-from typing import Dict, Union
+from typing import Dict, Union, Any, List
 
 from autogen import (
     Agent,
@@ -30,8 +30,8 @@ logger = logging.getLogger(__name__)
 
 
 def create_llm_config(
-    config_list: list[dict] | None = None, user: str = "autogen_rag", temperature: int = 0, timeout: int = 240
-) -> dict:
+    config_list: List[Dict[str, Any]] | None = None, user: str = "autogen_rag", temperature: int = 0, timeout: int = 240
+) -> Dict[str, Any]:
     """Creates a llm configuration for autogen agents with user tracking."""
     if config_list is not None:
         config_list_used = config_list
@@ -59,14 +59,14 @@ def create_llm_config(
 
 
 def streamed_print_received_message(
-    self,
-    message: Union[Dict, str],
+    self: Any,
+    message: Union[Dict[str, Any], str],
     sender: Agent,
-    queue: Queue,
+    queue: Queue[str | Dict[str, Any]],
     index: int,
-    *args,
-    **kwargs,
-):
+    *args: Any,
+    **kwargs: Any,
+) -> None:
     """Prints received messages with streaming support and handles tool responses."""
     streaming_message = ""
     iostream = IOStream.get_default()
@@ -100,15 +100,15 @@ def streamed_print_received_message(
 
 
 def handle_tool_responses(
-    self,
-    message: Dict,
+    self: Any,
+    message: Dict[str, Any],
     sender: Agent,
-    queue: Queue,
+    queue: Queue[str | Dict[str, Any]],
     index: int,
     iostream: IOStream,
     streaming_message: str,
-    *args,
-    **kwargs,
+    *args: Any,
+    **kwargs: Any,
 ) -> str:
     """Handles messages containing tool responses, including printing and queuing."""
     if message.get("role") == "tool":
@@ -134,7 +134,7 @@ def handle_tool_responses(
     return streaming_message
 
 
-def handle_function_tool_message(message: Dict, iostream: IOStream, streaming_message: str) -> str:
+def handle_function_tool_message(message: Dict[str, Any], iostream: IOStream, streaming_message: str) -> str:
     """Handles messages from function or tool calls."""
     id_key = "name" if message["role"] == "function" else "tool_call_id"
     id_str = message.get(id_key, "No id found")
@@ -151,7 +151,7 @@ def handle_function_tool_message(message: Dict, iostream: IOStream, streaming_me
     return streaming_message
 
 
-def handle_regular_message(self, message: Dict, iostream: IOStream, streaming_message: str) -> str:
+def handle_regular_message(self: Any, message: Dict[str, Any], iostream: IOStream, streaming_message: str) -> str:
     """Handles regular messages (not tool or function calls)."""
     content = message.get("content")
     if content is not None:
@@ -172,7 +172,7 @@ def handle_regular_message(self, message: Dict, iostream: IOStream, streaming_me
     return streaming_message
 
 
-def handle_suggested_function_call(function_call: Dict, iostream: IOStream, streaming_message: str) -> str:
+def handle_suggested_function_call(function_call: Dict[str, Any], iostream: IOStream, streaming_message: str) -> str:
     """Handles and prints suggested function calls."""
     function_call_dict = dict(function_call)
     func_print = f"***** Suggested function call: {function_call_dict.get('name', '(No function name found)')} *****"
@@ -187,7 +187,7 @@ def handle_suggested_function_call(function_call: Dict, iostream: IOStream, stre
     return streaming_message
 
 
-def handle_suggested_tool_calls(tool_calls: list[dict], iostream: IOStream, streaming_message: str) -> str:
+def handle_suggested_tool_calls(tool_calls: List[Dict[str, Any]], iostream: IOStream, streaming_message: str) -> str:
     """Handles and prints suggested tool calls."""
     for tool_call in tool_calls:
         id_str = tool_call.get("id", "No tool call id found")
@@ -209,10 +209,10 @@ def handle_suggested_tool_calls(tool_calls: list[dict], iostream: IOStream, stre
 class AutogenWorkflow:
     """A class for managing an Autogen workflow with multiple agents."""
 
-    def __init__(self, llm_config: dict | None = None, user: str = "autogen_rag"):
+    def __init__(self, llm_config: Dict[str, Any] | None = None, user: str = "autogen_rag"):
         """Initializes the AutogenWorkflow with default agents and configurations."""
         llm_config_used = llm_config if llm_config is not None else create_llm_config(user=user)
-        self.queue: Queue | None = None
+        self.queue: Queue[str | Dict[str, Any]] | None = None
 
         self.user_proxy = UserProxyAgent(
             name="UserProxy",
@@ -366,7 +366,7 @@ class AutogenWorkflow:
             system_message=SYSTEM_MESSAGE_MANAGER,
         )
 
-    def set_queue(self, queue: Queue):
+    def set_queue(self, queue: Queue[str | Dict[str, Any]]) -> None:
         """Sets the queue for streaming messages."""
         self.queue = queue
 
@@ -374,16 +374,17 @@ class AutogenWorkflow:
         """Initiates the Autogen workflow and returns the chat history."""
         if stream:
             index_counter = {"index": 0}
+            if self.queue is None:
+                raise ValueError("Queue is not set")
             queue = self.queue
 
-            def streamed_print_received_message_with_queue_and_index(self, *args, **kwargs):
+            def streamed_print_received_message_with_queue_and_index(self: Any, *args: Any, **kwargs: Any) -> None:
                 streamed_print_received_message_with_queue = partial(
                     streamed_print_received_message, queue=queue, index=index_counter["index"]
                 )
                 bound_method = types.MethodType(streamed_print_received_message_with_queue, self)
-                result = bound_method(*args, **kwargs)
+                bound_method(*args, **kwargs)
                 index_counter["index"] += 1
-                return result
 
             self.group_chat_manager_with_intros._print_received_message = types.MethodType(
                 streamed_print_received_message_with_queue_and_index, self.group_chat_manager_with_intros
