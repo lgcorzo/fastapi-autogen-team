@@ -89,6 +89,10 @@ branch = true
 source = ["src"]
 omit = ["__main__.py"]
 
+[tool.coverage.report]
+fail_under = 94
+show_missing = true
+
 [tool.mypy]
 pretty = true
 strict = false

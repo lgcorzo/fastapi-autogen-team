@@ -47,7 +47,7 @@ def security(ctx: Context) -> None:
 @task(pre=[test])
 def coverage(ctx: Context) -> None:
     """Check the coverage with coverage."""
-    ctx.run("poetry run pytest --numprocesses='auto' --cov=src/ --cov-fail-under=80 tests/unit")
+    ctx.run("poetry run pytest --numprocesses='auto' --cov=src/ --cov-fail-under=94 tests/unit")
 
 
 @task(pre=[poetry, format, type, code, security, coverage], default=True)
