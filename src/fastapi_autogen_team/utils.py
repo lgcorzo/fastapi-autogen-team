@@ -1,3 +1,6 @@
+from typing import Any, Optional
+
+
 def sanitize_log_input(input_str: Any) -> str:
     """Sanitizes input string for logging to prevent log injection.
 

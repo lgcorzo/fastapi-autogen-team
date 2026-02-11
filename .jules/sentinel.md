@@ -34,8 +34,8 @@
 **Learning:** When constructing prompts by concatenating user input with structural markers, the user input must be sanitized to ensure it cannot reproduce those markers.
 **Prevention:** Sanitize all user input used in prompts by altering or escaping sequences that match the prompt's structural delimiters (e.g., replacing `\n},\n` with `\n} ,\n`).
 
-## 2026-02-05 - Log Injection via User Input
+## 2026-02-06 - Log Injection Vulnerability
 
-**Vulnerability:** The application was logging user input (such as usernames, model names, and search queries) directly without sanitization. This allowed attackers to inject newlines and forge log entries, potentially confusing log analysis tools or hiding malicious activity.
-**Learning:** Logging raw user input is dangerous. Attackers can use control characters (like `\n` or `\r`) to manipulate log files.
-**Prevention:** Always sanitize user input before logging it. Use a utility function to escape newlines and carriage returns (e.g., replace `\n` with `\\n`).
+**Vulnerability:** User-controlled input (like `user` ID, model names, and search `query`) was logged directly, allowing attackers to inject fake log entries via control characters like newlines (`\n`) and carriage returns (`\r`).
+**Learning:** Logging raw user input is a security risk (CWE-117). Attackers can spoof log entries to mask malicious activity or confuse log analyzers.
+**Prevention:** Always sanitize user input before logging. Use the `sanitize_log_input` helper function to escape control characters.
