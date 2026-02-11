@@ -30,3 +30,27 @@ async def test_log_injection_reproduction():
 
             # Fail if newline is present in the logged message
             assert "\n" not in call_args, f"Log injection vulnerability detected! Logged message: {repr(call_args)}"
+
+
+def test_sanitize_log_input_normal():
+    assert sanitize_log_input("hello") == "hello"
+
+
+def test_sanitize_log_input_newlines():
+    assert sanitize_log_input("hello\nworld") == "hello\\nworld"
+
+
+def test_sanitize_log_input_carriage_returns():
+    assert sanitize_log_input("hello\rworld") == "hello\\rworld"
+
+
+def test_sanitize_log_input_mixed():
+    assert sanitize_log_input("hello\r\nworld") == "hello\\r\\nworld"
+
+
+def test_sanitize_log_input_none():
+    assert sanitize_log_input(None) == ""
+
+
+def test_sanitize_log_input_empty():
+    assert sanitize_log_input("") == ""

@@ -33,3 +33,9 @@
 **Vulnerability:** User input could contain sequences like `\n},\n` that mimic the structural delimiters used to build the LLM prompt. This allowed attackers to inject fake prompt blocks (e.g., overriding system instructions).
 **Learning:** When constructing prompts by concatenating user input with structural markers, the user input must be sanitized to ensure it cannot reproduce those markers.
 **Prevention:** Sanitize all user input used in prompts by altering or escaping sequences that match the prompt's structural delimiters (e.g., replacing `\n},\n` with `\n} ,\n`).
+
+## 2026-02-05 - Log Injection via User Input
+
+**Vulnerability:** The application was logging user input (such as usernames, model names, and search queries) directly without sanitization. This allowed attackers to inject newlines and forge log entries, potentially confusing log analysis tools or hiding malicious activity.
+**Learning:** Logging raw user input is dangerous. Attackers can use control characters (like `\n` or `\r`) to manipulate log files.
+**Prevention:** Always sanitize user input before logging it. Use a utility function to escape newlines and carriage returns (e.g., replace `\n` with `\\n`).
