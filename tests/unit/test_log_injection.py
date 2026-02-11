@@ -1,11 +1,9 @@
 import pytest
-<<<<<<< HEAD
-import os
 from unittest.mock import patch, MagicMock
 from fastapi import Request, HTTPException
 from fastapi_autogen_team.data_model import Input
-from fastapi_autogen_team.main import route_query, log_with_trace
-from fastapi_autogen_team.tool import async_search, get_jira_results
+from fastapi_autogen_team.main import route_query
+from fastapi_autogen_team.tool import async_search
 from fastapi_autogen_team.utils import sanitize_log_input
 
 
@@ -98,20 +96,11 @@ async def test_tool_log_sanitization(mock_jira, mock_r2r, mock_logger):
                 break
 
     assert found, "Logger did not log sanitized query"
-=======
-from unittest.mock import MagicMock
-from fastapi_autogen_team.main import route_query, Input
-from fastapi_autogen_team.tool import async_search
-from fastapi import Request, HTTPException
 
 
 @pytest.mark.asyncio
 async def test_log_injection_in_route_query(mocker):
     # Mock logger in main
-    # Note: main.py imports logger. We need to patch where it is used.
-    # main.py: logger = logging.getLogger(__name__)
-    # But log_with_trace uses logger.
-    # We can patch 'fastapi_autogen_team.main.logger'
     mock_logger = mocker.patch("fastapi_autogen_team.main.logger")
 
     # Mock request
@@ -119,15 +108,12 @@ async def test_log_injection_in_route_query(mocker):
     mock_request.headers.get.return_value = None
 
     # Input with newline
-    # Use a model name that likely exists or doesn't matter for the log call
     model_input = Input(model="internal-gpt", user="evil\nlog", messages=[])
 
     # Mock service to avoid actual execution
     mocker.patch("fastapi_autogen_team.main.serve_autogen", return_value={"choices": []})
 
     # Call the function
-    # It might raise 404 if model not found, or execute if found.
-    # We don't care about the result, only the log call.
     try:
         await route_query(model_input, mock_request)
     except HTTPException:
@@ -135,8 +121,6 @@ async def test_log_injection_in_route_query(mocker):
 
     # Check logger calls
     found_newline = False
-    # log_with_trace calls logger.info or logger.error depending on level
-    # It defaults to info
     for call in mock_logger.info.call_args_list:
         if "\n" in call[0][0]:
             found_newline = True
@@ -163,4 +147,3 @@ async def test_log_injection_in_tool_search(mocker):
             break
 
     assert not found_newline, "Log message in tool contains a newline character (Log Injection Vulnerability)"
->>>>>>> origin/sentinel/fix-log-injection-4709514690431274476
