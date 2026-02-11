@@ -28,14 +28,8 @@
 **Learning:** Even helper functions used for response processing can be a source of information leakage if they bubble up raw data in exception details.
 **Prevention:** Catch invalid states and log the specific error details (including the raw data) to the server logs, but raise an `HTTPException` with a generic, sanitized message to the client.
 
-## 2026-02-04 - Prompt Injection via Structural Delimiters
+## 2026-02-13 - Prevent Prompt Injection via Structural Delimiters
 
-**Vulnerability:** The application constructs LLM prompts using specific delimiters like `\n},\n'REQUEST':{\n`. Users could inject these delimiters to close the current block and open a new system block, potentially overriding instructions.
-**Learning:** Hardcoded structural delimiters in prompt templates can be exploited if user input is not sanitized against them.
-**Prevention:** Sanitize user input to break specific delimiter sequences (e.g., insert spaces) before embedding in the prompt.
-
-## 2026-02-09 - Log Injection Prevention
-
-**Vulnerability:** The application was logging raw user input (model names, user IDs, search queries) without sanitization. This allowed attackers to inject control characters like newlines (`\n`) and carriage returns (`\r`) to forge log entries, potentially masking attacks or confusing log analysis tools.
-**Learning:** Logging frameworks (like Python's `logging`) do not automatically sanitize input. Constructing log messages with untrusted input is a security risk (CWE-117).
-**Prevention:** Use the `sanitize_log_input` helper function to escape control characters before passing data to the logger.
+**Vulnerability:** User input could contain sequences like `\n},\n` that mimic the structural delimiters used to build the LLM prompt. This allowed attackers to inject fake prompt blocks (e.g., overriding system instructions).
+**Learning:** When constructing prompts by concatenating user input with structural markers, the user input must be sanitized to ensure it cannot reproduce those markers.
+**Prevention:** Sanitize all user input used in prompts by altering or escaping sequences that match the prompt's structural delimiters (e.g., replacing `\n},\n` with `\n} ,\n`).

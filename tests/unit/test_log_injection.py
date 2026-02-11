@@ -1,5 +1,11 @@
 import pytest
+import os
 from unittest.mock import patch, MagicMock
+from fastapi import Request, HTTPException
+from fastapi_autogen_team.data_model import Input
+from fastapi_autogen_team.main import route_query, log_with_trace
+from fastapi_autogen_team.tool import async_search, get_jira_results
+from fastapi_autogen_team.utils import sanitize_log_input
 
 
 @pytest.mark.asyncio
