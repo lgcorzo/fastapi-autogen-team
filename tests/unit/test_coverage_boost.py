@@ -30,10 +30,11 @@ def test_search_already_running_loop():
             assert result == {"r2r": "fallback_ok", "jira": "fallback_ok"}
 
 
-def test_get_r2r_results_missing_creds():
+@pytest.mark.asyncio
+async def test_get_r2r_results_missing_creds():
     with patch.dict(os.environ, {}, clear=True):
         with pytest.raises(ValueError, match="Faltan credenciales R2R"):
-            get_r2r_results("query")
+            await get_r2r_results("query")
 
 
 def test_get_jira_results_missing_creds():

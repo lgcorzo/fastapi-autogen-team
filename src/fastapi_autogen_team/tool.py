@@ -44,7 +44,7 @@ async def async_search(query: str, timeout: float = 10.0):
     logger.info(f"Ejecutando búsqueda para: {safe_query}")
 
     try:
-        r2r_task = asyncio.to_thread(safe_get_r2r_results, query)
+        r2r_task = safe_get_r2r_results(query)
         jira_task = asyncio.to_thread(safe_get_jira_results, query)
 
         results = await asyncio.gather(
@@ -69,9 +69,9 @@ async def async_search(query: str, timeout: float = 10.0):
         return {"r2r": "An error occurred during search.", "jira": "An error occurred during search."}
 
 
-def safe_get_r2r_results(query: str):
+async def safe_get_r2r_results(query: str):
     try:
-        return get_r2r_results(query)
+        return await get_r2r_results(query)
     except Exception:
         logger.exception("Error al obtener resultados de R2R:")
         return "An internal error occurred while searching R2R."
@@ -85,7 +85,7 @@ def safe_get_jira_results(query: str):
         return "An internal error occurred while searching Jira."
 
 
-def get_r2r_results(query: str):
+async def get_r2r_results(query: str):
     user = os.getenv("R2R_USER")
     pwd = os.getenv("R2R_PWD")
     base_url = os.getenv("R2R_URL", "http://r2r:7272")
@@ -94,9 +94,9 @@ def get_r2r_results(query: str):
         raise ValueError("Faltan credenciales R2R (R2R_USER o R2R_PWD)")
 
     client = R2RClient(base_url=base_url)
-    client.users.login(user, pwd)
+    await client.users.login(user, pwd)
 
-    response = client.retrieval.rag(query=query)
+    response = await client.retrieval.rag(query=query)
     return response
 
 
