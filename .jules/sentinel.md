@@ -1,34 +1,41 @@
 ## 2024-05-23 - Prevent Information Leakage in Error Responses
+
 **Vulnerability:** The application was returning raw exception messages in HTTP 500 responses in `autogen_server.py`. This could expose sensitive internal details like stack traces, database schemas, or file paths to attackers.
 **Learning:** FastAPI's `HTTPException` detail field is sent directly to the client. Developers often pass the exception string `str(e)` for convenience, not realizing it can contain sensitive info.
 **Prevention:** Always catch exceptions, log the full details with `logger.error(..., exc_info=True)`, and raise `HTTPException` with a generic, static error message (e.g., "An internal error occurred").
 
 ## 2026-01-19 - Information Leakage in Exception Handling
+
 **Vulnerability:** The application was leaking raw exception messages to clients in `serve_autogen`, `generate_streaming_response`, and `AutogenWorkflow.run`. This exposed internal details like variable names and system errors.
 **Learning:** Exception handling blocks were catching `Exception as e` and including `f"{e}"` directly in the `HTTPException` detail or response payload.
 **Prevention:** Always sanitize error messages returned to clients. Use generic messages like "An internal error occurred" and log the full exception details server-side with `exc_info=True`.
 
 ## 2024-05-22 - Exception Handling Information Leakage
+
 **Vulnerability:** The application was leaking sensitive internal exception details (including potential secrets or stack traces) to API clients via `HTTPException(detail=f"{e}")` and in streaming response payloads.
 **Learning:** Developers often pass `str(e)` to error responses to help with debugging, but this exposes internal state, paths, and potentially secrets to the user.
 **Prevention:** Catch exceptions, log the full details (including stack traces) using `logger.error(..., exc_info=True)`, but return a generic, sanitized message to the client (e.g., "An internal error occurred").
 
 ## 2026-01-16 - Exception Detail Leakage in AutoGen Workflow
+
 **Vulnerability:** The application was catching exceptions and explicitly including `str(e)` in the `HTTPException` detail and `ChatResult` response sent to the client. This exposes internal error details, potential stack trace fragments, or sensitive data contained in exception messages.
 **Learning:** Even when catching exceptions, simply passing the exception string to the client is insecure. This was prevalent in both the FastAPI server handlers and the AutoGen workflow logic where error messages were manually constructed.
 **Prevention:** Always return generic error messages (e.g., "An internal error occurred") to the client. Log the full exception details server-side using `logger.exception()` or `logger.error(..., exc_info=True)` for debugging.
 
 ## 2026-01-20 - Exception Leakage in handle_response
+
 **Vulnerability:** The `handle_response` function in `autogen_server.py` was raising `HTTPException` with details that included the raw string response or the type of the object. This leaked sensitive data or internal implementation details to the client.
 **Learning:** Even helper functions used for response processing can be a source of information leakage if they bubble up raw data in exception details.
 **Prevention:** Catch invalid states and log the specific error details (including the raw data) to the server logs, but raise an `HTTPException` with a generic, sanitized message to the client.
 
 ## 2026-02-04 - Prompt Injection via Structural Delimiters
+
 **Vulnerability:** The application constructs LLM prompts using specific delimiters like `\n},\n'REQUEST':{\n`. Users could inject these delimiters to close the current block and open a new system block, potentially overriding instructions.
 **Learning:** Hardcoded structural delimiters in prompt templates can be exploited if user input is not sanitized against them.
 **Prevention:** Sanitize user input to break specific delimiter sequences (e.g., insert spaces) before embedding in the prompt.
 
-## 2026-02-28 - Log Injection
-**Vulnerability:** The application was logging raw user input (model names, user IDs, search queries) without sanitization. This allows attackers to inject newline characters (`\n`, `\r`) to forge log entries, potentially confusing log analysis tools or hiding malicious activity.
-**Learning:** Logging frameworks (like Python's `logging`) do not automatically sanitize input. Developers must explicitly sanitize any untrusted input before logging it.
-**Prevention:** Use a dedicated sanitization function (e.g., `sanitize_log_input`) to escape control characters like `\n` and `\r` before passing data to the logger.
+## 2026-02-09 - Log Injection Prevention
+
+**Vulnerability:** The application was logging raw user input (model names, user IDs, search queries) without sanitization. This allowed attackers to inject control characters like newlines (`\n`) and carriage returns (`\r`) to forge log entries, potentially masking attacks or confusing log analysis tools.
+**Learning:** Logging frameworks (like Python's `logging`) do not automatically sanitize input. Constructing log messages with untrusted input is a security risk (CWE-117).
+**Prevention:** Use the `sanitize_log_input` helper function to escape control characters before passing data to the logger.

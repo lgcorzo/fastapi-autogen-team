@@ -3,6 +3,6 @@ def sanitize_log_input(input_str: str | None) -> str:
 
     Escapes newline and carriage return characters.
     """
-    if input_str is None:
+    if not input_str:
         return ""
     return input_str.replace("\n", "\\n").replace("\r", "\\r")
