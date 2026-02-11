@@ -75,28 +75,30 @@ def test_handle_regular_message_with_context():
 
 @pytest.mark.asyncio
 async def test_workflow_run_error_handling():
-    workflow = AutogenWorkflow(user="test_user")
-    with patch.object(workflow.user_proxy, "initiate_chat", side_effect=Exception("Workflow Failure")):
-        result = workflow.run("test", stream=False)
-        assert result.summary == "Conversation failed due to system error"
-        assert result.chat_history[0]["role"] == "error"
+    with patch.dict(os.environ, {"LITELLM_API_KEY": "fake_key"}, clear=False):
+        workflow = AutogenWorkflow(user="test_user")
+        with patch.object(workflow.user_proxy, "initiate_chat", side_effect=Exception("Workflow Failure")):
+            result = workflow.run("test", stream=False)
+            assert result.summary == "Conversation failed due to system error"
+            assert result.chat_history[0]["role"] == "error"
 
 
 @pytest.mark.asyncio
 async def test_workflow_run_stream_error():
-    workflow = AutogenWorkflow(user="test_user")
-    queue = Queue()
-    workflow.set_queue(queue)
+    with patch.dict(os.environ, {"LITELLM_API_KEY": "fake_key"}, clear=False):
+        workflow = AutogenWorkflow(user="test_user")
+        queue = Queue()
+        workflow.set_queue(queue)
 
-    with patch.object(workflow.user_proxy, "initiate_chat", side_effect=Exception("Stream Failure")):
-        workflow.run("test", stream=True)
-        # Check if error message and [DONE] are in queue
-        msgs = []
-        while not queue.empty():
-            msgs.append(queue.get())
+        with patch.object(workflow.user_proxy, "initiate_chat", side_effect=Exception("Stream Failure")):
+            workflow.run("test", stream=True)
+            # Check if error message and [DONE] are in queue
+            msgs = []
+            while not queue.empty():
+                msgs.append(queue.get())
 
-        assert any(isinstance(m, dict) and m.get("finish_reason") == "error" for m in msgs)
-        assert "[DONE]" in msgs
+            assert any(isinstance(m, dict) and m.get("finish_reason") == "error" for m in msgs)
+            assert "[DONE]" in msgs
 
 
 # --- autogen_server.py coverage ---
