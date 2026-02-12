@@ -85,7 +85,7 @@ def normalize_input_messages(inp: Input) -> str:
     # Construcción del prompt final
     short_memory = "\n".join(f"{m['role']}: {m['text']}" for m in historic_messages if m["role"] != "System")
 
-    system_message = "\n".join(f"{m['role']}: {m['text']}" for m in system_messages if m["role"] != "System")
+    system_message = "\n".join(f"{m['role']}: {m['text']}" for m in system_messages)
     request = f"{last_message['role']}: {last_message['text']}"
 
     full_prompt = (
