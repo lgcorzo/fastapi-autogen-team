@@ -21,6 +21,8 @@ EMPTY_USAGE = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
 def sanitize_for_prompt(text: str) -> str:
     """Sanitizes text to prevent prompt injection via structural delimiters."""
+    # Normalize line endings to avoid bypassing the check
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
     # Break the specific sequence used for prompt block delimiters
     # The template uses "\n},\n'KEY':{\n"
     text = text.replace("\n},\n", "\n} ,\n")

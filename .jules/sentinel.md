@@ -39,3 +39,9 @@
 **Vulnerability:** User-controlled input (like `user` ID, model names, and search `query`) was logged directly, allowing attackers to inject fake log entries via control characters like newlines (`\n`) and carriage returns (`\r`).
 **Learning:** Logging raw user input is a security risk (CWE-117). Attackers can spoof log entries to mask malicious activity or confuse log analyzers.
 **Prevention:** Always sanitize user input before logging. Use the `sanitize_log_input` helper function to escape control characters.
+
+## 2026-02-27 - Prompt Injection Bypass via Line Endings
+
+**Vulnerability:** The `sanitize_for_prompt` function was only checking for `\n` based delimiters, allowing attackers to bypass the check using `\r` or `\r\n` (CRLF) sequences if the downstream system or LLM normalizes them.
+**Learning:** Sanitization checks must account for all variations of control characters, especially line endings which can vary by platform or protocol.
+**Prevention:** Normalize line endings (e.g., replace `\r\n` and `\r` with `\n`) before applying structural sanitization checks to ensure no bypass is possible.
