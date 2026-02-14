@@ -11,6 +11,7 @@ from fastapi.responses import StreamingResponse
 
 from fastapi_autogen_team.autogen_workflow_team import AutogenWorkflow
 from fastapi_autogen_team.data_model import Input, Output
+from fastapi_autogen_team.utils import sanitize_log_input
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -100,7 +101,7 @@ def normalize_input_messages(inp: Input) -> str:
 def serve_autogen(inp: Input) -> StreamingResponse | Dict[str, Any]:
     """Serves the autogen workflow based on the input (streaming or non-streaming)."""
     try:
-        user_id = str(inp.user)
+        user_id = sanitize_log_input(str(inp.user))
         workflow = AutogenWorkflow(user=user_id)
         norm_message = normalize_input_messages(inp)
 
