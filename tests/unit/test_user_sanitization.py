@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 from fastapi_autogen_team.autogen_server import serve_autogen
 from fastapi_autogen_team.data_model import Input
 
+
 @patch("fastapi_autogen_team.autogen_server.AutogenWorkflow")
 def test_user_id_header_injection_mitigation(MockWorkflow):
     """
@@ -18,10 +19,7 @@ def test_user_id_header_injection_mitigation(MockWorkflow):
 
     # Input data
     input_data = Input(
-        model="test-model",
-        user=malicious_user,
-        messages=[{"role": "user", "content": "Hello"}],
-        stream=False
+        model="test-model", user=malicious_user, messages=[{"role": "user", "content": "Hello"}], stream=False
     )
 
     # Call the function
