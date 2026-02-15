@@ -5,11 +5,13 @@ from fastapi_autogen_team.data_model import Input
 from fastapi_autogen_team.autogen_server import serve_autogen
 from fastapi import HTTPException
 
+
 # Set required environment variables for the test
 @pytest.fixture(autouse=True)
 def set_env_vars():
     with patch.dict(os.environ, {"LITELLM_API_KEY": "test-key"}):
         yield
+
 
 @patch("fastapi_autogen_team.autogen_server.AutogenWorkflow")
 def test_user_header_injection(MockWorkflow):
@@ -32,10 +34,11 @@ def test_user_header_injection(MockWorkflow):
 
     # Check what user ID was passed to AutogenWorkflow
     MockWorkflow.assert_called_once()
-    called_user = MockWorkflow.call_args.kwargs.get('user')
+    called_user = MockWorkflow.call_args.kwargs.get("user")
 
     # We assert that the user ID is sanitized (escaped backslashes)
     assert called_user == "user\\r\\nLocation: malicious.com", f"User ID was not sanitized! Got: {repr(called_user)}"
+
 
 @patch("fastapi_autogen_team.autogen_server.AutogenWorkflow")
 def test_user_log_injection_newline(MockWorkflow):
@@ -53,6 +56,6 @@ def test_user_log_injection_newline(MockWorkflow):
         pass
 
     MockWorkflow.assert_called_once()
-    called_user = MockWorkflow.call_args.kwargs.get('user')
+    called_user = MockWorkflow.call_args.kwargs.get("user")
 
     assert called_user == "admin\\nfake_log_entry", f"User ID was not sanitized! Got: {repr(called_user)}"
