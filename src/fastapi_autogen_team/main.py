@@ -187,9 +187,11 @@ async def route_query(model_input: Input, request: Request) -> Dict[str, Any]:
     if header_user_id:
         model_input.user = header_user_id
 
-    safe_model = sanitize_log_input(model_input.model)
-    safe_user = sanitize_log_input(model_input.user)
-    log_with_trace(f"Chat completion request for model: {safe_model}, user: {safe_user}")
+    # Sanitize inputs before logging or processing
+    model_input.user = sanitize_log_input(model_input.user)
+    model_input.model = sanitize_log_input(model_input.model)
+
+    log_with_trace(f"Chat completion request for model: {model_input.model}, user: {model_input.user}")
     model_services = {model_info.name: serve_autogen}
     service = model_services.get(model_input.model)
 
