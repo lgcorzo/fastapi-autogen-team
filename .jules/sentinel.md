@@ -39,3 +39,9 @@
 **Vulnerability:** User-controlled input (like `user` ID, model names, and search `query`) was logged directly, allowing attackers to inject fake log entries via control characters like newlines (`\n`) and carriage returns (`\r`).
 **Learning:** Logging raw user input is a security risk (CWE-117). Attackers can spoof log entries to mask malicious activity or confuse log analyzers.
 **Prevention:** Always sanitize user input before logging. Use the `sanitize_log_input` helper function to escape control characters.
+
+## 2026-02-14 - Header Injection via User Input
+
+**Vulnerability:** The application was reading the `x-openwebui-user-id` header and directly assigning it to `model_input.user` without sanitization. This unsanitized value was then used in `AutogenWorkflow`, potentially leading to CRLF injection if used in downstream headers or logs.
+**Learning:** Even if a value comes from a header, it should be treated as untrusted user input. Direct assignment of header values to internal data structures can propagate vulnerabilities.
+**Prevention:** Sanitize all inputs, including headers, before using them in the application logic. Use `sanitize_log_input` (or similar) to escape control characters like `\n` and `\r`.
