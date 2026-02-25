@@ -63,3 +63,9 @@
 **Vulnerability:** The application was vulnerable to injection attacks because the `user` ID from the `x-openwebui-user-id` header was passed unsanitized to downstream services (`serve_autogen`, `AutogenWorkflow`). This could lead to Header Injection or Log Injection if the downstream services used this value in sensitive contexts.
 **Learning:** Even if input is sanitized for _logging_ locally, the _original_ raw input object might still be passed to other parts of the system.
 **Prevention:** Sanitize input fields (like `user` and `model`) _in place_ on the input object before passing it to any service or logging function.
+
+## 2026-02-14 - Header Injection via User ID
+
+**Vulnerability:** The application was using the `user` ID input directly in HTTP headers (via `create_llm_config`), allowing attackers to inject arbitrary headers (CRLF injection) via newlines.
+**Learning:** User inputs used in system configurations or downstream API calls (like HTTP headers) must be sanitized, not just for logging or display.
+**Prevention:** Sanitize the `user` ID using `sanitize_log_input` (or similar) to escape control characters before passing it to `AutogenWorkflow` or any downstream service.
