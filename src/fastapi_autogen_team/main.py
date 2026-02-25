@@ -185,7 +185,7 @@ async def route_query(model_input: Input, request: Request) -> Dict[str, Any]:
 
     # Overwrite model_input.user if header value is provided
     if header_user_id:
-        model_input.user = header_user_id
+        model_input.user = sanitize_log_input(header_user_id)
 
     safe_model = sanitize_log_input(model_input.model)
     safe_user = sanitize_log_input(model_input.user)

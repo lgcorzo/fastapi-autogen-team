@@ -51,3 +51,9 @@
 **Vulnerability:** The `normalize_input_messages` function in `autogen_server.py` was filtering out system messages from the input, causing any security constraints or instructions in the system prompt to be ignored.
 **Learning:** Logic errors in message processing can inadvertently bypass security controls. In this case, a list comprehension intended to process messages was incorrectly filtering them out.
 **Prevention:** Ensure that message processing logic correctly handles all message roles, especially system messages which often contain critical security instructions. Verify with unit tests that system messages are preserved.
+
+## 2026-02-17 - Header Injection Vulnerability via User ID
+
+**Vulnerability:** The application read the `x-openwebui-user-id` header and assigned it directly to the internal user model without sanitization. This allowed attackers to inject CRLF characters (`\r\n`) into the User ID, potentially leading to HTTP response splitting or log injection downstream.
+**Learning:** Trusting HTTP headers as "safe" input is a common mistake. Any input from the client, including headers, must be treated as untrusted and sanitized.
+**Prevention:** Sanitize all header values before using them in internal logic or logging. In this case, `sanitize_log_input` was applied to escape control characters.
