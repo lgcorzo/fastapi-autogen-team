@@ -1,5 +1,5 @@
 import time
-from typing import List, Optional, Dict, Literal, Union, Any
+from typing import List, Optional, Dict, Literal, Union, Any, Annotated
 
 from pydantic import BaseModel, Field
 
@@ -11,7 +11,7 @@ class ContentImage(BaseModel):
 
 class ContentText(BaseModel):
     type: Literal["text"]
-    text: str
+    text: str = Field(max_length=50000)
 
 
 class ModelInformation(BaseModel):
@@ -27,14 +27,14 @@ class ModelInformation(BaseModel):
 
 class Message(BaseModel):
     role: str
-    content: Union[str, List[Union[ContentText, ContentImage]]]
+    content: Union[Annotated[str, Field(max_length=50000)], List[Union[ContentText, ContentImage]]]
     name: Optional[str] = None
 
 
 class Input(BaseModel):
-    model: str
-    user: Optional[str] = "autogen_rag"
-    messages: List[Message]
+    model: str = Field(max_length=100)
+    user: Optional[str] = Field(default="autogen_rag", max_length=100)
+    messages: List[Message] = Field(max_length=100)
     temperature: float = 1
     top_p: float = 1
     presence_penalty: float = 0
