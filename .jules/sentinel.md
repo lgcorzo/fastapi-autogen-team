@@ -39,3 +39,33 @@
 **Vulnerability:** User-controlled input (like `user` ID, model names, and search `query`) was logged directly, allowing attackers to inject fake log entries via control characters like newlines (`\n`) and carriage returns (`\r`).
 **Learning:** Logging raw user input is a security risk (CWE-117). Attackers can spoof log entries to mask malicious activity or confuse log analyzers.
 **Prevention:** Always sanitize user input before logging. Use the `sanitize_log_input` helper function to escape control characters.
+
+## 2026-02-13 - Fix CRLF Prompt Injection Bypass
+
+**Vulnerability:** The `sanitize_for_prompt` function relied on exact string matching for `\n},\n` to prevent prompt injection. Attackers could bypass this using CRLF line endings (`\r\n},\r\n`), which the sanitizer failed to detect but the downstream LLM/parser treated as valid delimiters.
+**Learning:** Security sanitization logic that relies on exact string matching for structural delimiters is fragile. Variations in whitespace (like CRLF vs LF) can easily bypass such checks.
+**Prevention:** Normalize input (e.g., convert all line endings to `\n`) before applying sanitization rules, or use more robust matching (e.g., regex) that accounts for whitespace variations.
+
+## 2026-05-23 - Prevent Dropping of System Messages
+
+**Vulnerability:** The `normalize_input_messages` function in `autogen_server.py` was filtering out system messages from the input, causing any security constraints or instructions in the system prompt to be ignored.
+**Learning:** Logic errors in message processing can inadvertently bypass security controls. In this case, a list comprehension intended to process messages was incorrectly filtering them out.
+**Prevention:** Ensure that message processing logic correctly handles all message roles, especially system messages which often contain critical security instructions. Verify with unit tests that system messages are preserved.
+
+## 2026-02-17 - Header Injection Vulnerability via User ID
+
+**Vulnerability:** The application read the `x-openwebui-user-id` header and assigned it directly to the internal user model without sanitization. This allowed attackers to inject CRLF characters (`\r\n`) into the User ID, potentially leading to HTTP response splitting or log injection downstream.
+**Learning:** Trusting HTTP headers as "safe" input is a common mistake. Any input from the client, including headers, must be treated as untrusted and sanitized.
+**Prevention:** Sanitize all header values before using them in internal logic or logging. In this case, `sanitize_log_input` was applied to escape control characters.
+
+## 2024-10-25 - Prevent User ID Injection via Input Sanitization
+
+**Vulnerability:** The application was vulnerable to injection attacks because the `user` ID from the `x-openwebui-user-id` header was passed unsanitized to downstream services (`serve_autogen`, `AutogenWorkflow`). This could lead to Header Injection or Log Injection if the downstream services used this value in sensitive contexts.
+**Learning:** Even if input is sanitized for _logging_ locally, the _original_ raw input object might still be passed to other parts of the system.
+**Prevention:** Sanitize input fields (like `user` and `model`) _in place_ on the input object before passing it to any service or logging function.
+
+## 2026-02-14 - Header Injection via User ID
+
+**Vulnerability:** The application was using the `user` ID input directly in HTTP headers (via `create_llm_config`), allowing attackers to inject arbitrary headers (CRLF injection) via newlines.
+**Learning:** User inputs used in system configurations or downstream API calls (like HTTP headers) must be sanitized, not just for logging or display.
+**Prevention:** Sanitize the `user` ID using `sanitize_log_input` (or similar) to escape control characters before passing it to `AutogenWorkflow` or any downstream service.

@@ -7,6 +7,7 @@ from fastapi_autogen_team.autogen_server import (
     serve_autogen,
     create_non_streaming_response,
     generate_streaming_response,
+    normalize_input_messages,
 )
 from fastapi_autogen_team.data_model import Input, Output
 
@@ -99,3 +100,18 @@ def test_create_non_streaming_response_no_results():
     result = create_non_streaming_response(None, MODEL_NAME)
     assert len(result["choices"]) == 1
     assert "Sorry, I am unable to assist" in result["choices"][0]["message"]["content"]
+
+
+def test_normalize_input_messages_preserves_system_message():
+    """Test normalize_input_messages correctly preserves system messages."""
+    system_content = "You are a secure system."
+    test_input = Input(
+        model=MODEL_NAME,
+        messages=[
+            {"role": "system", "content": system_content},
+            {"role": "user", "content": "Hello"},
+        ],
+    )
+    result = normalize_input_messages(test_input)
+    assert system_content in result
+    assert "'SYSTEM_INFO':{\nSystem: " + system_content in result

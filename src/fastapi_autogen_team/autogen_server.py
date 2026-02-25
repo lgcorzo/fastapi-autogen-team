@@ -11,6 +11,7 @@ from fastapi.responses import StreamingResponse
 
 from fastapi_autogen_team.autogen_workflow_team import AutogenWorkflow
 from fastapi_autogen_team.data_model import Input, Output
+from fastapi_autogen_team.utils import sanitize_log_input
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -21,6 +22,9 @@ EMPTY_USAGE = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
 def sanitize_for_prompt(text: str) -> str:
     """Sanitizes text to prevent prompt injection via structural delimiters."""
+    # Normalize line endings to ensure consistent delimiter matching
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+
     # Break the specific sequence used for prompt block delimiters
     # The template uses "\n},\n'KEY':{\n"
     text = text.replace("\n},\n", "\n} ,\n")
@@ -85,7 +89,7 @@ def normalize_input_messages(inp: Input) -> str:
     # Construcción del prompt final
     short_memory = "\n".join(f"{m['role']}: {m['text']}" for m in historic_messages if m["role"] != "System")
 
-    system_message = "\n".join(f"{m['role']}: {m['text']}" for m in system_messages if m["role"] != "System")
+    system_message = "\n".join(f"{m['role']}: {m['text']}" for m in system_messages)
     request = f"{last_message['role']}: {last_message['text']}"
 
     full_prompt = (
@@ -100,7 +104,7 @@ def normalize_input_messages(inp: Input) -> str:
 def serve_autogen(inp: Input) -> StreamingResponse | Dict[str, Any]:
     """Serves the autogen workflow based on the input (streaming or non-streaming)."""
     try:
-        user_id = str(inp.user)
+        user_id = sanitize_log_input(str(inp.user))
         workflow = AutogenWorkflow(user=user_id)
         norm_message = normalize_input_messages(inp)
 
