@@ -57,3 +57,9 @@
 **Vulnerability:** The application read the `x-openwebui-user-id` header and assigned it directly to the internal user model without sanitization. This allowed attackers to inject CRLF characters (`\r\n`) into the User ID, potentially leading to HTTP response splitting or log injection downstream.
 **Learning:** Trusting HTTP headers as "safe" input is a common mistake. Any input from the client, including headers, must be treated as untrusted and sanitized.
 **Prevention:** Sanitize all header values before using them in internal logic or logging. In this case, `sanitize_log_input` was applied to escape control characters.
+
+## 2024-10-25 - Prevent User ID Injection via Input Sanitization
+
+**Vulnerability:** The application was vulnerable to injection attacks because the `user` ID from the `x-openwebui-user-id` header was passed unsanitized to downstream services (`serve_autogen`, `AutogenWorkflow`). This could lead to Header Injection or Log Injection if the downstream services used this value in sensitive contexts.
+**Learning:** Even if input is sanitized for _logging_ locally, the _original_ raw input object might still be passed to other parts of the system.
+**Prevention:** Sanitize input fields (like `user` and `model`) _in place_ on the input object before passing it to any service or logging function.
