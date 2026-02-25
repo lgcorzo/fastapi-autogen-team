@@ -69,3 +69,9 @@
 **Vulnerability:** The application was using the `user` ID input directly in HTTP headers (via `create_llm_config`), allowing attackers to inject arbitrary headers (CRLF injection) via newlines.
 **Learning:** User inputs used in system configurations or downstream API calls (like HTTP headers) must be sanitized, not just for logging or display.
 **Prevention:** Sanitize the `user` ID using `sanitize_log_input` (or similar) to escape control characters before passing it to `AutogenWorkflow` or any downstream service.
+
+## 2026-02-19 - DoS Risk via Unbounded Input
+
+**Vulnerability:** The application accepted unbounded string inputs for `messages`, `model`, and `user` fields in the API payload. This exposed the system to Denial of Service (DoS) attacks via memory exhaustion or excessive processing by sending massive payloads (e.g., 10MB strings).
+**Learning:** Relying on default Pydantic validation is insufficient for security; explicit length limits (`max_length`) must be defined for all string inputs, especially those processed by expensive downstream services like LLMs.
+**Prevention:** Use Pydantic's `Field(max_length=...)` to strictly enforce reasonable limits on all user-controlled string inputs. For complex types like `Union` in Pydantic V2, use `Annotated` to apply constraints.
