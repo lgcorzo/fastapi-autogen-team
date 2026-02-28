@@ -150,6 +150,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Security Headers Middleware
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next: Any) -> Any:
