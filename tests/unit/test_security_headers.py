@@ -4,21 +4,26 @@ from fastapi.testclient import TestClient
 
 from fastapi_autogen_team.main import app
 
+
 # Mock dependencies properly for TestClient
 @pytest.fixture
 def mock_telemetry():
-    with patch("fastapi_autogen_team.main.log_with_trace"), \
-         patch("fastapi_autogen_team.main.otlp_exporter"), \
-         patch("fastapi_autogen_team.main.otlp_metric_exporter"), \
-         patch("fastapi_autogen_team.main.otlp_log_exporter"), \
-         patch("fastapi_autogen_team.main.BatchSpanProcessor"), \
-         patch("fastapi_autogen_team.main.PeriodicExportingMetricReader"), \
-         patch("fastapi_autogen_team.main.BatchLogRecordProcessor"):
+    with (
+        patch("fastapi_autogen_team.main.log_with_trace"),
+        patch("fastapi_autogen_team.main.otlp_exporter"),
+        patch("fastapi_autogen_team.main.otlp_metric_exporter"),
+        patch("fastapi_autogen_team.main.otlp_log_exporter"),
+        patch("fastapi_autogen_team.main.BatchSpanProcessor"),
+        patch("fastapi_autogen_team.main.PeriodicExportingMetricReader"),
+        patch("fastapi_autogen_team.main.BatchLogRecordProcessor"),
+    ):
         yield
+
 
 @pytest.fixture
 def client(mock_telemetry):
     return TestClient(app)
+
 
 def test_security_headers_on_success(client):
     response = client.get("/autogen/api/v1beta/models")
@@ -28,6 +33,7 @@ def test_security_headers_on_success(client):
     assert "X-Frame-Options" in response.headers
     assert response.headers["X-Frame-Options"] == "DENY"
 
+
 def test_security_headers_on_redirect(client):
     # Test the redirect endpoint directly, follow_redirects=False is important here
     response = client.get("/autogen", follow_redirects=False)
@@ -36,6 +42,7 @@ def test_security_headers_on_redirect(client):
     assert response.headers["X-Content-Type-Options"] == "nosniff"
     assert "X-Frame-Options" in response.headers
     assert response.headers["X-Frame-Options"] == "DENY"
+
 
 def test_security_headers_on_error(client):
     # We trigger a 404 error
