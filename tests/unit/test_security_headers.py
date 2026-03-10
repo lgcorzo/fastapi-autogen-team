@@ -4,9 +4,12 @@ from fastapi.testclient import TestClient
 from fastapi_autogen_team.main import app
 
 # Mocking OpenTelemetry setup components to bypass remote calls during testing
-with patch("fastapi_autogen_team.main.OTLPMetricExporter"), patch("fastapi_autogen_team.main.OTLPSpanExporter"), patch(
-    "fastapi_autogen_team.main.OTLPLogExporter"
-), patch("fastapi_autogen_team.main.logger_tracer"):
+with (
+    patch("fastapi_autogen_team.main.OTLPMetricExporter"),
+    patch("fastapi_autogen_team.main.OTLPSpanExporter"),
+    patch("fastapi_autogen_team.main.OTLPLogExporter"),
+    patch("fastapi_autogen_team.main.logger_tracer"),
+):
     client = TestClient(app)
 
 
@@ -46,6 +49,7 @@ def test_security_headers_on_chat_completions(mock_serve_autogen):
     # which also should have the security headers.
     assert response.headers.get("X-Content-Type-Options") == "nosniff"
     assert response.headers.get("X-Frame-Options") == "DENY"
+
 
 def test_security_headers_on_404():
     """Test that security headers are present on errors."""

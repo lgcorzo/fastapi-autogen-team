@@ -152,7 +152,9 @@ app.add_middleware(
 
 
 @app.middleware("http")
-async def security_headers_middleware(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
+async def security_headers_middleware(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
     """Adds security headers to all HTTP responses."""
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
