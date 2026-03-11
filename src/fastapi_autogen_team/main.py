@@ -140,7 +140,6 @@ app = FastAPI(
 )
 
 
-
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
     response = await call_next(request)
