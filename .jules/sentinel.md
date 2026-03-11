@@ -75,3 +75,9 @@
 **Vulnerability:** The application accepted unbounded string inputs for `messages`, `model`, and `user` fields in the API payload. This exposed the system to Denial of Service (DoS) attacks via memory exhaustion or excessive processing by sending massive payloads (e.g., 10MB strings).
 **Learning:** Relying on default Pydantic validation is insufficient for security; explicit length limits (`max_length`) must be defined for all string inputs, especially those processed by expensive downstream services like LLMs.
 **Prevention:** Use Pydantic's `Field(max_length=...)` to strictly enforce reasonable limits on all user-controlled string inputs. For complex types like `Union` in Pydantic V2, use `Annotated` to apply constraints.
+
+## 2026-03-11 - Add HTTP Security Headers (X-Content-Type-Options, X-Frame-Options)
+
+**Vulnerability:** The application was missing basic HTTP security headers (`X-Content-Type-Options` and `X-Frame-Options`) on its API responses. This could allow attackers to execute MIME-sniffing attacks or clickjacking attacks by embedding the application in an iframe.
+**Learning:** Basic security headers are not enabled by default in FastAPI. They must be explicitly added via middleware to provide defense-in-depth against common web vulnerabilities.
+**Prevention:** Always implement a security middleware in FastAPI applications to append standard security headers (like `X-Content-Type-Options: nosniff` and `X-Frame-Options: DENY`) to all HTTP responses, including errors and redirects. Verify with dedicated unit tests.
