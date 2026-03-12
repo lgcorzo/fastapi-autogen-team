@@ -4,14 +4,16 @@ from fastapi.testclient import TestClient
 
 from fastapi_autogen_team.main import app
 
+
 @pytest.fixture
 def test_client():
     """Fixture providing a TestClient configured properly for middleware testing."""
     # We must mock OpenTelemetry exports/setup that might cause errors
-    with patch("fastapi_autogen_team.main.log_with_trace"), \
-         patch("fastapi_autogen_team.main.BackgroundScheduler"), \
-         patch("fastapi_autogen_team.main.FastAPIInstrumentor.instrument_app"):
-
+    with (
+        patch("fastapi_autogen_team.main.log_with_trace"),
+        patch("fastapi_autogen_team.main.BackgroundScheduler"),
+        patch("fastapi_autogen_team.main.FastAPIInstrumentor.instrument_app"),
+    ):
         with TestClient(app) as client:
             yield client
 
