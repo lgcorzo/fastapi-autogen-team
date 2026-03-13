@@ -5,7 +5,9 @@ from typing import Dict, Any
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
+from typing import Callable, Awaitable
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import RedirectResponse
 from apscheduler.schedulers.background import BackgroundScheduler
 from opentelemetry import metrics, trace
@@ -149,6 +151,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        return response
+
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 
 # Global Exception Handler
