@@ -28,4 +28,7 @@ with (
 
         # Check for Content-Security-Policy
         assert "content-security-policy" in response.headers
-        assert response.headers["content-security-policy"] == "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://fastapi.tiangolo.com;"
+        assert (
+            response.headers["content-security-policy"]
+            == "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://fastapi.tiangolo.com;"
+        )
