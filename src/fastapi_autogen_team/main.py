@@ -1,13 +1,11 @@
 import os
 import logging
+import uvicorn
 from typing import Dict, Any, Callable, Awaitable
-
-from typing import Awaitable, Callable
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Callable, Awaitable
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse
 from starlette.responses import RedirectResponse
 from apscheduler.schedulers.background import BackgroundScheduler
 from opentelemetry import metrics, trace
@@ -27,8 +25,6 @@ from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
 
-
-import uvicorn
 
 from fastapi_autogen_team.autogen_server import serve_autogen
 from fastapi_autogen_team.data_model import Input, ModelInformation
@@ -140,14 +136,6 @@ app = FastAPI(
     docs_url=DOCS_URL,
     redoc_url=None,
 )
-
-
-@app.middleware("http")
-async def add_security_headers(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
-    response = await call_next(request)
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
-    return response
 
 
 # CORS Middleware
