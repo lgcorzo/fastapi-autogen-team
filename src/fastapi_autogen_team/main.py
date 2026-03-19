@@ -5,7 +5,8 @@ from typing import Dict, Any
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from typing import Callable, Awaitable
+from fastapi.responses import JSONResponse, Response
 from starlette.responses import RedirectResponse
 from apscheduler.schedulers.background import BackgroundScheduler
 from opentelemetry import metrics, trace

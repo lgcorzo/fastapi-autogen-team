@@ -63,6 +63,7 @@ pre-commit = "^3.7.1"
 
 [tool.poetry.group.dev.dependencies]
 invoke = "^2.2.0"
+bandit = "^1.9.4"
 
 [tool.poetry.group.docs.dependencies]
 pdoc = "^14.5.1"
