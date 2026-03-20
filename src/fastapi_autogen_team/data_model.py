@@ -26,9 +26,9 @@ class ModelInformation(BaseModel):
 
 
 class Message(BaseModel):
-    role: str
+    role: str = Field(max_length=100)
     content: Union[Annotated[str, Field(max_length=50000)], List[Union[ContentText, ContentImage]]]
-    name: Optional[str] = None
+    name: Optional[str] = Field(default=None, max_length=100)
 
 
 class Input(BaseModel):
