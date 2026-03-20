@@ -2,6 +2,7 @@ import json
 import logging
 import uuid
 import time
+import re
 from queue import Queue
 from threading import Thread
 from typing import Any, Generator, Dict
@@ -25,10 +26,12 @@ def sanitize_for_prompt(text: str) -> str:
     # Normalize line endings to ensure consistent delimiter matching
     text = text.replace("\r\n", "\n").replace("\r", "\n")
 
-    # Break the specific sequence used for prompt block delimiters
+    # Break the specific sequence used for prompt block delimiters regardless of spacing
     # The template uses "\n},\n'KEY':{\n"
-    text = text.replace("\n},\n", "\n} ,\n")
-    text = text.replace("':{\n", "' : {\n")
+    # Replace `\n} ,\n` matching any whitespace between `}` and `,`
+    text = re.sub(r"\n\s*}\s*,\n", "\n} ,\n", text)
+    # Replace `':{\n` matching any whitespace between `'` and `:` and `{`
+    text = re.sub(r"'\s*:\s*{\n", "' : {\n", text)
     return text
 
 
