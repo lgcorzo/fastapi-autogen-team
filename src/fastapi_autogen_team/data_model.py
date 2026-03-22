@@ -27,7 +27,11 @@ class ModelInformation(BaseModel):
 
 class Message(BaseModel):
     role: str = Field(max_length=100)
-    content: Union[Annotated[str, Field(max_length=50000)], List[Union[ContentText, ContentImage]]]
+    # Security: Use Annotated to enforce max_length on the list to prevent DoS via massive payloads
+    content: Union[
+        Annotated[str, Field(max_length=50000)],
+        Annotated[List[Union[ContentText, ContentImage]], Field(max_length=100)],
+    ]
     name: Optional[str] = Field(default=None, max_length=100)
 
 
