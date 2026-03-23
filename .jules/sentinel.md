@@ -81,3 +81,9 @@
 **Vulnerability:** The application was not setting basic HTTP security headers (`X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`) on API responses. This could allow attackers to perform MIME-sniffing attacks or embed the application in malicious iframes (Clickjacking).
 **Learning:** Security headers should be applied globally to all endpoints by default, rather than relying on individual route configurations or reverse proxies, as an added layer of defense.
 **Prevention:** Implemented a global FastAPI middleware (`@app.middleware("http")`) to automatically inject `X-Content-Type-Options: nosniff` and `X-Frame-Options: DENY` headers into all `Response` objects before they are returned to the client.
+
+## 2026-03-21 - DoS Risk via Unbounded Input List
+
+**Vulnerability:** The application mitigated string-based DoS risks but missed limiting the length of nested lists (e.g., `content: List[Union[ContentText, ContentImage]]`), leaving a vector for DoS via massive arrays.
+**Learning:** Pydantic validation bypasses list length limits unless explicitly constrained, even if inner elements are bounded. Attackers can still exhaust memory by sending enormous arrays of small, valid items.
+**Prevention:** Always set `max_length` explicitly on `List` types (using `Annotated` in Pydantic V2) for user-provided data, especially inside nested objects or unions.
