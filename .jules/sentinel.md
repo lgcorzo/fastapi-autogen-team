@@ -87,3 +87,9 @@
 **Vulnerability:** The application mitigated string-based DoS risks but missed limiting the length of nested lists (e.g., `content: List[Union[ContentText, ContentImage]]`), leaving a vector for DoS via massive arrays.
 **Learning:** Pydantic validation bypasses list length limits unless explicitly constrained, even if inner elements are bounded. Attackers can still exhaust memory by sending enormous arrays of small, valid items.
 **Prevention:** Always set `max_length` explicitly on `List` types (using `Annotated` in Pydantic V2) for user-provided data, especially inside nested objects or unions.
+
+## 2026-03-24 - CORS Middleware Empty Origins Misconfiguration
+
+**Vulnerability:** The application was parsing `ALLOWED_ORIGINS` by splitting an empty string, which resulted in a list containing an empty string `[""]`. This was passed directly to FastAPI's `CORSMiddleware`, enabling broken CORS configurations or failing pre-flight OPTIONS requests (e.g., throwing an exception when `allow_credentials=True` is combined with a wildcard or malformed origin).
+**Learning:** Default fallback values for list-based environment variables like CORS origins must be rigorously validated. A default empty string split by comma creates an invalid list of one empty string, not an empty list.
+**Prevention:** Always strip whitespace and filter out empty strings when parsing comma-separated environment variables (e.g., `[origin.strip() for origin in os.getenv("ALLOWED_ORIGINS", "").split(",") if origin.strip()]`). Conditionally add the `CORSMiddleware` only if the resulting list has valid elements.
