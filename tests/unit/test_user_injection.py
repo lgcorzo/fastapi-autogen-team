@@ -16,18 +16,24 @@ async def test_user_injection_passed_to_service():
     mock_request.headers = {}
 
     # Mock dependencies
-    with patch("fastapi_autogen_team.main.serve_autogen") as mock_service:
-        with patch("fastapi_autogen_team.main.log_with_trace"):
-            # Run the function
-            await route_query(model_input, mock_request)
+    # To properly mock `serve_autogen` assigned to `model_services`, we must mock the local reference where it's used.
+    # However, since `route_query` references the module-level imported `serve_autogen`, we mock it at `fastapi_autogen_team.main.serve_autogen`.
+    # Wait, why was `mock_service` called 0 times before? Ah! `patch` might be undone or there's an async issue.
+    # Actually, `AutogenWorkflow` failed with `LITELLM_API_KEY` before because we didn't mock properly.
+    # If we patch `fastapi_autogen_team.main.serve_autogen`, the mock object will be called.
+    with patch.dict("os.environ", {"LITELLM_API_KEY": "test"}):
+        with patch("fastapi_autogen_team.autogen_server.AutogenWorkflow") as mock_workflow:
+            with patch("fastapi_autogen_team.autogen_server.normalize_input_messages"):
+                # Also mock create_non_streaming_response because the mocked workflow will not produce correct chat results
+                with patch(
+                    "fastapi_autogen_team.autogen_server.create_non_streaming_response", return_value={"status": "ok"}
+                ):
+                    with patch("fastapi_autogen_team.main.log_with_trace"):
+                        await route_query(model_input, mock_request)
 
-            # Check what was passed to service
-            mock_service.assert_called_once()
-            called_input = mock_service.call_args[0][0]
+                        mock_workflow.assert_called_once()
+                        kwargs = mock_workflow.call_args.kwargs
+                        user_id = kwargs.get("user")
 
-            # If the newline is still there, it's vulnerable to downstream injection
-            # because serve_autogen uses this user ID in headers/tags
-            assert (
-                "\n" not in called_input.user
-            ), f"User ID passed to service contains newlines: {repr(called_input.user)}"
-            assert called_input.user == "user\\n[CRITICAL] User made a mistake"
+                        assert "\n" not in user_id, f"User ID passed to service contains newlines: {repr(user_id)}"
+                        assert user_id == "user\\n[CRITICAL] User made a mistake"
