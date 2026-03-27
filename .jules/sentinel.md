@@ -93,3 +93,9 @@
 **Vulnerability:** The application was parsing `ALLOWED_ORIGINS` by splitting an empty string, which resulted in a list containing an empty string `[""]`. This was passed directly to FastAPI's `CORSMiddleware`, enabling broken CORS configurations or failing pre-flight OPTIONS requests (e.g., throwing an exception when `allow_credentials=True` is combined with a wildcard or malformed origin).
 **Learning:** Default fallback values for list-based environment variables like CORS origins must be rigorously validated. A default empty string split by comma creates an invalid list of one empty string, not an empty list.
 **Prevention:** Always strip whitespace and filter out empty strings when parsing comma-separated environment variables (e.g., `[origin.strip() for origin in os.getenv("ALLOWED_ORIGINS", "").split(",") if origin.strip()]`). Conditionally add the `CORSMiddleware` only if the resulting list has valid elements.
+
+## 2026-03-27 - Unbounded Numeric Input DoS Risk
+
+**Vulnerability:** The application accepted unbounded numeric inputs for `temperature`, `top_p`, `presence_penalty`, and `frequency_penalty` fields in the `Input` API payload. This exposed the system to Denial of Service (DoS) attacks or unpredictable behavior during downstream AI inference if given logically invalid or extremely large values.
+**Learning:** While string and list lengths are commonly limited to prevent DoS, numeric fields must also be strictly bounded to logically valid ranges to prevent downstream errors or excessive resource consumption.
+**Prevention:** Use Pydantic's `Field(ge=..., le=...)` constraints to explicitly restrict all numeric fields to their expected valid ranges (e.g., `temperature` 0.0 to 2.0).

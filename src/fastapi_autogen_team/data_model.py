@@ -39,10 +39,10 @@ class Input(BaseModel):
     model: str = Field(max_length=100)
     user: Optional[str] = Field(default="autogen_rag", max_length=100)
     messages: List[Message] = Field(max_length=100)
-    temperature: float = 1
-    top_p: float = 1
-    presence_penalty: float = 0
-    frequency_penalty: float = 0
+    temperature: float = Field(default=1, ge=0.0, le=2.0)
+    top_p: float = Field(default=1, ge=0.0, le=1.0)
+    presence_penalty: float = Field(default=0, ge=-2.0, le=2.0)
+    frequency_penalty: float = Field(default=0, ge=-2.0, le=2.0)
     stream: bool = False
 
 

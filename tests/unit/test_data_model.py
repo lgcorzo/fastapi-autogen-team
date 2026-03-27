@@ -83,6 +83,35 @@ def test_input_missing_field():
         Input(messages=[{"role": "user", "content": "hello"}])
 
 
+def test_input_numeric_bounds():
+    """Test that Input raises ValidationError when numeric fields exceed bounds."""
+    message = Message(role="user", content="Hello, world!")
+
+    # Test temperature bounds (0 to 2)
+    with pytest.raises(ValidationError):
+        Input(model="test", messages=[message], temperature=-0.1)
+    with pytest.raises(ValidationError):
+        Input(model="test", messages=[message], temperature=2.1)
+
+    # Test top_p bounds (0 to 1)
+    with pytest.raises(ValidationError):
+        Input(model="test", messages=[message], top_p=-0.1)
+    with pytest.raises(ValidationError):
+        Input(model="test", messages=[message], top_p=1.1)
+
+    # Test presence_penalty bounds (-2 to 2)
+    with pytest.raises(ValidationError):
+        Input(model="test", messages=[message], presence_penalty=-2.1)
+    with pytest.raises(ValidationError):
+        Input(model="test", messages=[message], presence_penalty=2.1)
+
+    # Test frequency_penalty bounds (-2 to 2)
+    with pytest.raises(ValidationError):
+        Input(model="test", messages=[message], frequency_penalty=-2.1)
+    with pytest.raises(ValidationError):
+        Input(model="test", messages=[message], frequency_penalty=2.1)
+
+
 def test_output_valid():
     """Test that a valid Output object can be created."""
     output = Output(
