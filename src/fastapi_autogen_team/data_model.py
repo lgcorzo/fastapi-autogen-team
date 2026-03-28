@@ -39,11 +39,10 @@ class Input(BaseModel):
     model: str = Field(max_length=100)
     user: Optional[str] = Field(default="autogen_rag", max_length=100)
     messages: List[Message] = Field(max_length=100)
-    # Security enhancement: Constrain numeric inputs to valid inference ranges
-    temperature: float = Field(default=1.0, ge=0.0, le=2.0)
-    top_p: float = Field(default=1.0, ge=0.0, le=1.0)
-    presence_penalty: float = Field(default=0.0, ge=-2.0, le=2.0)
-    frequency_penalty: float = Field(default=0.0, ge=-2.0, le=2.0)
+    temperature: float = Field(default=1, ge=0.0, le=2.0)
+    top_p: float = Field(default=1, ge=0.0, le=1.0)
+    presence_penalty: float = Field(default=0, ge=-2.0, le=2.0)
+    frequency_penalty: float = Field(default=0, ge=-2.0, le=2.0)
     stream: bool = False
 
 
