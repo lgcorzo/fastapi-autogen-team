@@ -32,6 +32,11 @@ def sanitize_for_prompt(text: str) -> str:
     text = re.sub(r"\n\s*}\s*,\n", "\n} ,\n", text)
     # Replace `':{\n` matching any whitespace between `'` and `:` and `{`
     text = re.sub(r"'\s*:\s*{\n", "' : {\n", text)
+
+    # Prevent role spoofing prompt injection (case-insensitive)
+    text = re.sub(r"(?i)\n(system|user|assistant)\s*:", r"\n_\1_:", text)
+    text = re.sub(r"(?i)^(system|user|assistant)\s*:", r"_\1_:", text)
+
     return text
 
 
