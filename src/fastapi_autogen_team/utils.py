@@ -2,7 +2,7 @@ import re
 from typing import Any
 
 # Matches control characters except newline (\n), carriage return (\r), and tab (\t)
-CONTROL_CHAR_PATTERN = re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]')
+CONTROL_CHAR_PATTERN = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 
 def sanitize_log_input(input_str: Any) -> str:
