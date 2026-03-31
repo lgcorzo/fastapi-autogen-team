@@ -59,6 +59,19 @@ def test_sanitize_log_input_non_string():
     assert sanitize_log_input(123) == "123"
 
 
+def test_sanitize_log_input_ansi_escape():
+    # \x1b is ESC, used in ANSI escape codes
+    assert sanitize_log_input("hello\x1b[2Kworld") == "hello[2Kworld"
+
+
+def test_sanitize_log_input_null_byte():
+    assert sanitize_log_input("hello\x00world") == "helloworld"
+
+
+def test_sanitize_log_input_mixed_control_chars():
+    assert sanitize_log_input("hello\x07\x0b\x0cworld") == "helloworld"
+
+
 @patch("fastapi_autogen_team.main.log_with_trace")
 @patch("fastapi_autogen_team.main.serve_autogen")
 @pytest.mark.asyncio
