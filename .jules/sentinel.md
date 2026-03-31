@@ -99,3 +99,9 @@
 **Vulnerability:** The application accepted unbounded numeric inputs for `temperature`, `top_p`, `presence_penalty`, and `frequency_penalty` fields in the `Input` API payload. This exposed the system to Denial of Service (DoS) attacks or unpredictable behavior during downstream AI inference if given logically invalid or extremely large values.
 **Learning:** While string and list lengths are commonly limited to prevent DoS, numeric fields must also be strictly bounded to logically valid ranges to prevent downstream errors or excessive resource consumption.
 **Prevention:** Use Pydantic's `Field(ge=..., le=...)` constraints to explicitly restrict all numeric fields to their expected valid ranges (e.g., `temperature` 0.0 to 2.0).
+
+## 2026-03-30 - DoS Risk via Unbounded Image URL Object
+
+**Vulnerability:** The application accepted an unbounded dictionary `Dict[str, str]` for the `image_url` property in the `ContentImage` model. This exposed the system to Denial of Service (DoS) attacks via memory exhaustion by allowing attackers to send payloads with massive base64 strings or an enormous number of keys.
+**Learning:** Pydantic's generic typing (like `Dict[str, str]`) provides no length or size constraints. For large, potentially malicious input like base64 image representations, explicitly bounded models are critical to prevent memory starvation and excessive JSON parsing overhead.
+**Prevention:** Replace unbounded dictionary types with strongly typed Pydantic sub-models (e.g., `ImageUrl`). Enforce strict `max_length` constraints on all fields (e.g., `url: str = Field(max_length=5000000)`) to validate and restrict the payload size at the schema level.

@@ -4,9 +4,14 @@ from typing import List, Optional, Dict, Literal, Union, Any, Annotated
 from pydantic import BaseModel, Field
 
 
+class ImageUrl(BaseModel):
+    url: str = Field(max_length=5000000)
+    detail: Optional[str] = Field(default=None, max_length=100)
+
+
 class ContentImage(BaseModel):
     type: Literal["image_url"]
-    image_url: Dict[str, str]  # {"url": "data:image/png;base64,..."}
+    image_url: ImageUrl
 
 
 class ContentText(BaseModel):
