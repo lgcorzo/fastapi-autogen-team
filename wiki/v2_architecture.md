@@ -1,63 +1,72 @@
-# V2 System Architecture (Rust)
+# V2 System Architecture (Rust DDD)
 
-## 🏗️ High-Level Design
-The system has been redesigned as a modular, asynchronous Rust service. It follows a clean architecture pattern, separating the web interface, the agentic orchestration logic, and the external tool integrations.
-
----
-
-### [Axum API Layer]
-The entry point of the service is a REST API built with **Axum**. It manages:
-- **AppState**: Centralized state management for the `AgentTeam`, environment configuration, and sharing it across request handlers.
-- **Handlers**: The `/chat/completions` endpoint uses **Tokio channels** to stream partial tokens back to the client in real-time.
-- **Safety**: Robust error handling via `axum::response::IntoResponse` and `anyhow`.
+## 🏗️ High-Level Design (DDD)
+The system has been architected using **Domain-Driven Design (DDD)** principles. This separation ensures that the core agentic orchestration remains decoupled from the web boundary and external technical details.
 
 ---
 
-### [Agent Orchestration (Rig)]
-At the heart of the service is the `AgentTeam`, implemented in `src/agents.rs`. It utilizes the **Rig** framework to orchestrate a triad of specialized agents:
-
-1.  **Planner Agent**: 
-    - Analyzes the initial user request.
-    - Breaks the problem into logical steps and tool calls.
-    - Orchestrated through Rig's `Agent` trait.
-2.  **Searcher Agent**:
-    - Possesses a suite of **Tools** (Jira, R2R).
-    - Executes precise queries based on the Planner's instructions.
-    - Gathers relevant context for the final generation.
-3.  **QA Agent**:
-    - Reviews the raw response and gathered context.
-    - Ensures the output meets quality standards.
-    - Finalizes the message for the user.
+### [Interface Layer]
+The entry point of the service is a REST API built with **Axum**, located in `src/interface/http/`.
+- **routes.rs**: Centralized router configuration and shared `AppState`.
+- **handlers.rs**: OpenAI-compatible route handlers implementing **Tokio streaming** for real-time SSE token delivery.
+- **middleware.rs**: Layer for security (HSTS, CSP, X-Frame-Options) and CORS orchestration.
 
 ---
 
-### [Tool Integrations]
-Our tools are implemented as Rust structs that conform to Rig's `Tool` trait, allowing the agents to call them autonomously.
-
-#### 📁 R2R (Retrieval-Augmented Generation)
-- **Engine**: R2R (Neo4j/Vector DB).
-- **Functionality**: Performs vector similarity search across indexed documents to provide the LLM with grounded facts.
-
-#### 🎫 Jira (Project Management)
-- **Engine**: Atlassian Jira Rest API.
-- **Functionality**: Lists, searches, and summarizes Jira issues to keep the agent team informed about task status.
+### [Application Layer]
+The transport and orchestration layer, located in `src/application/`.
+- **dtos.rs**: Serde-ready Data Transfer Objects that define the contract for all internal and external communication.
 
 ---
 
-## 🚦 Request Lifecycle
-
-1.  **Request**: User sends a POST to `/chat/completions`.
-2.  **Dispatch**: Axum extracts the query and passes it to the `AgentTeam`.
-3.  **Planning**: The Planner agent determines if local search or Jira is required.
-4.  **Action**: The Searcher agent executes the tool(s) and retrieves context.
-5.  **Synthesis**: The QA agent formats the response.
-6.  **Response**: The result is streamed or returned as a JSON object to the user.
+### [Domain Layer]
+The core business logic and agent orchestration, located in `src/domain/agent/`.
+- **team.rs**: Implements the `AgentTeam` using the **Rig** framework.
+- **Orchestration Triad**:
+    1.  **Planner**: Deconstructs user queries into actionable steps.
+    2.  **Searcher**: Executes context-gathering tools.
+    3.  **QA Agent**: Validates the reasoning and synthesizes the final response.
 
 ---
 
-## 🛠️ Module Structure
-- `src/main.rs`: Entry point and server initialization.
-- `src/lib.rs`: Shared library and Axum router setup.
-- `src/agents.rs`: Rig Agent definitions and orchestration logic.
-- `src/tools.rs`: External API integrations (Jira, R2R).
-- `src/data_model.rs`: Serde-ready structs for API and internal communication.
+### [Infrastructure Layer]
+Concrete implementations of external dependencies, located in `src/infrastructure/`.
+- **tools/jira.rs**: Jira JQL client for issue tracking.
+- **tools/r2r.rs**: Client for R2R vector retrieval.
+- **tools/search.rs**: Unified SearchTool that provides a common interface for the agents.
+- **telemetry.rs**: Instrumentation for OpenTelemetry (tracing, metrics, and logs).
+
+---
+
+## 🚦 Request Lifecycle through DDD Layers
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant I as Interface (Axum)
+    participant A as Application (DTOs)
+    participant D as Domain (AgentTeam)
+    participant Inf as Infrastructure (Tools)
+
+    C->>I: POST /chat/completions
+    I->>A: Deserialize JSON to DTO
+    I->>D: Invoke AgentTeam::run_stream
+    D->>D: Planner: Generate Instructions
+    loop Agentic Execution
+        D->>Inf: Searcher: Call Tool (Jira/R2R)
+        Inf-->>D: Return Raw Data / Context
+    end
+    D->>D: QA: Final Synthesis
+    D-->>I: Yield Partial Tokens (Stream)
+    I-->>C: SSE Response
+```
+
+---
+
+## 🛠️ Module Structure (DDD)
+- `src/interface/`: HTTP boundary and web server logic.
+- `src/application/`: Data transport models.
+- `src/domain/`: Core binary orchestration and agent flow.
+- `src/infrastructure/`: External API interaction and telemetry.
+- `src/main.rs`: Bootstraps the application.
+- `src/lib.rs`: Exposes the core library to the binary.

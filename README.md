@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/github/license/lgcorzo/fastapi-autogen-team)](https://github.com/lgcorzo/fastapi-autogen-team/blob/main/LICENCE.txt)
 [![Release](https://img.shields.io/github/v/release/lgcorzo/fastapi-autogen-team)](https://github.com/lgcorzo/fastapi-autogen-team/releases)
 
-**This repository contains a high-performance Rust service designed as an MLOps template application using the [Axum](https://github.com/tokio-rs/axum) web framework and the [Rig](https://github.com/0xPlayground/rig) LLM orchestration library.**
+**This repository contains a high-performance Rust service designed as an MLOps template application following Domain-Driven Design (DDD) principles.** It uses the [Axum](https://github.com/tokio-rs/axum) web framework and the [Rig](https://github.com/0xPlayground/rig) LLM orchestration library.
 
 It provides an OpenAI-compatible streaming interface for multi-agent workflows, enabling real-time interactions suitable for LiteLLM and other OpenAI-compatible integrations.
 
@@ -16,15 +16,12 @@ It provides an OpenAI-compatible streaming interface for multi-agent workflows, 
 - [Table of Contents](#table-of-contents)
 - [Overview](#overview)
 - [Architecture](#architecture)
-    - [Component Diagram](#component-diagram)
-    - [Sequence Flow](#sequence-flow)
+    - [DDD Layered Structure](#ddd-layered-structure)
+    - [Request Flow](#request-flow)
+- [Project Structure](#project-structure)
 - [Installation](#installation)
-    - [Prerequisites](#prerequisites)
-    - [Setup](#setup)
 - [Configuration](#configuration)
 - [Usage](#usage)
-    - [Chat Completions](#chat-completions)
-    - [Models Information](#models-information)
 - [Testing](#testing)
 - [Development in Kubernetes](#development-in-kubernetes)
 - [References](#references)
@@ -38,50 +35,79 @@ The project facilitates complex LLM orchestration through a "Team" of agents:
 
 # Architecture
 
-The system uses a layered approach for reliability and performance.
+The system is built on **Domain-Driven Design (DDD)** principles to ensure a clear separation of concerns and a highly maintainable codebase.
 
-### Component Diagram
+### DDD Layered Structure
 
 ```mermaid
 graph TD
-    Client[OpenAI-Compatible Client] --> Axum[Axum Web Server]
-    Axum --> AppState[App State & Context]
-    AppState --> AgentTeam[Rig Agent Team]
+    Client[OpenAI-Compatible Client] --> Interface[Interface Layer]
     
-    subgraph Agents
+    subgraph Layers
+        Interface --> Application[Application Layer]
+        Interface --> Domain[Domain Layer]
+        Domain --> Infrastructure[Infrastructure Layer]
+        Application -.-> Domain
+    end
+
+    subgraph Interface Details
+        Interface --> Handlers[Axum Handlers]
+        Interface --> Middleware[Security & CORS]
+        Interface --> Routes[Router Setup]
+    end
+
+    subgraph Domain Details
+        Domain --> AgentTeam[Rig Agent Team]
         AgentTeam --> Planner[Planner Agent]
         AgentTeam --> Searcher[Searcher Agent]
-        AgentTeam --> QA[QA/Expert Agent]
     end
 
-    subgraph Tools
-        Searcher --> R2R[R2R RAG Tool]
-        Searcher --> Jira[Jira JQL Tool]
+    subgraph Infrastructure Details
+        Infrastructure --> Tools[Jira / R2R / Search Tools]
+        Infrastructure --> Telemetry[OpenTelemetry]
     end
-
-    R2R --> R2RBkd[R2R Backend]
-    Jira --> JiraBkd[Atlassian Cloud]
 ```
 
-### Sequence Flow
+### Request Flow
 
 ```mermaid
 sequenceDiagram
     participant C as Client
-    participant A as Axum API
-    participant AT as AgentTeam (Rig)
-    participant T as Tools (R2R/Jira)
+    participant I as Interface (Axum)
+    participant D as Domain (AgentTeam)
+    participant Inf as Infrastructure (Tools)
 
-    C->>A: POST /chat/completions
-    A->>AT: Orchestrate Workflow
-    AT->>AT: Planner: Generate Queries
-    loop For each query
-        AT->>T: Searcher: Execute Tool
-        T-->>AT: Return Results
+    C->>I: POST /chat/completions
+    I->>D: Orchestrate Workflow
+    D->>D: Planner: Generate Queries
+    loop Multi-agent Search
+        D->>Inf: Searcher: Execute Tool
+        Inf-->>D: Return Context
     end
-    AT->>AT: QA: Final Synthesis
-    AT-->>A: Return Result
-    A-->>C: JSON Response
+    D->>D: QA: Final Synthesis
+    D-->>I: SSE Stream / JSON
+    I-->>C: Response
+```
+
+# Project Structure
+
+```text
+src/
+├── application/         # DTOs and Shared Models
+│   └── dtos.rs
+├── domain/              # Core Business Logic & Orchestration
+│   └── agent/
+│       └── team.rs      # AgentTeam implementation
+├── infrastructure/      # External Clients & Tools
+│   ├── tools/           # Jira, R2R, SearchTool
+│   └── telemetry.rs     # OTEL Setup
+├── interface/           # HTTP Boundary
+│   └── http/
+│       ├── handlers.rs  # Axum Handlers
+│       ├── middleware.rs# Security/CORS
+│       └── routes.rs    # Router & AppState
+├── lib.rs               # Library Entry Point
+└── main.rs              # Application Entry Point
 ```
 
 # Installation
@@ -123,6 +149,7 @@ The service is configured via environment variables. Create a `.env` file or exp
 | `JIRA_INSTANCE_URL` | Your Jira Cloud URL (e.g., https://site.atlassian.net) |
 | `JIRA_USERNAME` | Jira account email |
 | `JIRA_API_TOKEN` | Jira API Token |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins |
 
 # Usage
 
@@ -145,30 +172,17 @@ curl http://localhost:8000/autogen/api/v1beta/models
 
 # Testing
 
-The project includes a robust testing suite covering unit tests for tools and agents, as well as integration tests for the API layer.
-
 ```bash
 # Run all tests
 cargo test
-
-# Run tests with output
-cargo test -- --nocapture
 ```
-
-We use `mockito` to isolate external dependencies (LiteLLM, Jira, R2R) during testing.
 
 # Development in Kubernetes
 
 To develop directly inside your Kubernetes cluster, we recommend using [Okteto](https://www.okteto.com/).
 
-1.  **Start Development Mode**:
-    ```bash
-    okteto up
-    ```
-2.  **Inside the Okteto shell**:
-    ```bash
-    cargo run
-    ```
+1.  **Start Development Mode**: `okteto up`
+2.  **Inside the Okteto shell**: `cargo run`
 
 # References
 

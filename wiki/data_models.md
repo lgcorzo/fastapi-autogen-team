@@ -1,18 +1,52 @@
-# Data Models
+# Data Models (Application Layer)
 
-The following diagram illustrates the primary Rust structs used for state management and API communication.
-
-![Data Models Diagram](data_models.plantuml)
+All data transport models are centralized in the **Application Layer** to ensure consistent communication across the Interface, Domain, and Infrastructure.
 
 ---
 
-## 🏗️ Core Structs
+## 🏗️ Core Models
 
-### AppState
-The global state shared across all Axum handlers. It contains the initialized `AgentTeam` and the necessary API configurations for Jira and R2R.
+The following structs are located in `src/application/dtos.rs` and are responsible for defining the OpenAI-compatible API contracts.
 
-### AgentInput
-The structured request body for the `/chat/completions` endpoint. It closely follows the OpenAI specification but leverages Rust's safety for optional fields and strictly typed message roles.
+### [Input Models]
+- **ChatCompletionRequest**: The main input structure for the `/chat/completions` endpoint.
+- **Message**: Represents individual messages in the conversation (role/content).
+- **ModelInformation**: Returned by the `/models` endpoint.
 
-### AgentOutput
-The standardized response format. When streaming is disabled, this object encapsulates the full completion, including usage statistics.
+### [Output Models]
+- **ChatCompletionResponse**: Used for non-streaming responses.
+- **ChatCompletionChunk**: Used for streaming (SSE) responses.
+- **Choice** / **ChoiceChunk**: Individual choices associated with completions.
+
+---
+
+## 📊 Data Mapping Example
+
+```mermaid
+classDiagram
+    class ChatCompletionRequest {
+        +String model
+        +Vec messages
+        +Option bool stream
+    }
+    class Message {
+        +String role
+        +String content
+    }
+    class ChatCompletionResponse {
+        +String id
+        +String object
+        +i64 created
+        +String model
+        +Vec choices
+    }
+    ChatCompletionRequest "1" *-- "many" Message
+    ChatCompletionResponse "1" *-- "many" Choice
+```
+
+---
+
+## 🛠️ Validation Logic
+Data validation (deserialization) occurs at the **Interface Layer** before passing these models to the **Domain Layer**. This ensures that the core orchestration only processes valid, well-formed entities.
+
+The service uses **Serde** for high-performance JSON serialization and deserialization across all data transport objects.
