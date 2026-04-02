@@ -27,7 +27,7 @@ impl AgentTeam {
 
     pub async fn run(&self, input: Input) -> anyhow::Result<String> {
         // 1. Planner Agent: Decompose query
-        let planner = self.client.agent("gpt-4o")
+        let planner = self.client.agent("minimax-m2.7:cloud")
             .preamble("You are the Planner. Analyze the user message and break it down into focused search queries in English. Return only the queries, one per line.")
             .build();
 
@@ -42,7 +42,7 @@ impl AgentTeam {
         tracing::info!("Planner queries: {}", queries);
 
         // 2. RAG Searcher: Execute tools
-        let rag_searcher = self.client.agent("gpt-4o")
+        let rag_searcher = self.client.agent("minimax-m2.7:cloud")
             .preamble("You are the RAG_searcher. Use the search tool to find information.")
             .tool(SearchTool)
             .build();
@@ -56,7 +56,7 @@ impl AgentTeam {
         }
 
         // 3. QA Agent: Final Synthesis
-        let qa = self.client.agent("gpt-4o")
+        let qa = self.client.agent("minimax-m2.7:cloud")
             .preamble("You are the Quality Assurance agent. Synthesize the results into a final response in the user's original language. End with TERMINATE.")
             .build();
 
@@ -67,7 +67,7 @@ impl AgentTeam {
 
     pub async fn run_stream(&self, input: Input) -> anyhow::Result<impl futures::Stream<Item = anyhow::Result<String>>> {
         // 1. Planner Agent: Decompose query
-        let planner = self.client.agent("gpt-4o")
+        let planner = self.client.agent("minimax-m2.7:cloud")
             .preamble("You are the Planner. Analyze the user message and break it down into focused search queries in English. Return only the queries, one per line.")
             .build();
 
@@ -81,7 +81,7 @@ impl AgentTeam {
         let queries = planner.prompt(&last_message).await?;
 
         // 2. RAG Searcher: Execute tools
-        let rag_searcher = self.client.agent("gpt-4o")
+        let rag_searcher = self.client.agent("minimax-m2.7:cloud")
             .preamble("You are the RAG_searcher. Use the search tool to find information.")
             .tool(SearchTool)
             .build();
@@ -95,7 +95,7 @@ impl AgentTeam {
         }
 
         // 3. QA Agent: Final Synthesis (Streaming)
-        let qa = self.client.agent("gpt-4o")
+        let qa = self.client.agent("minimax-m2.7:cloud")
             .preamble("You are the Quality Assurance agent. Synthesize the results into a final response in the user's original language. End with TERMINATE.")
             .build();
 
