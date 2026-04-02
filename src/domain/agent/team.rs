@@ -1,6 +1,7 @@
 use rig::providers::openai;
 use rig::completion::{Prompt};
-use rig::streaming::StreamingPrompt;
+use rig::streaming::{StreamingPrompt, StreamedAssistantContent};
+use rig::agent::MultiTurnStreamItem;
 use rig::client::CompletionClient;
 use crate::infrastructure::tools::search::SearchTool;
 use crate::application::dtos::Input;
@@ -26,9 +27,12 @@ impl AgentTeam {
     }
 
     pub async fn run(&self, input: Input) -> anyhow::Result<String> {
+        let client = self.client.clone().completions_api();
+
         // 1. Planner Agent: Decompose query
-        let planner = self.client.agent("minimax-m2.7:cloud")
+        let planner = client.agent("minimax-m2.7:cloud")
             .preamble("You are the Planner. Analyze the user message and break it down into focused search queries in English. Return only the queries, one per line.")
+            .default_max_turns(10)
             .build();
 
         let last_message = input.messages.last()
@@ -42,9 +46,10 @@ impl AgentTeam {
         tracing::info!("Planner queries: {}", queries);
 
         // 2. RAG Searcher: Execute tools
-        let rag_searcher = self.client.agent("minimax-m2.7:cloud")
+        let rag_searcher = client.agent("minimax-m2.7:cloud")
             .preamble("You are the RAG_searcher. Use the search tool to find information.")
             .tool(SearchTool)
+            .default_max_turns(10)
             .build();
 
         let mut all_results = String::new();
@@ -56,8 +61,9 @@ impl AgentTeam {
         }
 
         // 3. QA Agent: Final Synthesis
-        let qa = self.client.agent("minimax-m2.7:cloud")
+        let qa = client.agent("minimax-m2.7:cloud")
             .preamble("You are the Quality Assurance agent. Synthesize the results into a final response in the user's original language. End with TERMINATE.")
+            .default_max_turns(10)
             .build();
 
         let final_response = qa.prompt(format!("User query: {}\n\nResults found:\n{}", last_message, all_results)).await?;
@@ -66,9 +72,12 @@ impl AgentTeam {
     }
 
     pub async fn run_stream(&self, input: Input) -> anyhow::Result<impl futures::Stream<Item = anyhow::Result<String>>> {
+        let client = self.client.clone().completions_api();
+
         // 1. Planner Agent: Decompose query
-        let planner = self.client.agent("minimax-m2.7:cloud")
+        let planner = client.agent("minimax-m2.7:cloud")
             .preamble("You are the Planner. Analyze the user message and break it down into focused search queries in English. Return only the queries, one per line.")
+            .default_max_turns(10)
             .build();
 
         let last_message = input.messages.last()
@@ -81,9 +90,10 @@ impl AgentTeam {
         let queries = planner.prompt(&last_message).await?;
 
         // 2. RAG Searcher: Execute tools
-        let rag_searcher = self.client.agent("minimax-m2.7:cloud")
+        let rag_searcher = client.agent("minimax-m2.7:cloud")
             .preamble("You are the RAG_searcher. Use the search tool to find information.")
             .tool(SearchTool)
+            .default_max_turns(10)
             .build();
 
         let mut all_results = String::new();
@@ -95,14 +105,19 @@ impl AgentTeam {
         }
 
         // 3. QA Agent: Final Synthesis (Streaming)
-        let qa = self.client.agent("minimax-m2.7:cloud")
+        let qa = client.agent("minimax-m2.7:cloud")
             .preamble("You are the Quality Assurance agent. Synthesize the results into a final response in the user's original language. End with TERMINATE.")
+            .default_max_turns(10)
             .build();
 
         let stream = qa.stream_prompt(format!("User query: {}\n\nResults found:\n{}", last_message, all_results)).await;
 
         Ok(stream.map(|res| {
-            res.map(|item| format!("{:?}", item)).map_err(anyhow::Error::from)
+            match res {
+                Ok(MultiTurnStreamItem::StreamAssistantItem(StreamedAssistantContent::Text(text))) => Ok(text.text),
+                Ok(_) => Ok("".to_string()),
+                Err(e) => Err(anyhow::anyhow!(e)),
+            }
         }))
     }
     
