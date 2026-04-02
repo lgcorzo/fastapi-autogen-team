@@ -1,5 +1,4 @@
 use std::env;
-use serde_json::json;
 
 pub async fn get_jira_results(url: &str, query: &str) -> anyhow::Result<String> {
     let user = env::var("JIRA_USERNAME")?;

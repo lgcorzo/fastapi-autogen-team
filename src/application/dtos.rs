@@ -124,4 +124,32 @@ mod tests {
         assert_eq!(input.model, "test_model");
         assert_eq!(input.messages.len(), 1);
     }
+
+    #[test]
+    fn test_content_type_list() {
+        let json_data = json!([
+            {"type": "text", "text": "Hello"},
+            {"type": "image_url", "image_url": {"url": "http://test.com"}}
+        ]);
+        
+        let content: ContentType = serde_json::from_value(json_data).unwrap();
+        match content {
+            ContentType::List(list) => {
+                assert_eq!(list.len(), 2);
+                match &list[0] {
+                    Content::Text { text } => assert_eq!(text, "Hello"),
+                    _ => panic!("Expected Text"),
+                }
+            }
+            _ => panic!("Expected List"),
+        }
+    }
+
+    #[test]
+    fn test_output_default() {
+        let output = Output::default();
+        assert_eq!(output.object, "chat.completion");
+        assert!(output.created > 0);
+        assert!(output.choices.is_empty());
+    }
 }
