@@ -208,17 +208,6 @@ cargo test --test security_tests
 
 # Deployment
 
-### Docker
-
-1. **Build the image**:
-   ```bash
-   docker build -t fastapi-autogen-team .
-   ```
-
-2. **Run the container**:
-   ```bash
-   docker run -p 4100:4100 --env-file .env fastapi-autogen-team
-   ```
 
 ### Kubernetes
 
