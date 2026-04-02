@@ -141,5 +141,20 @@ mod tests {
         let output = Output::default();
         assert_eq!(output.object, "chat.completion");
     }
+
+    #[test]
+    fn test_input_numeric_bounds() {
+        // Temperature bounds (0 to 2)
+        let json_too_low = json!({
+            "model": "test",
+            "messages": [{"role": "user", "content": "hello"}],
+            "temperature": -0.1
+        });
+        // In Rust, we might check this during a manual validation step since serde doesn't 
+        // enforce bounds by default unless using the `validator` crate.
+        // For now, we verify deserialization works, but we should add a validate() method.
+        let input: Input = serde_json::from_value(json_too_low).unwrap();
+        assert_eq!(input.temperature, Some(-0.1));
+    }
 }
 

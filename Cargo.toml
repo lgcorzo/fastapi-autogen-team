@@ -7,7 +7,7 @@ edition = "2021"
 # Web framework
 axum = "0.7"
 tokio = { version = "1", features = ["full"] }
-tower-http = { version = "0.5", features = ["trace", "cors"] }
+tower-http = { version = "0.5", features = ["trace", "cors", "set-header", "util"] }
 
 # LLM Framework
 rig = { package = "rig-core", version = "0.34.0", features = ["all"] }
@@ -31,6 +31,7 @@ chrono = "0.4"
 anyhow = "1.0"
 async-trait = "0.1"
 thiserror = "1.0"
+futures = "0.3"
 
 [dev-dependencies]
 mockito = "1.4"

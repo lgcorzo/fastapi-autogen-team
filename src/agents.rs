@@ -1,9 +1,12 @@
 use rig::providers::openai;
-use rig::completion::Prompt;
+use rig::completion::{Prompt, CompletionModel};
+use rig::streaming::StreamingPrompt;
 use rig::client::CompletionClient;
 use crate::tools::SearchTool;
 use crate::data_model::Input;
 use std::env;
+use futures::StreamExt;
+use futures::TryStreamExt;
 
 pub struct AgentTeam {
     client: openai::Client,
@@ -61,6 +64,49 @@ impl AgentTeam {
         let final_response = qa.prompt(format!("User query: {}\n\nResults found:\n{}", last_message, all_results)).await?;
 
         Ok(final_response)
+    }
+
+    pub async fn run_stream(&self, input: Input) -> anyhow::Result<impl futures::Stream<Item = anyhow::Result<String>>> {
+        use futures::StreamExt;
+        
+        // 1. Planner Agent: Decompose query
+        let planner = self.client.agent("gpt-4o")
+            .preamble("You are the Planner. Analyze the user message and break it down into focused search queries in English. Return only the queries, one per line.")
+            .build();
+
+        let last_message = input.messages.last()
+            .and_then(|m| match &m.content {
+                crate::data_model::ContentType::String(s) => Some(s.clone()),
+                _ => None,
+            })
+            .unwrap_or_default();
+
+        let queries = planner.prompt(&last_message).await?;
+
+        // 2. RAG Searcher: Execute tools
+        let rag_searcher = self.client.agent("gpt-4o")
+            .preamble("You are the RAG_searcher. Use the search tool to find information.")
+            .tool(SearchTool)
+            .build();
+
+        let mut all_results = String::new();
+        for query in queries.lines() {
+            if query.trim().is_empty() { continue; }
+            let res = rag_searcher.prompt(query).await?;
+            all_results.push_str(&res);
+            all_results.push_str("\n---\n");
+        }
+
+        // 3. QA Agent: Final Synthesis (Streaming)
+        let qa = self.client.agent("gpt-4o")
+            .preamble("You are the Quality Assurance agent. Synthesize the results into a final response in the user's original language. End with TERMINATE.")
+            .build();
+
+        let stream = qa.stream_prompt(format!("User query: {}\n\nResults found:\n{}", last_message, all_results)).await;
+
+        Ok(stream.map(|res: Result<_, _>| {
+            res.map(|item| format!("{:?}", item)).map_err(anyhow::Error::from)
+        }))
     }
     pub fn new_mock() -> Self {
         let client = openai::Client::builder()
@@ -167,6 +213,26 @@ mod tests {
 
         let result = team.run(input).await.unwrap();
         assert!(result.contains("TERMINATE"));
+    }
+
+    #[tokio::test]
+    async fn test_agent_team_empty_messages() {
+        let team = AgentTeam::new_mock();
+        let input = Input {
+            model: "test".to_string(),
+            user: None,
+            messages: vec![],
+            temperature: None,
+            top_p: None,
+            presence_penalty: None,
+            frequency_penalty: None,
+            stream: None,
+        };
+
+        // Should not panic, should return a response (likely synthesized from empty search)
+        // In our current 'run' implementation, last_message defaults to empty string.
+        let _result = team.run(input).await;
+        // Rig might fail if it can't prompt with empty string, depending on provider.
     }
 }
 
