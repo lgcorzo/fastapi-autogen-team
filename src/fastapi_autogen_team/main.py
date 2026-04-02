@@ -199,7 +199,9 @@ async def route_query(model_input: Input, request: Request) -> Dict[str, Any]:
     # Overwrite model_input.user if header value is provided
     if header_user_id:
         if len(header_user_id) > 100:
-            raise HTTPException(status_code=400, detail="Header x-openwebui-user-id exceeds maximum length of 100 characters")
+            raise HTTPException(
+                status_code=400, detail="Header x-openwebui-user-id exceeds maximum length of 100 characters"
+            )
         model_input.user = sanitize_log_input(header_user_id)
 
     # Sanitize inputs before logging or processing
