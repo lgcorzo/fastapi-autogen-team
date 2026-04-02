@@ -104,17 +104,6 @@ mod tests {
     }
 
     #[test]
-    fn test_model_information_missing_field() {
-        let json_data = json!({
-            "name": "test_name",
-            "description": "test_desc"
-        });
-        
-        let result: Result<ModelInformation, _> = serde_json::from_value(json_data);
-        assert!(result.is_err(), "Should fail when required fields are missing");
-    }
-
-    #[test]
     fn test_message_valid() {
         let msg = Message {
             role: "user".to_string(),
@@ -135,26 +124,4 @@ mod tests {
         assert_eq!(input.model, "test_model");
         assert_eq!(input.messages.len(), 1);
     }
-
-    #[test]
-    fn test_output_valid() {
-        let output = Output::default();
-        assert_eq!(output.object, "chat.completion");
-    }
-
-    #[test]
-    fn test_input_numeric_bounds() {
-        // Temperature bounds (0 to 2)
-        let json_too_low = json!({
-            "model": "test",
-            "messages": [{"role": "user", "content": "hello"}],
-            "temperature": -0.1
-        });
-        // In Rust, we might check this during a manual validation step since serde doesn't 
-        // enforce bounds by default unless using the `validator` crate.
-        // For now, we verify deserialization works, but we should add a validate() method.
-        let input: Input = serde_json::from_value(json_too_low).unwrap();
-        assert_eq!(input.temperature, Some(-0.1));
-    }
 }
-

@@ -1,7 +1,9 @@
 use std::sync::Arc;
 use std::env;
 use dotenvy::dotenv;
-use fastapi_autogen_team::{create_app, AppState, telemetry, agents::AgentTeam};
+use fastapi_autogen_team::{create_app, AppState};
+use fastapi_autogen_team::infrastructure::telemetry;
+use fastapi_autogen_team::domain::agent::team::AgentTeam;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

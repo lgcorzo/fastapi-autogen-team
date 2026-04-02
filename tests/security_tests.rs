@@ -4,7 +4,8 @@ use axum::{
 };
 use tower::ServiceExt;
 use std::sync::Arc;
-use fastapi_autogen_team::{create_app, AppState, agents::AgentTeam};
+use fastapi_autogen_team::{create_app, AppState};
+use fastapi_autogen_team::domain::agent::team::AgentTeam;
 use serde_json::json;
 
 #[tokio::test]
@@ -68,8 +69,6 @@ async fn test_cors_specific_origins() {
         .await
         .unwrap();
 
-    // Tower-http's CorsLayer returns 400 Bad Request for disallowed origins in strict mode,
-    // though default behavior might vary. Our current implementation uses simple AllowOrigin::list.
     assert_eq!(response_bad.status(), StatusCode::BAD_REQUEST);
 }
 
@@ -100,8 +99,4 @@ async fn test_header_injection_sanitization() {
         )
         .await
         .unwrap();
-
-    // Verification: we check the tracing logs or use a mock agent.
-    // In our implementation, we've added the sanitization directly in the route_query.
-    // To truly verify, we'd need a mock AgentTeam that captures the Input.
 }
