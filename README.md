@@ -125,15 +125,22 @@ src/
     cd fastapi-autogen-team
     ```
 
-2.  **Build the project**:
+2.  **Install dependencies**:
+    ```bash
+    sudo apt-get update
+    sudo apt-get install -y build-essential pkg-config libssl-dev
+    ```
+
+3.  **Build the project**:
     ```bash
     cargo build --release
     ```
 
-3.  **Run the service**:
+4.  **Run the service**:
     ```bash
     cargo run
     ```
+    The server will start on `http://127.0.0.1:4100` by default.
 
 # Configuration
 
@@ -156,7 +163,7 @@ The service is configured via environment variables. Create a `.env` file or exp
 ### Chat Completions
 
 ```bash
-curl -X POST "http://localhost:8000/autogen/api/v1beta/chat/completions" \
+curl -X POST "http://localhost:4100/autogen/api/v1beta/chat/completions" \
      -H "Content-Type: application/json" \
      -d '{
        "model": "gpt-4o",
@@ -167,15 +174,55 @@ curl -X POST "http://localhost:8000/autogen/api/v1beta/chat/completions" \
 ### Models Information
 
 ```bash
-curl http://localhost:8000/autogen/api/v1beta/models
+curl http://localhost:4100/autogen/api/v1beta/models
 ```
 
-# Testing
+# Testing and Debugging
 
+### Running Tests
+
+To run all tests (unit, integration, and security):
 ```bash
-# Run all tests
 cargo test
 ```
+
+To run a specific test file:
+```bash
+cargo test --test security_tests
+```
+
+### Debugging
+
+- **Logging**: The application uses `tracing`. Control log verbosity with `RUST_LOG`:
+  ```bash
+  RUST_LOG=debug cargo run
+  ```
+- **Backtraces**: For detailed error stack traces:
+  ```bash
+  RUST_BACKTRACE=1 cargo run
+  ```
+- **Live Logs**: If running in the background, monitor `server.log`:
+  ```bash
+  tail -f server.log
+  ```
+
+# Deployment
+
+### Docker
+
+1. **Build the image**:
+   ```bash
+   docker build -t fastapi-autogen-team .
+   ```
+
+2. **Run the container**:
+   ```bash
+   docker run -p 4100:4100 --env-file .env fastapi-autogen-team
+   ```
+
+### Kubernetes
+
+The service is optimized for Kubernetes. Ensure environment variables (see [Configuration](#configuration)) are provided via ConfigMaps or Secrets.
 
 # Development in Kubernetes
 

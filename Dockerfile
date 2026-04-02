@@ -24,9 +24,10 @@ WORKDIR /usr/local/bin
 COPY --from=builder /usr/src/app/target/release/fastapi-autogen-team .
 
 # Expose the Axum port
-EXPOSE 8000
+EXPOSE 4100
 
 # Set environment variables for Rig/Axum
 ENV RUST_LOG=info
+ENV DEFAULT_PORT=4100
 
 CMD ["./fastapi-autogen-team"]
