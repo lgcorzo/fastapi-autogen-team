@@ -57,3 +57,26 @@ async def test_normal_header_user_id():
 
         called_input = mock_service.call_args[0][0]
         assert called_input.user == "safe_user_123"
+
+
+@pytest.mark.asyncio
+async def test_header_user_id_length_limit():
+    """
+    Test that the x-openwebui-user-id header is rejected if it exceeds 100 characters.
+    This prevents DoS via unbounded header input bypassing Pydantic validation.
+    """
+    # Massive header over 100 characters
+    massive_header = "A" * 101
+
+    model_input = Input(model="internal-gpt", messages=[{"role": "user", "content": "Hello"}], user="original_user")
+
+    mock_request = MagicMock(spec=Request)
+    mock_request.headers.get.return_value = massive_header
+
+    from fastapi import HTTPException
+
+    with pytest.raises(HTTPException) as exc_info:
+        await route_query(model_input, mock_request)
+
+    assert exc_info.value.status_code == 400
+    assert "exceeds maximum length of 100 characters" in exc_info.value.detail
