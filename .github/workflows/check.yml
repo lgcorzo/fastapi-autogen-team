@@ -3,6 +3,15 @@ on:
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - 'wiki/**'
+      - 'README.md'
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'wiki/**'
+      - 'README.md'
 concurrency:
   cancel-in-progress: true
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -12,8 +21,21 @@ permissions:
 jobs:
   checks:
     runs-on: ubuntu-latest
+    env:
+      LITELLM_API_KEY: "dummy_key"
+      LITELLM_BASE_URL: "http://localhost:8080"
+      R2R_URL: "http://localhost:8081"
+      R2R_USER: "dummy"
+      R2R_PWD: "dummy"
+      JIRA_INSTANCE_URL: "http://localhost:8082"
+      JIRA_USERNAME: "dummy"
+      JIRA_API_TOKEN: "dummy"
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
-      - run: poetry install --with checks
-      - run: poetry run invoke checks
+      - name: Rustfmt Check
+        run: cargo fmt --check
+      - name: Clippy Lint
+        run: cargo clippy -- -D warnings
+      - name: Run Tests
+        run: cargo test

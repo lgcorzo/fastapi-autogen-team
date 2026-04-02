@@ -1,0 +1,30 @@
+@startuml architecture_modules
+set namespaceSeparator none
+
+package "main.rs" as main {
+  note bottom: Entry point and server initialization
+}
+
+package "lib.rs" as lib {
+  note bottom: Shared Axum router and AppState
+}
+
+package "agents.rs" as agents {
+  note bottom: Rig AgentTeam orchestration
+}
+
+package "tools.rs" as tools {
+  note bottom: Jira & R2R integrations
+}
+
+package "data_model.rs" as data_model {
+  note bottom: Serde structs for API
+}
+
+main --> lib : calls create_app()
+lib --> agents : uses AgentTeam in AppState
+agents --> tools : uses Tool trait
+agents --> data_model : uses models
+tools --> data_model : uses models
+
+@enduml

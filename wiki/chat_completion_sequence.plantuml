@@ -1,68 +1,42 @@
-@startuml
+@startuml chat_completion_sequence
+skinparam backgroundColor white
+skinparam BoxPadding 10
+
 actor User
+participant "Axum API\n(/chat/completions)" as API
+participant "Rig AgentTeam" as Team
+participant "Planner Agent" as Planner
+participant "Searcher Agent" as Searcher
+database "Tools\n(Jira/R2R)" as Tools
+participant "QA Agent" as QA
 
-participant "FastAPI (main.py)" as FastAPI
-participant "AutogenServer (autogen_server.py)" as AutogenServer
-participant "AutogenWorkflow (autogen_workflow_team.py)" as AutogenWorkflow
-participant "GroupChatManager" as GroupChatManager
-participant "UserProxy" as UserProxy
-participant "Planner" as Planner
-participant "RAGSearcher" as RAGSearcher
-participant "QualityAssurance" as QualityAssurance
-participant "Search Tool" as SearchTool
+User -> API : POST [AgentInput]
+activate API
 
-User -> FastAPI: POST /autogen/api/v1beta/chat/completions
-activate FastAPI
+API -> Team : .generate(input)
+activate Team
 
-FastAPI -> AutogenServer: serve_autogen(input)
-activate AutogenServer
-
-AutogenServer -> AutogenWorkflow: create AutogenWorkflow
-activate AutogenWorkflow
-
-AutogenServer -> AutogenWorkflow: run(message)
-
-AutogenWorkflow -> GroupChatManager: initiate_chat(message)
-activate GroupChatManager
-
-GroupChatManager -> UserProxy: send_message(message)
-activate UserProxy
-
-UserProxy -> Planner: send_message(message)
-deactivate UserProxy
+Team -> Planner : plan(messages)
 activate Planner
-
-Planner -> RAGSearcher: send_message(search_query)
+Planner --> Team : Steps and Tool Calls
 deactivate Planner
-activate RAGSearcher
 
-RAGSearcher -> SearchTool: search(query)
-activate SearchTool
+Team -> Searcher : execute(tools)
+activate Searcher
+Searcher -> Tools : Query
+Tools --> Searcher : Context/Tickets
+Searcher --> Team : Gathered Facts
+deactivate Searcher
 
-SearchTool --> RAGSearcher: search_results
-deactivate SearchTool
+Team -> QA : finalize(context)
+activate QA
+QA --> Team : Refined Response
+deactivate QA
 
-RAGSearcher --> Planner: send_message(search_results)
-deactivate RAGSearcher
-activate Planner
+Team --> API : Stream/Result
+deactivate Team
 
-Planner -> QualityAssurance: send_message(collected_info)
-deactivate Planner
-activate QualityAssurance
-
-QualityAssurance --> GroupChatManager: send_message(final_response, "TERMINATE")
-deactivate QualityAssurance
-
-GroupChatManager --> AutogenWorkflow: chat_result
-deactivate GroupChatManager
-
-AutogenWorkflow --> AutogenServer: chat_result
-deactivate AutogenWorkflow
-
-AutogenServer --> FastAPI: response
-deactivate AutogenServer
-
-FastAPI --> User: HTTP Response
-deactivate FastAPI
+API --> User : [AgentOutput]
+deactivate API
 
 @enduml
