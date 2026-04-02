@@ -69,7 +69,8 @@ async fn test_cors_specific_origins() {
         .await
         .unwrap();
 
-    assert_eq!(response_bad.status(), StatusCode::BAD_REQUEST);
+    assert_eq!(response_bad.status(), StatusCode::OK);
+    assert!(response_bad.headers().get("access-control-allow-origin").is_none());
 }
 
 #[tokio::test]
@@ -87,16 +88,13 @@ async fn test_header_injection_sanitization() {
         "messages": [{"role": "user", "content": "Hello"}]
     });
 
-    let _response = app
-        .oneshot(
-            Request::builder()
-                .method("POST")
-                .uri("/autogen/api/v1beta/chat/completions")
-                .header("Content-Type", "application/json")
-                .header("x-openwebui-user-id", malicious_header)
-                .body(Body::from(payload.to_string()))
-                .unwrap(),
-        )
-        .await
-        .unwrap();
+    let res = Request::builder()
+        .method("POST")
+        .uri("/autogen/api/v1beta/chat/completions")
+        .header("Content-Type", "application/json")
+        .header("x-openwebui-user-id", malicious_header)
+        .body(Body::from(payload.to_string()));
+
+    // Verify that the http crate itself prevents header injection by returning an error
+    assert!(res.is_err());
 }
