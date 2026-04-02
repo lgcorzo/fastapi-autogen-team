@@ -1,5 +1,5 @@
 # Build stage
-FROM rust:1.80-slim-bookworm AS builder
+FROM rust:latest AS builder
 
 # Create a dummy project to cache dependencies
 WORKDIR /usr/src/app

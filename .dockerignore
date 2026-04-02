@@ -43,3 +43,4 @@ Documentation/
 dockerignore
 .stignore
 okteto.yaml
+target/
