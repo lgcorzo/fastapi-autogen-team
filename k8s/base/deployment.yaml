@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: fastapi-autogen-team
-          image: lgcorzo/fastapi-autogen-team:v1.2.0
+          image: lgcorzo/fastapi-autogen-team:latest
           ports:
             - containerPort: 4100
           envFrom:
