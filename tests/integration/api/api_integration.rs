@@ -75,15 +75,19 @@ async fn test_chat_completions_route() {
     let _m1 = server.mock("POST", "/chat/completions")
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{"choices":[{"message":{"content":"search query 1","role":"assistant"},"index":0,"finish_reason":"stop"}]}"#)
+        .with_body(r#"{
+            "id": "p1", "object": "chat.completion", "created": 12345, "model": "test",
+            "choices":[{"message":{"content":"search query 1","role":"assistant"},"index":0,"finish_reason":"stop"}],
+            "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        }"#)
         .create_async().await;
 
     // 2. RAG Searcher Call (Trigger Tool)
-    // Rig expects a specific format for tool calls when Using OpenAI provider
     let _m2 = server.mock("POST", "/chat/completions")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(r#"{
+            "id": "s1", "object": "chat.completion", "created": 12345, "model": "test",
             "choices": [{
                 "message": {
                     "role": "assistant",
@@ -98,7 +102,8 @@ async fn test_chat_completions_route() {
                 },
                 "index": 0,
                 "finish_reason": "tool_calls"
-            }]
+            }],
+            "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
         }"#)
         .create_async().await;
 
@@ -127,14 +132,22 @@ async fn test_chat_completions_route() {
     let _m3 = server.mock("POST", "/chat/completions")
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{"choices":[{"message":{"content":"Search completed successfully. Here is the info...","role":"assistant"},"index":0,"finish_reason":"stop"}]}"#)
+        .with_body(r#"{
+            "id": "s2", "object": "chat.completion", "created": 12345, "model": "test",
+            "choices":[{"message":{"content":"Search completed successfully. Here is the info...","role":"assistant"},"index":0,"finish_reason":"stop"}],
+            "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        }"#)
         .create_async().await;
 
     // 6. QA Agent Call
     let _m4 = server.mock("POST", "/chat/completions")
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{"choices":[{"message":{"content":"Final synthesized response TERMINATE","role":"assistant"},"index":0,"finish_reason":"stop"}]}"#)
+        .with_body(r#"{
+            "id": "q1", "object": "chat.completion", "created": 12345, "model": "test",
+            "choices":[{"message":{"content":"Final synthesized response TERMINATE","role":"assistant"},"index":0,"finish_reason":"stop"}],
+            "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        }"#)
         .create_async().await;
 
     let team = AgentTeam::new_test(&url);

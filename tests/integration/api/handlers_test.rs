@@ -35,27 +35,43 @@ async fn test_route_query_no_stream() {
     let _m1 = server.mock("POST", "/chat/completions")
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{"choices":[{"message":{"content":"search query 1\nsearch query 2","role":"assistant"},"index":0,"finish_reason":"stop"}]}"#)
+        .with_body(r#"{
+            "id": "p1", "object": "chat.completion", "created": 12345, "model": "test",
+            "choices":[{"message":{"content":"search query 1\nsearch query 2","role":"assistant"},"index":0,"finish_reason":"stop"}],
+            "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        }"#)
         .create_async().await;
 
     // Mock searcher calls (2 queries)
     let _m2 = server.mock("POST", "/chat/completions")
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{"choices":[{"message":{"content":"Search results part 1","role":"assistant"},"index":0,"finish_reason":"stop"}]}"#)
+        .with_body(r#"{
+            "id": "s1", "object": "chat.completion", "created": 12345, "model": "test",
+            "choices":[{"message":{"content":"Search results part 1","role":"assistant"},"index":0,"finish_reason":"stop"}],
+            "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        }"#)
         .create_async().await;
 
     let _m3 = server.mock("POST", "/chat/completions")
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{"choices":[{"message":{"content":"Search results part 2","role":"assistant"},"index":0,"finish_reason":"stop"}]}"#)
+        .with_body(r#"{
+            "id": "s2", "object": "chat.completion", "created": 12345, "model": "test",
+            "choices":[{"message":{"content":"Search results part 2","role":"assistant"},"index":0,"finish_reason":"stop"}],
+            "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        }"#)
         .create_async().await;
         
     // Mock QA call
     let _m4 = server.mock("POST", "/chat/completions")
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{"choices":[{"message":{"content":"Final response TERMINATE","role":"assistant"},"index":0,"finish_reason":"stop"}]}"#)
+        .with_body(r#"{
+            "id": "q1", "object": "chat.completion", "created": 12345, "model": "test",
+            "choices":[{"message":{"content":"Final response TERMINATE","role":"assistant"},"index":0,"finish_reason":"stop"}],
+            "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        }"#)
         .create_async().await;
 
     let state = Arc::new(AppState { team: AgentTeam::new_test(&url) });
