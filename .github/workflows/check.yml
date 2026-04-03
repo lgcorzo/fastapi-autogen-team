@@ -37,5 +37,6 @@ jobs:
         run: cargo fmt --check
       - name: Clippy Lint
         run: cargo clippy -- -D warnings
-      - name: Run Tests
-        run: cargo test
+      - name: Run Mocked Tests
+        run: cargo test --test unit_tests --test integration_tests
+
