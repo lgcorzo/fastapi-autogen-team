@@ -8,17 +8,16 @@ pub async fn get_r2r_results(url: &str, query: &str) -> anyhow::Result<String> {
     let client = reqwest::Client::new();
 
     // 1. Login to get token
-    let login_url = format!("{}/v3/auth/login", url.trim_end_matches('/'));
+    let login_url = format!("{}/v3/users/login", url.trim_end_matches('/'));
     let login_res = client
         .post(&login_url)
-        .form(&[("email", &user), ("password", &pwd)])
+        .form(&[("username", &user), ("password", &pwd)])
         .send()
         .await?;
 
     let login_data: serde_json::Value = login_res.json().await?;
-    let token = login_data["results"]["access_token"]
+    let token = login_data["results"]["access_token"]["token"]
         .as_str()
-        .or_else(|| login_data["access_token"].as_str())
         .ok_or_else(|| {
             anyhow::anyhow!(
                 "Failed to retrieve access token from R2R. Response was: {}",

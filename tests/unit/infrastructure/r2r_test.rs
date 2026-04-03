@@ -11,10 +11,10 @@ async fn test_get_r2r_results_success() {
     env::set_var("R2R_PWD", "test_pwd");
 
     let _m_login = server
-        .mock("POST", "/v3/auth/login")
+        .mock("POST", "/v3/users/login")
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{"results": {"access_token": "mock_token"}}"#)
+        .with_body(r#"{"results": {"access_token": {"token": "mock_token", "token_type": "bearer"}, "refresh_token": {"token": "mock_refresh", "token_type": "bearer"}}}"#)
         .create_async()
         .await;
 
