@@ -11,6 +11,7 @@ Handles the communication with external clients (REST API).
 - **`handlers.rs`**: Processes incoming HTTP requests and delegates work to the Domain layer.
 - **`routes.rs`**: Manages the application router and state.
 - **`middleware.rs`**: Implements security headers, CORS, and request sanitization.
+- **`validation.rs`**: Custom JSON extractor for FastAPI-compatible error reporting (422 Unprocessable Entity).
 
 ### 2. Application Layer (`src/application/`)
 Defines the data formats and transformations used within the application.
@@ -39,8 +40,13 @@ classDiagram
     }
 
     class Handlers {
-        +route_query(State, Json)
+        +route_query(State, ValidatedJson)
         +get_models()
+    }
+
+    class ValidatedJson {
+        +Input input
+        +from_request()
     }
 
     class AgentTeam {
@@ -68,6 +74,8 @@ classDiagram
     }
 
     Handlers --> AppState : Uses
+    Handlers --> ValidatedJson : Uses
+    ValidatedJson --> Input : Extracts
     AppState --> AgentTeam : Contains
     AgentTeam "1" *-- "Multi" Tool : Orchestrates
     SearchTool ..|> Tool : Implements

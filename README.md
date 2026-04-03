@@ -194,7 +194,7 @@ cargo test --test integration_tests
 ```
 
 ### 3. Security Tests
-Focused on security headers, CORS policies, and input sanitization (payload size limits, JSON injection).
+Focused on security headers, CORS policies, and input sanitization (payload size limits, JSON injection, empty content).
 ```bash
 cargo test --test integration_tests security
 ```
@@ -205,7 +205,14 @@ Zero-mock tests that verify live connectivity to LLM, Jira, and R2R. **Warning: 
 cargo test --test integration_tests smoke -- --ignored --nocapture
 ```
 
-### Running Everything
+### Recommended Order
+For new developers, we recommend running the suites in the following order:
+1. `unit_tests`
+2. `integration_tests` (Standard)
+3. `integration_tests` (Security)
+4. `integration_tests` (Smoke)
+
+### Running Everything (Standard)
 To run all suites (excluding ignored smoke tests):
 ```bash
 cargo test

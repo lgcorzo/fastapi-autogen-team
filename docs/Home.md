@@ -254,6 +254,45 @@ CQL_translator.generate_reply(messages=[{"role": "user", "content": query}])
 
 ---
 
+## 🚀 Getting Started & Testing
+
+To ensure the system is functioning correctly, follow this recommended test execution order:
+
+1.  **Unit Tests**: Verify individual components and domain logic.
+    ```bash
+    cargo test --test unit_tests
+    ```
+2.  **Integration Tests**: Verify API contracts and component interactions.
+    ```bash
+    cargo test --test integration_tests
+    ```
+3.  **Security Tests**: Specifically verify sanitization and rejection logic.
+    ```bash
+    cargo test --test integration_tests security
+    ```
+4.  **Smoke Tests (Live)**: Verify connectivity to real infrastructure (LiteLLM, Jira, R2R).
+    ```bash
+    cargo test --test integration_tests smoke -- --ignored --nocapture
+    ```
+
+---
+
+## 🖼️ Image Generation
+
+This project uses **Mermaid** for all architectural and flow diagrams.
+
+### Diagrams
+To update or generate static images from the diagrams:
+1.  Copy the Mermaid code block from the documentation.
+2.  Paste it into the [Mermaid Live Editor](https://mermaid.live/).
+3.  Download the result as PNG or SVG and place it in the `image/` directory if needed for external use.
+
+### Assets & Banners
+The project banner and assets were generated using AI-driven imaging tools. To generate or update assets:
+- Use a tool like **Antigravity** (AI Coding Assistant) with descriptive prompts (e.g., "Minimalist banner for a high-performance Rust multi-agent service, following DDD principles").
+
+---
+
 ## ✅ Next Steps
 
 Would you like help with:
