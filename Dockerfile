@@ -10,7 +10,7 @@ RUN rm -f target/release/deps/fastapi_autogen_team*
 
 # Copy the actual source and build
 COPY . .
-RUN cargo build --release
+RUN touch src/lib.rs && cargo build --release
 
 # Runtime stage
 FROM debian:trixie-slim
