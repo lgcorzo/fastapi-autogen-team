@@ -32,7 +32,7 @@
 <a href=#32 id=32 data-nosnippet>32</a>
 <a href=#33 id=33 data-nosnippet>33</a>        <span class="comment">// 1. Planner Agent: Decomposed query (Strictly one-per-line)
 <a href=#34 id=34 data-nosnippet>34</a>        </span><span class="kw">let </span>planner = client.agent(<span class="string">"minimax-m2.7:cloud"</span>)
-<a href=#35 id=35 data-nosnippet>35</a>            .preamble(<span class="string">"You are the Planner. Analyze the user message and break it down into focused search queries in English. \
+<a href=#35 id=35 data-nosnippet>35</a>            .preamble(<span class="string">"You are the Planner. Analyze the user message and break it down into AT MOST 5 focused search queries in English. \
 <a href=#36 id=36 data-nosnippet>36</a>                      Return ONLY the search queries, one per line. \
 <a href=#37 id=37 data-nosnippet>37</a>                      DO NOT return JSON. DO NOT return follow-up questions. DO NOT use markdown formatting. \
 <a href=#38 id=38 data-nosnippet>38</a>                      Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?"</span>)
@@ -56,11 +56,11 @@
 <a href=#56 id=56 data-nosnippet>56</a>            .agent(<span class="string">"minimax-m2.7:cloud"</span>)
 <a href=#57 id=57 data-nosnippet>57</a>            .preamble(<span class="string">"You are the RAG_searcher. Use the search tool to find information."</span>)
 <a href=#58 id=58 data-nosnippet>58</a>            .tool(SearchTool)
-<a href=#59 id=59 data-nosnippet>59</a>            .default_max_turns(<span class="number">10</span>)
+<a href=#59 id=59 data-nosnippet>59</a>            .default_max_turns(<span class="number">3</span>)
 <a href=#60 id=60 data-nosnippet>60</a>            .build();
 <a href=#61 id=61 data-nosnippet>61</a>
 <a href=#62 id=62 data-nosnippet>62</a>        <span class="kw">let </span><span class="kw-2">mut </span>all_results = String::new();
-<a href=#63 id=63 data-nosnippet>63</a>        <span class="kw">for </span>query <span class="kw">in </span>queries.lines() {
+<a href=#63 id=63 data-nosnippet>63</a>        <span class="kw">for </span>query <span class="kw">in </span>queries.lines().take(<span class="number">5</span>) {
 <a href=#64 id=64 data-nosnippet>64</a>            <span class="kw">let </span>trimmed = query.trim();
 <a href=#65 id=65 data-nosnippet>65</a>            <span class="kw">if </span>trimmed.is_empty()
 <a href=#66 id=66 data-nosnippet>66</a>                || trimmed.starts_with(<span class="string">'{'</span>)
@@ -102,7 +102,7 @@
 <a href=#102 id=102 data-nosnippet>102</a>
 <a href=#103 id=103 data-nosnippet>103</a>        <span class="comment">// 1. Planner Agent: Decomposed query (Strictly one-per-line)
 <a href=#104 id=104 data-nosnippet>104</a>        </span><span class="kw">let </span>planner = client.agent(<span class="string">"minimax-m2.7:cloud"</span>)
-<a href=#105 id=105 data-nosnippet>105</a>            .preamble(<span class="string">"You are the Planner. Analyze the user message and break it down into focused search queries in English. \
+<a href=#105 id=105 data-nosnippet>105</a>            .preamble(<span class="string">"You are the Planner. Analyze the user message and break it down into AT MOST 5 focused search queries in English. \
 <a href=#106 id=106 data-nosnippet>106</a>                      Return ONLY the search queries, one per line. \
 <a href=#107 id=107 data-nosnippet>107</a>                      DO NOT return JSON. DO NOT return follow-up questions. DO NOT use markdown formatting. \
 <a href=#108 id=108 data-nosnippet>108</a>                      Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?"</span>)
@@ -125,11 +125,11 @@
 <a href=#125 id=125 data-nosnippet>125</a>            .agent(<span class="string">"minimax-m2.7:cloud"</span>)
 <a href=#126 id=126 data-nosnippet>126</a>            .preamble(<span class="string">"You are the RAG_searcher. Use the search tool to find information."</span>)
 <a href=#127 id=127 data-nosnippet>127</a>            .tool(SearchTool)
-<a href=#128 id=128 data-nosnippet>128</a>            .default_max_turns(<span class="number">10</span>)
+<a href=#128 id=128 data-nosnippet>128</a>            .default_max_turns(<span class="number">3</span>)
 <a href=#129 id=129 data-nosnippet>129</a>            .build();
 <a href=#130 id=130 data-nosnippet>130</a>
 <a href=#131 id=131 data-nosnippet>131</a>        <span class="kw">let </span><span class="kw-2">mut </span>all_results = String::new();
-<a href=#132 id=132 data-nosnippet>132</a>        <span class="kw">for </span>query <span class="kw">in </span>queries.lines() {
+<a href=#132 id=132 data-nosnippet>132</a>        <span class="kw">for </span>query <span class="kw">in </span>queries.lines().take(<span class="number">5</span>) {
 <a href=#133 id=133 data-nosnippet>133</a>            <span class="kw">let </span>trimmed = query.trim();
 <a href=#134 id=134 data-nosnippet>134</a>            <span class="kw">if </span>trimmed.is_empty()
 <a href=#135 id=135 data-nosnippet>135</a>                || trimmed.starts_with(<span class="string">'{'</span>)
