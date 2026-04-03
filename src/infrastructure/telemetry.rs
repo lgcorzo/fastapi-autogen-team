@@ -11,7 +11,7 @@ pub fn init_telemetry(app_name: &str, endpoint: &str) -> anyhow::Result<()> {
         .with_exporter(
             opentelemetry_otlp::new_exporter()
                 .http()
-                .with_endpoint(format!("{}/traces", endpoint)),
+                .with_endpoint(endpoint),
         )
         .with_trace_config(Config::default().with_resource(resource))
         .install_batch(runtime::Tokio)?;
