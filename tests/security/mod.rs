@@ -78,7 +78,6 @@ async fn test_header_injection_sanitization() {
     let state = Arc::new(AppState {
         team: AgentTeam::new_mock(),
     });
-    let app = create_app(state);
 
     // Malicious header with CRLF injection
     let malicious_header = "user\r\nInjected-Header: malicious";

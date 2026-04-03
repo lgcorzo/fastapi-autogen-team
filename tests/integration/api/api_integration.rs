@@ -6,7 +6,7 @@ use fastapi_autogen_team::{create_app, AppState};
 use fastapi_autogen_team::domain::agent::team::AgentTeam;
 use fastapi_autogen_team::application::dtos::{Input, Message, ContentType};
 use http_body_util::BodyExt;
-use serde_json::{json, Value};
+use serde_json::Value;
 use std::sync::Arc;
 use tower::ServiceExt;
 use mockito::Server;
@@ -59,7 +59,7 @@ async fn test_get_models() {
 
 #[tokio::test]
 async fn test_chat_completions_route() {
-    let mut server = Server::new_async().await;
+    let server = Server::new_async().await;
     let url = server.url();
 
     env::set_var("LITELLM_API_KEY", "test_key");

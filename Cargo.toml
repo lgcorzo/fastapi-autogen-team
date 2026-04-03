@@ -3,6 +3,10 @@ name = "fastapi-autogen-team"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "fastapi_autogen_team"
+path = "src/lib.rs"
+
 [dependencies]
 # Web framework
 axum = "0.7"
