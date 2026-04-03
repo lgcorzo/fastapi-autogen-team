@@ -17,11 +17,9 @@ spec:
       containers:
         - name: fastapi-autogen-team
           image: lgcorzo/fastapi-autogen-team:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 4100
-          envFrom:
-            - secretRef:
-                name: fastapi-autogen-secrets
           env:
             - name: DEFAULT_OTEL_ENDPOINT
               valueFrom:
