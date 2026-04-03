@@ -69,7 +69,4 @@ spec:
                   name: fastapi-autogen-secrets
                   key: LITELLM_API_KEY
             - name: LITELLM_BASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: fastapi-autogen-secrets
-                  key: LITELLM_BASE_URL
+              value: "http://litellm.llm-apps.svc.cluster.local/v1"
