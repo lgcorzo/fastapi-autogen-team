@@ -62,7 +62,11 @@ impl AgentTeam {
         let mut all_results = String::new();
         for query in queries.lines() {
             let trimmed = query.trim();
-            if trimmed.is_empty() || trimmed.starts_with('{') || trimmed.starts_with('}') || trimmed.starts_with('[') {
+            if trimmed.is_empty()
+                || trimmed.starts_with('{')
+                || trimmed.starts_with('}')
+                || trimmed.starts_with('[')
+            {
                 continue;
             }
 
@@ -127,7 +131,11 @@ impl AgentTeam {
         let mut all_results = String::new();
         for query in queries.lines() {
             let trimmed = query.trim();
-            if trimmed.is_empty() || trimmed.starts_with('{') || trimmed.starts_with('}') || trimmed.starts_with('[') {
+            if trimmed.is_empty()
+                || trimmed.starts_with('{')
+                || trimmed.starts_with('}')
+                || trimmed.starts_with('[')
+            {
                 continue;
             }
 
