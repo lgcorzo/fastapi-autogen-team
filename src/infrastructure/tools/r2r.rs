@@ -35,7 +35,7 @@ pub async fn get_r2r_results(url: &str, query: &str) -> anyhow::Result<String> {
             "query": query,
             "use_vector_search": true,
             "search_filters": {},
-            "search_limit": 10
+            "search_limit": 3
         }))
         .send()
         .await?;
