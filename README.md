@@ -45,9 +45,8 @@ graph TD
     
     subgraph Layers
         Interface --> Application[Application Layer]
-        Interface --> Domain[Domain Layer]
+        Application --> Domain[Domain Layer]
         Domain --> Infrastructure[Infrastructure Layer]
-        Application -.-> Domain
     end
 
     subgraph Interface Details
@@ -56,16 +55,30 @@ graph TD
         Interface --> Routes[Router Setup]
     end
 
-    subgraph Domain Details
-        Domain --> AgentTeam[Rig Agent Team]
-        AgentTeam --> Planner[Planner Agent]
-        AgentTeam --> Searcher[Searcher Agent]
+    subgraph Application Details
+        Application --> DTOs[Input / Output Schema]
+        Application --> Validation[Request Validation]
     end
 
-    subgraph Infrastructure Details
-        Infrastructure --> Tools[Jira / R2R / Search Tools]
+    subgraph Domain Layer
+        AgentTeam[Agent Team Orchestrator]
+        AgentTeam --> Planner[Planner Agent]
+        AgentTeam --> Searcher[Searcher Agent]
+        AgentTeam --> QA[QA / Expert Agent]
+    end
+
+    subgraph Infrastructure Layer
+        Infrastructure --> LiteLLM[LiteLLM Gateway]
+        Infrastructure --> R2R[R2R RAG Tool]
+        Infrastructure --> Jira[Jira Tool]
         Infrastructure --> Telemetry[OpenTelemetry]
     end
+
+    %% Dependencies
+    Planner --> LiteLLM
+    Searcher --> R2R
+    Searcher --> Jira
+    QA --> LiteLLM
 ```
 
 ### Request Flow
