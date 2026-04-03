@@ -30,10 +30,13 @@ impl AgentTeam {
     pub async fn run(&self, input: Input) -> anyhow::Result<String> {
         let client = self.client.clone().completions_api();
 
-        // 1. Planner Agent: Decompose query
+        // 1. Planner Agent: Decomposed query (Strictly one-per-line)
         let planner = client.agent("minimax-m2.7:cloud")
-            .preamble("You are the Planner. Analyze the user message and break it down into focused search queries in English. Return only the queries, one per line.")
-            .default_max_turns(10)
+            .preamble("You are the Planner. Analyze the user message and break it down into focused search queries in English. \
+                      Return ONLY the search queries, one per line. \
+                      DO NOT return JSON. DO NOT return follow-up questions. DO NOT use markdown formatting. \
+                      Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?")
+            .default_max_turns(2)
             .build();
 
         let last_message = input
@@ -58,18 +61,23 @@ impl AgentTeam {
 
         let mut all_results = String::new();
         for query in queries.lines() {
-            if query.trim().is_empty() {
+            let trimmed = query.trim();
+            if trimmed.is_empty() || trimmed.starts_with('{') || trimmed.starts_with('}') || trimmed.starts_with('[') {
                 continue;
             }
-            let res = rag_searcher.prompt(query).await?;
+
+            tracing::info!("Executing RAG search for: {}", trimmed);
+            let res = rag_searcher.prompt(trimmed).await?;
             all_results.push_str(&res);
             all_results.push_str("\n---\n");
         }
 
         // 3. QA Agent: Final Synthesis
         let qa = client.agent("minimax-m2.7:cloud")
-            .preamble("You are the Quality Assurance agent. Synthesize the results into a final response in the user's original language. End with TERMINATE.")
-            .default_max_turns(10)
+            .preamble("You are the Quality Assurance agent. Synthesize the results into a final response in the user's original language. \
+                      If no relevant information was found, state it clearly. \
+                      End your response with the word: TERMINATE")
+            .default_max_turns(2)
             .build();
 
         let final_response = qa
@@ -88,10 +96,13 @@ impl AgentTeam {
     ) -> anyhow::Result<impl futures::Stream<Item = anyhow::Result<String>>> {
         let client = self.client.clone().completions_api();
 
-        // 1. Planner Agent: Decompose query
+        // 1. Planner Agent: Decomposed query (Strictly one-per-line)
         let planner = client.agent("minimax-m2.7:cloud")
-            .preamble("You are the Planner. Analyze the user message and break it down into focused search queries in English. Return only the queries, one per line.")
-            .default_max_turns(10)
+            .preamble("You are the Planner. Analyze the user message and break it down into focused search queries in English. \
+                      Return ONLY the search queries, one per line. \
+                      DO NOT return JSON. DO NOT return follow-up questions. DO NOT use markdown formatting. \
+                      Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?")
+            .default_max_turns(2)
             .build();
 
         let last_message = input
@@ -115,18 +126,23 @@ impl AgentTeam {
 
         let mut all_results = String::new();
         for query in queries.lines() {
-            if query.trim().is_empty() {
+            let trimmed = query.trim();
+            if trimmed.is_empty() || trimmed.starts_with('{') || trimmed.starts_with('}') || trimmed.starts_with('[') {
                 continue;
             }
-            let res = rag_searcher.prompt(query).await?;
+
+            tracing::info!("Executing RAG search for: {}", trimmed);
+            let res = rag_searcher.prompt(trimmed).await?;
             all_results.push_str(&res);
             all_results.push_str("\n---\n");
         }
 
         // 3. QA Agent: Final Synthesis (Streaming)
         let qa = client.agent("minimax-m2.7:cloud")
-            .preamble("You are the Quality Assurance agent. Synthesize the results into a final response in the user's original language. End with TERMINATE.")
-            .default_max_turns(10)
+            .preamble("You are the Quality Assurance agent. Synthesize the results into a final response in the user's original language. \
+                      If no relevant information was found, state it clearly. \
+                      End your response with the word: TERMINATE")
+            .default_max_turns(2)
             .build();
 
         let stream = qa
