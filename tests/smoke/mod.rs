@@ -39,7 +39,7 @@ async fn test_production_pipeline_smoke() {
                 messages: vec![Message {
                     role: "user".to_string(),
                     content: ContentType::String(
-                        "Please perform a simple smoke test query about recent issues.".to_string(),
+                        "que es el mlops y como se defien un proyecto por pasos".to_string(),
                     ),
                     name: None,
                 }],
