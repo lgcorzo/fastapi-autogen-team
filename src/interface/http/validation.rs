@@ -21,9 +21,12 @@ where
         match Json::<T>::from_request(req, state).await {
             Ok(Json(value)) => Ok(ValidatedJson(value)),
             Err(rejection) => {
-                let status = StatusCode::UNPROCESSABLE_ENTITY;
+                let status = match rejection.status() {
+                    StatusCode::PAYLOAD_TOO_LARGE => StatusCode::PAYLOAD_TOO_LARGE,
+                    _ => StatusCode::UNPROCESSABLE_ENTITY,
+                };
                 let body = Json(serde_json::json!({
-                    "error": "Unprocessable Entity",
+                    "error": status.canonical_reason().unwrap_or("Error"),
                     "details": rejection.to_string()
                 }));
                 Err((status, body).into_response())
