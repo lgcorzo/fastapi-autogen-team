@@ -8,7 +8,7 @@ pub async fn get_r2r_results(url: &str, query: &str) -> anyhow::Result<String> {
     let client = reqwest::Client::new();
 
     // 1. Login to get token
-    let login_url = format!("{}/v2/users/login", url.trim_end_matches('/'));
+    let login_url = format!("{}/v3/auth/login", url.trim_end_matches('/'));
     let login_res = client
         .post(&login_url)
         .form(&[("email", &user), ("password", &pwd)])
@@ -21,7 +21,7 @@ pub async fn get_r2r_results(url: &str, query: &str) -> anyhow::Result<String> {
         .ok_or_else(|| anyhow::anyhow!("Failed to retrieve access token from R2R"))?;
 
     // 2. Execute RAG query
-    let rag_url = format!("{}/v2/retrieval/rag", url.trim_end_matches('/'));
+    let rag_url = format!("{}/v3/retrieval/rag", url.trim_end_matches('/'));
     let rag_res = client
         .post(&rag_url)
         .bearer_auth(token)
