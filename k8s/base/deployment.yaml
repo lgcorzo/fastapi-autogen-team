@@ -24,7 +24,10 @@ spec:
                 name: fastapi-autogen-secrets
           env:
             - name: DEFAULT_OTEL_ENDPOINT
-              value: "http://opentelemetry-collector.monitoring.svc.cluster.local:4318/v1"
+              valueFrom:
+                secretKeyRef:
+                  name: fastapi-autogen-secrets
+                  key: DEFAULT_OTEL_ENDPOINT
             - name: DEFAULT_HOST
               value: "0.0.0.0"
             - name: JIRA_API_TOKEN
