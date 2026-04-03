@@ -59,28 +59,47 @@ pub async fn route_query(
     }
 
     if request.stream.unwrap_or(false) {
-        let stream = state.team.run_stream(request).await.unwrap();
-        let sse_stream = stream.map(|res| {
-            let content = res.unwrap_or_else(|e| format!("Error: {}", e));
-            let chunk = json!({
-                "choices": [{
-                    "delta": { "content": content },
-                    "index": 0,
-                    "finish_reason": if content.contains("TERMINATE") { Some("stop") } else { None }
-                }]
-            });
-            Ok::<Event, Infallible>(Event::default().data(chunk.to_string()))
-        });
-        return Sse::new(sse_stream)
-            .keep_alive(axum::response::sse::KeepAlive::default())
-            .into_response();
+        match state.team.run_stream(request).await {
+            Ok(stream) => {
+                let sse_stream = stream.map(|res| {
+                    let content = res.unwrap_or_else(|e| {
+                        tracing::error!("Stream error: {}", e);
+                        "An internal error occurred".to_string()
+                    });
+                    let chunk = json!({
+                        "choices": [{
+                            "delta": { "content": content },
+                            "index": 0,
+                            "finish_reason": if content.contains("TERMINATE") { Some("stop") } else { None }
+                        }]
+                    });
+                    Ok::<Event, Infallible>(Event::default().data(chunk.to_string()))
+                });
+                return Sse::new(sse_stream)
+                    .keep_alive(axum::response::sse::KeepAlive::default())
+                    .into_response();
+            }
+            Err(e) => {
+                tracing::error!("Stream initialization error: {}", e);
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(json!({
+                        "error": "Internal Server Error",
+                        "details": "An internal error occurred"
+                    })),
+                )
+                    .into_response();
+            }
+        }
     }
 
-    let response = state
-        .team
-        .run(request)
-        .await
-        .unwrap_or_else(|e| format!("Error: {}", e));
+    let response = match state.team.run(request).await {
+        Ok(res) => res,
+        Err(e) => {
+            tracing::error!("Execution error: {}", e);
+            "An internal error occurred".to_string()
+        }
+    };
 
     let output = json!({
         "id": "chatcmpl-default",

@@ -105,3 +105,9 @@
 **Vulnerability:** The application accepted an unbounded dictionary `Dict[str, str]` for the `image_url` property in the `ContentImage` model. This exposed the system to Denial of Service (DoS) attacks via memory exhaustion by allowing attackers to send payloads with massive base64 strings or an enormous number of keys.
 **Learning:** Pydantic's generic typing (like `Dict[str, str]`) provides no length or size constraints. For large, potentially malicious input like base64 image representations, explicitly bounded models are critical to prevent memory starvation and excessive JSON parsing overhead.
 **Prevention:** Replace unbounded dictionary types with strongly typed Pydantic sub-models (e.g., `ImageUrl`). Enforce strict `max_length` constraints on all fields (e.g., `url: str = Field(max_length=5000000)`) to validate and restrict the payload size at the schema level.
+
+## 2024-04-03 - Prevent Information Leakage and Panic-based DoS in Axum Handlers
+
+**Vulnerability:** The Axum HTTP handler `route_query` used `unwrap()` on an asynchronous stream initialization, which could panic and crash the thread, causing a Denial of Service (DoS). Additionally, `unwrap_or_else` was used to map errors directly into string responses sent to the client, leading to Information Leakage (e.g., exposing underlying HTTP or LLM client errors).
+**Learning:** Using `unwrap()` or returning formatted exception strings directly to the client in web frameworks like Axum bypasses proper error boundary handling, exposing the system to crashes and leaking internal infrastructure details.
+**Prevention:** Always use robust error matching (`match` or `?` operator where applicable). Log the precise, raw error internally using a logging framework (like `tracing::error!`) and return a sanitized, generic message (e.g., "An internal error occurred") alongside an appropriate HTTP status code to the client.
