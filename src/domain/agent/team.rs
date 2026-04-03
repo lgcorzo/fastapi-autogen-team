@@ -32,7 +32,7 @@ impl AgentTeam {
 
         // 1. Planner Agent: Decomposed query (Strictly one-per-line)
         let planner = client.agent("minimax-m2.7:cloud")
-            .preamble("You are the Planner. Analyze the user message and break it down into focused search queries in English. \
+            .preamble("You are the Planner. Analyze the user message and break it down into AT MOST 5 focused search queries in English. \
                       Return ONLY the search queries, one per line. \
                       DO NOT return JSON. DO NOT return follow-up questions. DO NOT use markdown formatting. \
                       Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?")
@@ -56,11 +56,11 @@ impl AgentTeam {
             .agent("minimax-m2.7:cloud")
             .preamble("You are the RAG_searcher. Use the search tool to find information.")
             .tool(SearchTool)
-            .default_max_turns(10)
+            .default_max_turns(3)
             .build();
 
         let mut all_results = String::new();
-        for query in queries.lines() {
+        for query in queries.lines().take(5) {
             let trimmed = query.trim();
             if trimmed.is_empty()
                 || trimmed.starts_with('{')
@@ -102,7 +102,7 @@ impl AgentTeam {
 
         // 1. Planner Agent: Decomposed query (Strictly one-per-line)
         let planner = client.agent("minimax-m2.7:cloud")
-            .preamble("You are the Planner. Analyze the user message and break it down into focused search queries in English. \
+            .preamble("You are the Planner. Analyze the user message and break it down into AT MOST 5 focused search queries in English. \
                       Return ONLY the search queries, one per line. \
                       DO NOT return JSON. DO NOT return follow-up questions. DO NOT use markdown formatting. \
                       Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?")
@@ -125,11 +125,11 @@ impl AgentTeam {
             .agent("minimax-m2.7:cloud")
             .preamble("You are the RAG_searcher. Use the search tool to find information.")
             .tool(SearchTool)
-            .default_max_turns(10)
+            .default_max_turns(3)
             .build();
 
         let mut all_results = String::new();
-        for query in queries.lines() {
+        for query in queries.lines().take(5) {
             let trimmed = query.trim();
             if trimmed.is_empty()
                 || trimmed.starts_with('{')

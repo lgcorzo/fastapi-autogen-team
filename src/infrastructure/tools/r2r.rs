@@ -18,7 +18,13 @@ pub async fn get_r2r_results(url: &str, query: &str) -> anyhow::Result<String> {
     let login_data: serde_json::Value = login_res.json().await?;
     let token = login_data["results"]["access_token"]
         .as_str()
-        .ok_or_else(|| anyhow::anyhow!("Failed to retrieve access token from R2R"))?;
+        .or_else(|| login_data["access_token"].as_str())
+        .ok_or_else(|| {
+            anyhow::anyhow!(
+                "Failed to retrieve access token from R2R. Response was: {}",
+                login_data
+            )
+        })?;
 
     // 2. Execute RAG query
     let rag_url = format!("{}/v3/retrieval/rag", url.trim_end_matches('/'));
