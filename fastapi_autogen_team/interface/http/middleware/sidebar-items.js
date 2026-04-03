@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["cors_layer","security_headers"]};
