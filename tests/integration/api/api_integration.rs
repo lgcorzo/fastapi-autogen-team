@@ -59,11 +59,83 @@ async fn test_get_models() {
 
 #[tokio::test]
 async fn test_chat_completions_route() {
-    let server = Server::new_async().await;
+    let mut server = Server::new_async().await;
     let url = server.url();
 
     env::set_var("LITELLM_API_KEY", "test_key");
     env::set_var("LITELLM_BASE_URL", &url);
+    env::set_var("R2R_URL", &url);
+    env::set_var("JIRA_INSTANCE_URL", &url);
+    env::set_var("R2R_USER", "test_user");
+    env::set_var("R2R_PWD", "test_pwd");
+    env::set_var("JIRA_USERNAME", "test_user");
+    env::set_var("JIRA_API_TOKEN", "test_token");
+
+    // 1. Planner Agent Call
+    let _m1 = server.mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{"choices":[{"message":{"content":"search query 1","role":"assistant"},"index":0,"finish_reason":"stop"}]}"#)
+        .create_async().await;
+
+    // 2. RAG Searcher Call (Trigger Tool)
+    // Rig expects a specific format for tool calls when Using OpenAI provider
+    let _m2 = server.mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{
+            "choices": [{
+                "message": {
+                    "role": "assistant",
+                    "tool_calls": [{
+                        "id": "call_123",
+                        "type": "function",
+                        "function": {
+                            "name": "search",
+                            "arguments": "{\"query\": \"search query 1\"}"
+                        }
+                    }]
+                },
+                "index": 0,
+                "finish_reason": "tool_calls"
+            }]
+        }"#)
+        .create_async().await;
+
+    // 3. R2R Mocks
+    let _m_r2r_login = server.mock("POST", "/v2/users/login")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{"results": {"access_token": "mock_token"}}"#)
+        .create_async().await;
+
+    let _m_r2r_rag = server.mock("POST", "/v2/retrieval/rag")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{"results": {"generated_answer": "Mocked R2R results"}}"#)
+        .create_async().await;
+
+    // 4. Jira Mock
+    let _m_jira = server.mock("GET", "/rest/api/2/search")
+        .match_query(mockito::Matcher::Any)
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{"issues": [{"key": "PROJ-1", "fields": {"summary": "Mocked Jira Issue"}}]}"#)
+        .create_async().await;
+
+    // 5. RAG Searcher Call (Response after tool)
+    let _m3 = server.mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{"choices":[{"message":{"content":"Search completed successfully. Here is the info...","role":"assistant"},"index":0,"finish_reason":"stop"}]}"#)
+        .create_async().await;
+
+    // 6. QA Agent Call
+    let _m4 = server.mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{"choices":[{"message":{"content":"Final synthesized response TERMINATE","role":"assistant"},"index":0,"finish_reason":"stop"}]}"#)
+        .create_async().await;
 
     let team = AgentTeam::new_test(&url);
     let state = Arc::new(AppState { team });
@@ -80,8 +152,6 @@ async fn test_chat_completions_route() {
         stream: Some(false),
     };
 
-    // Since we are mocking the entire client and the handler handles errors gracefully,
-    // we can check for OK status or error string in body.
     let response = app
         .oneshot(
             Request::builder()
@@ -95,4 +165,8 @@ async fn test_chat_completions_route() {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
+    
+    let body_bytes = response.into_body().collect().await.unwrap().to_bytes();
+    let body_str = String::from_utf8_lossy(&body_bytes);
+    assert!(body_str.contains("Final synthesized response"), "Body does not contain expected response: {}", body_str);
 }

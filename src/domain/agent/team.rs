@@ -124,6 +124,7 @@ impl AgentTeam {
     pub fn new_mock() -> Self {
         let client = openai::Client::builder()
             .api_key("none")
+            .base_url("http://localhost:0/v1")
             .build()
             .unwrap();
         Self { client }

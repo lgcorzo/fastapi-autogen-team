@@ -5,11 +5,11 @@ use fastapi_autogen_team::domain::agent::team::AgentTeam;
 use fastapi_autogen_team::interface::http::validation::ValidatedJson;
 use axum::{
     extract::State,
-    Json,
     http::{StatusCode, HeaderMap},
     response::IntoResponse,
 };
 use std::sync::Arc;
+use mockito::Server;
 
 #[tokio::test]
 async fn test_docs_redirect() {
@@ -28,7 +28,37 @@ async fn test_get_models() {
 
 #[tokio::test]
 async fn test_route_query_no_stream() {
-    let state = Arc::new(AppState { team: AgentTeam::new_mock() });
+    let mut server = Server::new_async().await;
+    let url = server.url();
+    
+    // Mock the planner call
+    let _m1 = server.mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{"choices":[{"message":{"content":"search query 1\nsearch query 2","role":"assistant"},"index":0,"finish_reason":"stop"}]}"#)
+        .create_async().await;
+
+    // Mock searcher calls (2 queries)
+    let _m2 = server.mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{"choices":[{"message":{"content":"Search results part 1","role":"assistant"},"index":0,"finish_reason":"stop"}]}"#)
+        .create_async().await;
+
+    let _m3 = server.mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{"choices":[{"message":{"content":"Search results part 2","role":"assistant"},"index":0,"finish_reason":"stop"}]}"#)
+        .create_async().await;
+        
+    // Mock QA call
+    let _m4 = server.mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{"choices":[{"message":{"content":"Final response TERMINATE","role":"assistant"},"index":0,"finish_reason":"stop"}]}"#)
+        .create_async().await;
+
+    let state = Arc::new(AppState { team: AgentTeam::new_test(&url) });
     let request = Input {
         model: "test".to_string(),
         messages: vec![Message {
