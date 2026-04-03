@@ -32,17 +32,38 @@ pub async fn get_r2r_results(url: &str, query: &str) -> anyhow::Result<String> {
         .bearer_auth(token)
         .json(&json!({
             "query": query,
-            "use_vector_search": true,
-            "search_filters": {},
-            "search_limit": 3
+            "stream": false,
+            "search_settings": {
+                "use_vector_search": true,
+                "search_filters": {},
+                "search_limit": 3
+            }
         }))
         .send()
         .await?;
 
-    let rag_data: serde_json::Value = rag_res.json().await?;
+    let status = rag_res.status();
+    let body_text = rag_res.text().await?;
+
+    if !status.is_success() {
+        anyhow::bail!(
+            "R2R RAG query failed with status {}. Body: {}",
+            status,
+            body_text
+        );
+    }
+
+    let rag_data: serde_json::Value = serde_json::from_str(&body_text).map_err(|e| {
+        anyhow::anyhow!(
+            "Failed to decode R2R RAG response: {}. Body: {}",
+            e,
+            body_text
+        )
+    })?;
 
     let search_results = rag_data["results"]["generated_answer"]
         .as_str()
+        .or_else(|| rag_data["generated_answer"].as_str())
         .unwrap_or("No internal r2r result found")
         .to_string();
 
