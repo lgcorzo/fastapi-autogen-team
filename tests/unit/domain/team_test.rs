@@ -1,5 +1,5 @@
+use fastapi_autogen_team::application::dtos::{ContentType, Input, Message};
 use fastapi_autogen_team::domain::agent::team::AgentTeam;
-use fastapi_autogen_team::application::dtos::{Input, Message, ContentType};
 use mockito::Server;
 
 #[tokio::test]
@@ -26,9 +26,11 @@ async fn test_agent_team_run_error() {
     // Mock error for OpenAI call
     // Note: Rig might use /chat/completions or /completions depending on configuration.
     // In the execution code, it uses .completions_api() which usually maps to /chat/completions for OpenAI.
-    let _m = server.mock("POST", "/chat/completions")
+    let _m = server
+        .mock("POST", "/chat/completions")
         .with_status(500)
-        .create_async().await;
+        .create_async()
+        .await;
 
     let res = team.run(input).await;
     assert!(res.is_err());

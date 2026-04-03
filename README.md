@@ -218,6 +218,23 @@ To run all suites (excluding ignored smoke tests):
 cargo test
 ```
 
+# Automated Checks (CI)
+
+This project uses GitHub Actions to ensure code quality and stability. Every pull request and push to the `main` branch triggers the following checks:
+
+1.  **Format Check**: Ensures all code follows the Rust standard formatting.
+    ```bash
+    cargo fmt --check
+    ```
+2.  **Linting**: Uses Clippy to catch common mistakes and enforce best practices across all targets (library, binary, and tests).
+    ```bash
+    cargo clippy --all-targets -- -D warnings
+    ```
+3.  **Tests**: Executes the full unit and integration test suite (excluding smoke tests).
+    ```bash
+    cargo test --test unit_tests --test integration_tests
+    ```
+
 
 ### Debugging
 

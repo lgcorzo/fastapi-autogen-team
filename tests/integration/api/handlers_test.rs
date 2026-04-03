@@ -1,22 +1,25 @@
-use fastapi_autogen_team::interface::http::handlers::{docs_redirect, get_models, route_query};
-use fastapi_autogen_team::interface::http::routes::AppState;
-use fastapi_autogen_team::application::dtos::{Input, Message, ContentType};
-use fastapi_autogen_team::domain::agent::team::AgentTeam;
-use fastapi_autogen_team::interface::http::validation::ValidatedJson;
 use axum::{
     extract::State,
-    http::{StatusCode, HeaderMap},
+    http::{HeaderMap, StatusCode},
     response::IntoResponse,
 };
-use std::sync::Arc;
+use fastapi_autogen_team::application::dtos::{ContentType, Input, Message};
+use fastapi_autogen_team::domain::agent::team::AgentTeam;
+use fastapi_autogen_team::interface::http::handlers::{docs_redirect, get_models, route_query};
+use fastapi_autogen_team::interface::http::routes::AppState;
+use fastapi_autogen_team::interface::http::validation::ValidatedJson;
 use mockito::Server;
+use std::sync::Arc;
 
 #[tokio::test]
 async fn test_docs_redirect() {
     let res = docs_redirect().await;
     let response = res.into_response();
     assert_eq!(response.status(), StatusCode::SEE_OTHER);
-    assert_eq!(response.headers().get("Location").unwrap(), "https://autogen-team.com/docs");
+    assert_eq!(
+        response.headers().get("Location").unwrap(),
+        "https://autogen-team.com/docs"
+    );
 }
 
 #[tokio::test]
@@ -30,7 +33,7 @@ async fn test_get_models() {
 async fn test_route_query_no_stream() {
     let mut server = Server::new_async().await;
     let url = server.url();
-    
+
     // Mock the planner call
     let _m1 = server.mock("POST", "/chat/completions")
         .with_status(200)
@@ -62,7 +65,7 @@ async fn test_route_query_no_stream() {
             "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
         }"#)
         .create_async().await;
-        
+
     // Mock QA call
     let _m4 = server.mock("POST", "/chat/completions")
         .with_status(200)
@@ -74,7 +77,9 @@ async fn test_route_query_no_stream() {
         }"#)
         .create_async().await;
 
-    let state = Arc::new(AppState { team: AgentTeam::new_test(&url) });
+    let state = Arc::new(AppState {
+        team: AgentTeam::new_test(&url),
+    });
     let request = Input {
         model: "test".to_string(),
         messages: vec![Message {
@@ -89,7 +94,7 @@ async fn test_route_query_no_stream() {
         presence_penalty: None,
         frequency_penalty: None,
     };
-    
+
     let mut headers = HeaderMap::new();
     headers.insert("authorization", "Bearer test".parse().unwrap());
 

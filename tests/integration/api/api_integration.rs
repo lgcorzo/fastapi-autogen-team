@@ -2,15 +2,15 @@ use axum::{
     body::Body,
     http::{self, Request, StatusCode},
 };
-use fastapi_autogen_team::{create_app, AppState};
+use fastapi_autogen_team::application::dtos::{ContentType, Input, Message};
 use fastapi_autogen_team::domain::agent::team::AgentTeam;
-use fastapi_autogen_team::application::dtos::{Input, Message, ContentType};
+use fastapi_autogen_team::{create_app, AppState};
 use http_body_util::BodyExt;
+use mockito::Server;
 use serde_json::Value;
+use std::env;
 use std::sync::Arc;
 use tower::ServiceExt;
-use mockito::Server;
-use std::env;
 
 #[tokio::test]
 async fn test_docs_redirect() {
@@ -29,7 +29,10 @@ async fn test_docs_redirect() {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::SEE_OTHER);
-    assert_eq!(response.headers().get("location").unwrap(), "https://autogen-team.com/docs");
+    assert_eq!(
+        response.headers().get("location").unwrap(),
+        "https://autogen-team.com/docs"
+    );
 }
 
 #[tokio::test]
@@ -52,7 +55,7 @@ async fn test_get_models() {
 
     let body = response.into_body().collect().await.unwrap().to_bytes();
     let body: Value = serde_json::from_slice(&body).unwrap();
-    
+
     let data = body["data"].as_array().unwrap();
     assert!(data.iter().any(|m| m["id"] == "minimax-m2.7:cloud"));
 }
@@ -83,10 +86,12 @@ async fn test_chat_completions_route() {
         .create_async().await;
 
     // 2. RAG Searcher Call (Trigger Tool)
-    let _m2 = server.mock("POST", "/chat/completions")
+    let _m2 = server
+        .mock("POST", "/chat/completions")
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{
+        .with_body(
+            r#"{
             "id": "s1", "object": "chat.completion", "created": 12345, "model": "test",
             "choices": [{
                 "message": {
@@ -104,29 +109,37 @@ async fn test_chat_completions_route() {
                 "finish_reason": "tool_calls"
             }],
             "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
-        }"#)
-        .create_async().await;
+        }"#,
+        )
+        .create_async()
+        .await;
 
     // 3. R2R Mocks
-    let _m_r2r_login = server.mock("POST", "/v2/users/login")
+    let _m_r2r_login = server
+        .mock("POST", "/v2/users/login")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(r#"{"results": {"access_token": "mock_token"}}"#)
-        .create_async().await;
+        .create_async()
+        .await;
 
-    let _m_r2r_rag = server.mock("POST", "/v2/retrieval/rag")
+    let _m_r2r_rag = server
+        .mock("POST", "/v2/retrieval/rag")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(r#"{"results": {"generated_answer": "Mocked R2R results"}}"#)
-        .create_async().await;
+        .create_async()
+        .await;
 
     // 4. Jira Mock
-    let _m_jira = server.mock("GET", "/rest/api/2/search")
+    let _m_jira = server
+        .mock("GET", "/rest/api/2/search")
         .match_query(mockito::Matcher::Any)
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(r#"{"issues": [{"key": "PROJ-1", "fields": {"summary": "Mocked Jira Issue"}}]}"#)
-        .create_async().await;
+        .create_async()
+        .await;
 
     // 5. RAG Searcher Call (Response after tool)
     let _m3 = server.mock("POST", "/chat/completions")
@@ -157,7 +170,11 @@ async fn test_chat_completions_route() {
     let input = Input {
         model: "test".to_string(),
         user: None,
-        messages: vec![Message { role: "user".to_string(), content: ContentType::String("Hello".to_string()), name: None }],
+        messages: vec![Message {
+            role: "user".to_string(),
+            content: ContentType::String("Hello".to_string()),
+            name: None,
+        }],
         temperature: None,
         top_p: None,
         presence_penalty: None,
@@ -178,8 +195,12 @@ async fn test_chat_completions_route() {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::OK);
-    
+
     let body_bytes = response.into_body().collect().await.unwrap().to_bytes();
     let body_str = String::from_utf8_lossy(&body_bytes);
-    assert!(body_str.contains("Final synthesized response"), "Body does not contain expected response: {}", body_str);
+    assert!(
+        body_str.contains("Final synthesized response"),
+        "Body does not contain expected response: {}",
+        body_str
+    );
 }

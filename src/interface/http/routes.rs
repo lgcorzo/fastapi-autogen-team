@@ -1,11 +1,11 @@
+use crate::domain::agent::team::AgentTeam;
+use crate::interface::http::handlers::{docs_redirect, get_models, route_query};
+use crate::interface::http::middleware::{cors_layer, security_headers};
 use axum::{
     routing::{get, post},
     Router,
 };
 use std::sync::Arc;
-use crate::domain::agent::team::AgentTeam;
-use crate::interface::http::handlers::{docs_redirect, get_models, route_query};
-use crate::interface::http::middleware::{security_headers, cors_layer};
 
 pub struct AppState {
     pub team: AgentTeam,

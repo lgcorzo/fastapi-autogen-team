@@ -2,11 +2,11 @@ use axum::{
     body::Body,
     http::{Request, StatusCode},
 };
-use tower::ServiceExt;
-use std::sync::Arc;
-use fastapi_autogen_team::{create_app, AppState};
 use fastapi_autogen_team::domain::agent::team::AgentTeam;
+use fastapi_autogen_team::{create_app, AppState};
 use serde_json::json;
+use std::sync::Arc;
+use tower::ServiceExt;
 
 #[tokio::test]
 async fn test_large_payload_rejection() {
@@ -37,7 +37,9 @@ async fn test_large_payload_rejection() {
     // Standard Axum/Tower-HTTP limit is usually around 2MB or similar by default if configured
     // If not configured, it might be OK, but for security, we should check for reasonable limits.
     // Here we check if the service handles it (either OK if under limit or PayloadTooLarge)
-    assert!(response.status() == StatusCode::OK || response.status() == StatusCode::PAYLOAD_TOO_LARGE);
+    assert!(
+        response.status() == StatusCode::OK || response.status() == StatusCode::PAYLOAD_TOO_LARGE
+    );
 }
 
 #[tokio::test]

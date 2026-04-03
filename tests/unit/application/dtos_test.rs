@@ -13,7 +13,7 @@ fn test_model_information_valid() {
         "top_provider": {"max_completion_tokens": 1000, "is_moderated": true},
         "per_request_limits": {"max_requests": 100}
     });
-    
+
     let model_info: ModelInformation = serde_json::from_value(json_data).unwrap();
     assert_eq!(model_info.id, "test_id");
     assert_eq!(model_info.name, "test_name");
@@ -35,7 +35,7 @@ fn test_input_valid() {
         "model": "test_model",
         "messages": [{"role": "user", "content": "Hello, world!"}]
     });
-    
+
     let input: Input = serde_json::from_value(json_data).unwrap();
     assert_eq!(input.model, "test_model");
     assert_eq!(input.messages.len(), 1);
@@ -47,7 +47,7 @@ fn test_content_type_list() {
         {"type": "text", "text": "Hello"},
         {"type": "image_url", "image_url": {"url": "http://test.com"}}
     ]);
-    
+
     let content: ContentType = serde_json::from_value(json_data).unwrap();
     match content {
         ContentType::List(list) => {

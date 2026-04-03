@@ -36,7 +36,7 @@ jobs:
       - name: Rustfmt Check
         run: cargo fmt --check
       - name: Clippy Lint
-        run: cargo clippy -- -D warnings
+        run: cargo clippy --all-targets -- -D warnings
       - name: Run Mocked Tests
         run: cargo test --test unit_tests --test integration_tests
 

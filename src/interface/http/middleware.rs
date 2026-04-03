@@ -1,7 +1,7 @@
 use axum::http::{HeaderName, HeaderValue};
+use std::env;
 use tower_http::cors::{AllowOrigin, CorsLayer};
 use tower_http::set_header::SetResponseHeaderLayer;
-use std::env;
 
 pub fn security_headers() -> Vec<SetResponseHeaderLayer<HeaderValue>> {
     vec![

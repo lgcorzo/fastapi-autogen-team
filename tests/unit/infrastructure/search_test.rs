@@ -1,4 +1,4 @@
-use fastapi_autogen_team::infrastructure::tools::search::{SearchTool};
+use fastapi_autogen_team::infrastructure::tools::search::SearchTool;
 use rig::tool::Tool;
 
 #[tokio::test]

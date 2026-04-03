@@ -5,16 +5,19 @@ use axum::{
     Json,
 };
 use futures::StreamExt;
-use std::sync::Arc;
-use std::convert::Infallible;
 use serde_json::json;
+use std::convert::Infallible;
+use std::sync::Arc;
 
-use crate::interface::http::routes::AppState;
 use crate::application::dtos::Input;
+use crate::interface::http::routes::AppState;
 use crate::interface::http::validation::ValidatedJson;
 
 pub async fn docs_redirect() -> impl IntoResponse {
-    (StatusCode::SEE_OTHER, [("Location", "https://autogen-team.com/docs")])
+    (
+        StatusCode::SEE_OTHER,
+        [("Location", "https://autogen-team.com/docs")],
+    )
 }
 
 pub async fn get_models() -> impl IntoResponse {
@@ -42,15 +45,19 @@ pub async fn route_query(
 ) -> impl IntoResponse {
     // Basic Header Sanitization (example: carry over authorization if needed)
     let _auth = headers.get("authorization");
-    
+
     // Validation: Empty messages
     if request.messages.is_empty() {
-        return (StatusCode::UNPROCESSABLE_ENTITY, Json(json!({
-            "error": "Unprocessable Entity",
-            "details": "messages list cannot be empty"
-        }))).into_response();
+        return (
+            StatusCode::UNPROCESSABLE_ENTITY,
+            Json(json!({
+                "error": "Unprocessable Entity",
+                "details": "messages list cannot be empty"
+            })),
+        )
+            .into_response();
     }
-    
+
     if request.stream.unwrap_or(false) {
         let stream = state.team.run_stream(request).await.unwrap();
         let sse_stream = stream.map(|res| {
@@ -64,11 +71,17 @@ pub async fn route_query(
             });
             Ok::<Event, Infallible>(Event::default().data(chunk.to_string()))
         });
-        return Sse::new(sse_stream).keep_alive(axum::response::sse::KeepAlive::default()).into_response();
+        return Sse::new(sse_stream)
+            .keep_alive(axum::response::sse::KeepAlive::default())
+            .into_response();
     }
 
-    let response = state.team.run(request).await.unwrap_or_else(|e| format!("Error: {}", e));
-    
+    let response = state
+        .team
+        .run(request)
+        .await
+        .unwrap_or_else(|e| format!("Error: {}", e));
+
     let output = json!({
         "id": "chatcmpl-default",
         "object": "chat.completion",
@@ -91,5 +104,3 @@ pub async fn route_query(
 
     Json(output).into_response()
 }
-
-

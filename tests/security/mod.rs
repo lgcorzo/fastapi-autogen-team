@@ -2,11 +2,11 @@ use axum::{
     body::Body,
     http::{Request, StatusCode},
 };
-use tower::ServiceExt;
-use std::sync::Arc;
-use fastapi_autogen_team::{create_app, AppState};
 use fastapi_autogen_team::domain::agent::team::AgentTeam;
+use fastapi_autogen_team::{create_app, AppState};
 use serde_json::json;
+use std::sync::Arc;
+use tower::ServiceExt;
 
 #[tokio::test]
 async fn test_security_headers_present() {
@@ -25,9 +25,18 @@ async fn test_security_headers_present() {
         .await
         .unwrap();
 
-    assert_eq!(response.headers().get("x-content-type-options").unwrap(), "nosniff");
+    assert_eq!(
+        response.headers().get("x-content-type-options").unwrap(),
+        "nosniff"
+    );
     assert_eq!(response.headers().get("x-frame-options").unwrap(), "DENY");
-    assert!(response.headers().get("strict-transport-security").unwrap().to_str().unwrap().contains("max-age=31536000"));
+    assert!(response
+        .headers()
+        .get("strict-transport-security")
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .contains("max-age=31536000"));
 }
 
 #[tokio::test]
@@ -39,7 +48,8 @@ async fn test_cors_specific_origins() {
     let app = create_app(state);
 
     // Good origin
-    let response_good = app.clone()
+    let response_good = app
+        .clone()
         .oneshot(
             Request::builder()
                 .method("OPTIONS")
@@ -53,7 +63,13 @@ async fn test_cors_specific_origins() {
         .unwrap();
 
     assert_eq!(response_good.status(), StatusCode::OK);
-    assert_eq!(response_good.headers().get("access-control-allow-origin").unwrap(), "https://good.com");
+    assert_eq!(
+        response_good
+            .headers()
+            .get("access-control-allow-origin")
+            .unwrap(),
+        "https://good.com"
+    );
 
     // Bad origin
     let response_bad = app
@@ -70,14 +86,15 @@ async fn test_cors_specific_origins() {
         .unwrap();
 
     assert_eq!(response_bad.status(), StatusCode::OK);
-    assert!(response_bad.headers().get("access-control-allow-origin").is_none());
+    assert!(response_bad
+        .headers()
+        .get("access-control-allow-origin")
+        .is_none());
 }
 
 #[tokio::test]
 async fn test_header_injection_sanitization() {
-    let state = Arc::new(AppState {
-        team: AgentTeam::new_mock(),
-    });
+    // No state needed for this test as it verifies the request builder
 
     // Malicious header with CRLF injection
     let malicious_header = "user\r\nInjected-Header: malicious";

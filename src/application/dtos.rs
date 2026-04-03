@@ -79,5 +79,3 @@ impl Default for Output {
         }
     }
 }
-
-

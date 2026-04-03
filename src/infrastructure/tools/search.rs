@@ -1,11 +1,11 @@
+use crate::infrastructure::tools::jira::get_jira_results;
+use crate::infrastructure::tools::r2r::get_r2r_results;
 use rig::completion::ToolDefinition;
 use rig::tool::Tool;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::env;
 use thiserror::Error;
-use crate::infrastructure::tools::jira::get_jira_results;
-use crate::infrastructure::tools::r2r::get_r2r_results;
 
 #[derive(Deserialize)]
 pub struct SearchArgs {
@@ -76,5 +76,3 @@ impl Tool for SearchTool {
         })
     }
 }
-
-
