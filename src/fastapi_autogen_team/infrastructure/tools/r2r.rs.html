@@ -8,7 +8,7 @@
 <a href=#8 id=8 data-nosnippet>8</a>    <span class="kw">let </span>client = reqwest::Client::new();
 <a href=#9 id=9 data-nosnippet>9</a>
 <a href=#10 id=10 data-nosnippet>10</a>    <span class="comment">// 1. Login to get token
-<a href=#11 id=11 data-nosnippet>11</a>    </span><span class="kw">let </span>login_url = <span class="macro">format!</span>(<span class="string">"{}/v2/users/login"</span>, url.trim_end_matches(<span class="string">'/'</span>));
+<a href=#11 id=11 data-nosnippet>11</a>    </span><span class="kw">let </span>login_url = <span class="macro">format!</span>(<span class="string">"{}/v3/auth/login"</span>, url.trim_end_matches(<span class="string">'/'</span>));
 <a href=#12 id=12 data-nosnippet>12</a>    <span class="kw">let </span>login_res = client
 <a href=#13 id=13 data-nosnippet>13</a>        .post(<span class="kw-2">&amp;</span>login_url)
 <a href=#14 id=14 data-nosnippet>14</a>        .form(<span class="kw-2">&amp;</span>[(<span class="string">"email"</span>, <span class="kw-2">&amp;</span>user), (<span class="string">"password"</span>, <span class="kw-2">&amp;</span>pwd)])
@@ -21,7 +21,7 @@
 <a href=#21 id=21 data-nosnippet>21</a>        .ok_or_else(|| <span class="macro">anyhow::anyhow!</span>(<span class="string">"Failed to retrieve access token from R2R"</span>))<span class="question-mark">?</span>;
 <a href=#22 id=22 data-nosnippet>22</a>
 <a href=#23 id=23 data-nosnippet>23</a>    <span class="comment">// 2. Execute RAG query
-<a href=#24 id=24 data-nosnippet>24</a>    </span><span class="kw">let </span>rag_url = <span class="macro">format!</span>(<span class="string">"{}/v2/retrieval/rag"</span>, url.trim_end_matches(<span class="string">'/'</span>));
+<a href=#24 id=24 data-nosnippet>24</a>    </span><span class="kw">let </span>rag_url = <span class="macro">format!</span>(<span class="string">"{}/v3/retrieval/rag"</span>, url.trim_end_matches(<span class="string">'/'</span>));
 <a href=#25 id=25 data-nosnippet>25</a>    <span class="kw">let </span>rag_res = client
 <a href=#26 id=26 data-nosnippet>26</a>        .post(<span class="kw-2">&amp;</span>rag_url)
 <a href=#27 id=27 data-nosnippet>27</a>        .bearer_auth(token)
