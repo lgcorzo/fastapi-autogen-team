@@ -1,442 +1,285 @@
 ![Fastapi-Autogen-team Banner](image/README/banner.png)
 
-# Fastapi-Autogen-team Python Package
+# Fastapi-Autogen-team Rust Service
 
 [![check.yml](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/check.yml/badge.svg)](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/check.yml)
-[![publish.yml](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/publish.yml/badge.svg)](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/publish.yml)
-[![Documentation](https://img.shields.io/badge/documentation-available-brightgreen.svg)](https://lgcorzo.github.io/fastapi-autogen-team/)
 [![License](https://img.shields.io/github/license/lgcorzo/fastapi-autogen-team)](https://github.com/lgcorzo/fastapi-autogen-team/blob/main/LICENCE.txt)
 [![Release](https://img.shields.io/github/v/release/lgcorzo/fastapi-autogen-team)](https://github.com/lgcorzo/fastapi-autogen-team/releases)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lgcorzo/fastapi-autogen-team)
 
-**This repository contains a Python codebase designed as an MLOps template application using FastAPI and Microsoft AutoGen. It focuses on creating a streaming interface for OpenAI-compatible models, enabling real-time interactions suitable for applications like LiteLLM and other OpenAI-compatible apps.**
+**This repository contains a high-performance Rust service designed as an MLOps template application following Domain-Driven Design (DDD) principles.** It uses the [Axum](https://github.com/tokio-rs/axum) web framework and the [Rig](https://github.com/0xPlayground/rig) LLM orchestration library.
 
-The package leverages several tools and best practices to make your MLOps experience as flexible, robust, and productive as possible. You can use this package as part of your MLOps toolkit or platform (e.g., Model Registry, Experiment Tracking, Realtime Inference).
+It provides an OpenAI-compatible streaming interface for multi-agent workflows, enabling real-time interactions suitable for LiteLLM and other OpenAI-compatible integrations.
 
 # Table of Contents
 
-- [Fastapi-Autogen-team Python Package](#fastapi-autogen-team-python-package)
+- [Fastapi-Autogen-team Rust Service](#fastapi-autogen-team-rust-service)
 - [Table of Contents](#table-of-contents)
-- [Install](#install)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Next Steps](#next-steps)
-  - [Development in Kubernetes](#development-in-kubernetes)
-    - [Prerequisites](#prerequisites-1)
-    - [Start Developing](#start-developing)
-  - [Usage](#usage)
-    - [Example Request](#example-request)
-    - [Expected Response](#expected-response)
-  - [Automation](#automation)
-  - [Workflows](#workflows)
-    - [1. **Project Purpose**](#1-project-purpose)
-    - [2. **Project Setup**](#2-project-setup)
-    - [3. **Project Structure**](#3-project-structure)
-    - [4. **Implementing the Streaming Interface**](#4-implementing-the-streaming-interface)
-    - [5. **Request Handling**](#5-request-handling)
-    - [6. **Performance Optimization**](#6-performance-optimization)
-    - [7. **Testing**](#7-testing)
-    - [8. **Conclusion**](#8-conclusion)
-- [Docker Image Build and Okteto Deployment Walkthrough](#docker-image-build-and-okteto-deployment-walkthrough)
-  - [Changes Made](#changes-made)
-    - [build](#build)
-  - [Verification Results](#verification-results)
-    - [Build Verification](#build-verification)
-    - [Deployment Verification](#deployment-verification)
-  - [How to use](#how-to-use)
-  - [References:](#references)
+- [Overview](#overview)
+- [Architecture](#architecture)
+    - [DDD Layered Structure](#ddd-layered-structure)
+    - [Request Flow](#request-flow)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Testing](#testing)
+- [Development in Kubernetes](#development-in-kubernetes)
+- [References](#references)
 
-# Install
+# Overview
 
-This section details the requirements, actions, and next steps to kickstart your MLOps project.
+The project facilitates complex LLM orchestration through a "Team" of agents:
+1. **Planner**: Breaks down user requests into actionable search queries.
+2. **Searcher**: Executes searches across integrated tools (R2R and Jira).
+3. **QA/Expert**: Synthesizes search results into a final answer.
 
-## Prerequisites
+# Architecture
 
-- Python>=3.12: to benefit from the latest features and performance improvements
-- Poetry>=1.8.2: to initialize the project virtual environment and its dependencies
+The system is built on **Domain-Driven Design (DDD)** principles to ensure a clear separation of concerns and a highly maintainable codebase.
 
-## Installation
-
-1.  Clone this GitHub repository on your computer
-
-    ```bash
-    # with ssh (recommended)
-    $ git clone git@github.com:lgcorzo/fastapi-autogen-team.git
-    or https
-    $ git clone https://github.com/lgcorzo/fastapi-autogen-team
-    ```
-
-2.  Run the project installation with poetry (install poetry in the base environment)
-
-    ```bash
-    $ cd fastapi-autogen-team/
-    $ poetry env use $(which python)
-    $ poetry install
-    $ poetry env activate
-    ```
-
-    ```bash
-    $ poetry run invoke containers.build
-    ```
-
-## Next Steps
-
-Going from there, there are dozens of ways to integrate this package into your MLOps platform. For instance, you can use Databricks or AWS as your compute platform and model registry. It's up to you to adapt the package code to the solution you target.
-
-Debugging in VS Code is possible with the following configuration:
-
-```json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Poetry evaluations Debug",
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/src/fastapi_autogen_team/main.py", // Adjust the entry point path
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}", // Set the working directory to the project root
-      "env": {
-        "PYTHONPATH": "${workspaceFolder}/src"
-      } // Ensure module discovery
-    }
-  ]
-}
-```
-
-In production, you can build, ship, and run the project as a Python package:
-
-```bash
-poetry build
-poetry publish # optional
-python -m pip install [package]
-
-## added mocogpt for integration test if you need to simulate a chatgpt call
-poetry add --group checks "mocogpt[cli]@git+https://github.com/lgcorzo/mocogpt.git"
-```
-
-## Development in Kubernetes
-
-To develop directly inside your Kubernetes cluster, we use [Okteto](https://www.okteto.com/docs/) and VS Code Dev Containers. This ensures your development environment matches production.
-
-### Prerequisites
-
-- An active Kubernetes cluster
-- `kubectl` configured to talk to your cluster
-- [Okteto CLI](https://www.okteto.com/docs/getting-started/) installed
-- VS Code with [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) and [Okteto](https://marketplace.visualstudio.com/items?itemName=okteto.remote-kubernetes) extensions.
-
-### Start Developing
-
-1.  **Deploy the application** to your cluster (if not already running).
-2.  **Start Development Mode**:
-    ```bash
-    okteto up
-    ```
-    Select the `fastapi-autogen-team` deployment if prompted.
-3.  **Connect VS Code**:
-    - Okteto will automatically sync your files and perform port forwarding.
-    - You can open the remote folder in VS Code to get full IntelliSense and debugging support inside the cluster.
-
-This setup uses the configuration in `okteto.yaml` and `.devcontainer/`.
-
-## Usage
-
-To use the application, send requests to the FastAPI server. Here are some example requests:
-
-### Example Request
-
-```bash
-curl -X POST "http://localhost:8000/chat/completions" -H "Content-Type: application/json" -d '{
-  "messages": [{"role": "user", "content": "Hello!"}],
-  "model": "gpt-3.5-turbo",
-  "stream": true
-}'
-```
-
-### Expected Response
-
-```json
-{
-  "choices": [
-    {
-      "message": {
-        "role": "assistant",
-        "content": "Hello! How can I assist you today?"
-      }
-    }
-  ]
-}
-```
-
-## Automation
-
-This project includes several automation tasks to easily repeat common actions. You can invoke the actions from the command line or VS Code extension.
-
-```bash
-# execute the project DAG
-$ inv projects
-# create a code archive
-$ inv packages
-# list other actions
-$ inv --list
-```
-
-**Available tasks**:
-
-- **checks.all (checks)** - Run all check tasks.
-- **checks.code** - Check the codes with ruff.
-- **checks.coverage** - Check the coverage with coverage.
-- **checks.format** - Check the formats with ruff.
-- **checks.poetry** - Check poetry config files.
-- **checks.security** - Check the security with bandit.
-- **checks.test** - Check the tests with pytest.
-- **checks.type** - Check the types with mypy.
-- **cleans.all (cleans)** - Run all tools and folders tasks.
-- **cleans.cache** - Clean the cache folder.
-- **cleans.coverage** - Clean the coverage tool.
-- **cleans.dist** - Clean the dist folder.
-- **cleans.docs** - Clean the docs folder.
-- **cleans.environment** - Clean the project environment file.
-- **cleans.folders** - Run all folders tasks.
-- **cleans.mypy** - Clean the mypy tool.
-- **cleans.outputs** - Clean the outputs folder.
-- **cleans.poetry** - Clean poetry lock file.
-- **cleans.pytest** - Clean the pytest tool.
-- **cleans.projects** - Run all projects tasks.
-- **cleans.python** - Clean python caches and bytecodes.
-- **cleans.requirements** - Clean the project requirements file.
-- **cleans.reset** - Run all tools, folders, and sources tasks.
-- **cleans.ruff** - Clean the ruff tool.
-- **cleans.sources** - Run all sources tasks.
-- **cleans.tools** - Run all tools tasks.
-- **cleans.venv** - Clean the venv folder.
-- **commits.all (commits)** - Run all commit tasks.
-- **commits.bump** - Bump the version of the package.
-- **commits.commit** - Commit all changes with a message.
-- **commits.info** - Print a guide for messages.
-- **containers.all (containers)** - Run all container tasks.
-- **containers.build** - Build the container image with the given tag.
-- **containers.compose** - Start up docker compose.
-- **containers.run** - Run the container image with the given tag.
-- **docs.all (docs)** - Run all docs tasks.
-- **docs.api** - Document the API with pdoc using the given format and output directory.
-- **docs.serve** - Serve the API docs with pdoc using the given format and computer port.
-- **formats.all** - (formats) Run all format tasks.
-- **formats.imports** - Format python imports with ruff.
-- **formats.sources** - Format python sources with ruff.
-- **installs.all (installs)** - Run all install tasks.
-- **installs.poetry** - Install poetry packages.
-- **installs.pre-commit** - Install pre-commit hooks on git.
-- **packages.all (packages)** - Run all package tasks.
-- **packages.build** - Build a python package with the given format.
-- **projects.all (projects)** - Run all project tasks.
-- **projects.environment** - Export the project environment file.
-- **projects.requirements** - Export the project requirements file.
-
-## Workflows
-
-This package supports two GitHub Workflows in `.github/workflows`:
-
-- `check.yml`: Validate the quality of the package on each Pull Request
-- `publish.yml`: Build and publish the docs and packages on code release.
-- `docs-to-wiki.yml`:publish the docs and packages on the wiki.
-
-The GitHub Actions pipelines automate the following tasks:
-
-- **Continuous Integration (CI)**: The `check.yml` workflow runs on every pull request to ensure that the code meets quality standards. It includes linting, testing, and type checking.
-- **Continuous Deployment (CD)**: The `publish.yml` workflow triggers on releases, automatically building and publishing the documentation and packages to the appropriate repositories.
-
-You can use and extend these workflows to automate repetitive package management tasks.
-
-You can use and extend these workflows to automate repetitive package management tasks.
-
-### 1. **Project Purpose**
-
-The project aims to create a streaming interface for OpenAI-compatible models using **FastAPI** and **Microsoft AutoGen**. It uses **Server-Sent Events (SSE)** to enable real-time updates for client-server communication, suitable for applications like **LiteLLM** and **OpenAI-compatible apps**.
-
-![1743105581333](image/README/1743105581333.png)
-
----
-
-### 2. **Project Setup**
-
-- **Installation:**
-  - Steps include cloning a GitHub repository and setting up a Python environment (with Python 3.12 and Poetry).
-  - Key dependencies are `FastAPI` and `pyautogen`.
-
-- **Environment Variables:**
-  Litellm gateway - A API key is required, which should be stored in environment variables or an `.env` file.
-
-- **Running the Server:**
-  - Instructions include running a script (`run.sh`) to start the FastAPI server.
-- **Deploy the image**:
-  - generated with the poetry run invoke containers.build command
-
----
-
-### 3. **Project Structure**
-
-- **Main Files:**
-  - `src/fastapi_autogen_team/main.py`: Entry point for the FastAPI application; handles environment variables and routes.
-  - `src/fastapi_autogen_team/data_model.py`: Defines request/response models using Pydantic (compatible with OpenAI).
-  - `src/fastapi_autogen_team/autogen_workflow_team.py`: Contains logic for the AutoGen workflows and interactions.
-  - `src/fastapi_autogen_team/autogen_server.py`: Implements handling of streaming and non-streaming client requests.
-  - `src/fastapi_autogen_team/tool.py`: Orchestrates search operations (R2R, Jira) with built-in security to prevent exception leakage.
+### DDD Layered Structure
 
 ```mermaid
-classDiagram
-    class Input {
-        messages: list[Message]
-        model: str
-        stream: bool
-    }
-    class Message {
-        role: str
-        content: str
-    }
-    class Output {
-        choices: list[dict]
-    }
-    class ModelInformation {
-        id: str
-        name: str
-    }
-    class AutogenWorkflow {
-        llm_config: dict
-        user: str
-        queue: Queue
-        run(message: str, stream: bool) : ChatResult
-    }
+graph TD
+    Client[OpenAI-Compatible Client] --> Interface[Interface Layer]
+    
+    subgraph Layers
+        Interface --> Application[Application Layer]
+        Application --> Domain[Domain Layer]
+        Domain --> Infrastructure[Infrastructure Layer]
+    end
 
-    Input -- Message : contains
-    Output -- dict : contains
-    AutogenWorkflow -- Queue : uses
+    subgraph Interface Details
+        Interface --> Handlers[Axum Handlers]
+        Interface --> Middleware[Security & CORS]
+        Interface --> Routes[Router Setup]
+    end
+
+    subgraph Application Details
+        Application --> DTOs[Input / Output Schema]
+        Application --> Validation[Request Validation]
+    end
+
+    subgraph Domain Layer
+        AgentTeam[Agent Team Orchestrator]
+        AgentTeam --> Planner[Planner Agent]
+        AgentTeam --> Searcher[Searcher Agent]
+        AgentTeam --> QA[QA / Expert Agent]
+    end
+
+    subgraph Infrastructure Layer
+        Infrastructure --> LiteLLM[LiteLLM Gateway]
+        Infrastructure --> R2R[R2R RAG Tool]
+        Infrastructure --> Jira[Jira Tool]
+        Infrastructure --> Telemetry[OpenTelemetry]
+    end
+
+    %% Dependencies
+    Planner --> LiteLLM
+    Searcher --> R2R
+    Searcher --> Jira
+    QA --> LiteLLM
 ```
+
+### Request Flow
 
 ```mermaid
 sequenceDiagram
-    participant Client
-    participant FastAPI
-    participant autogen_server.py
-    participant autogen_workflow_team.py
-    participant AutoGen Agent
+    participant C as Client
+    participant I as Interface (Axum)
+    participant D as Domain (AgentTeam)
+    participant Inf as Infrastructure (Tools)
 
-    Client->>FastAPI: POST /chat/completions
-    FastAPI->>autogen_server.py: serve_autogen(Input)
-    autogen_server.py->>autogen_workflow_team.py: AutogenWorkflow.run(message, stream)
-    autogen_workflow_team.py->>AutoGen Agent: Send message
-    AutoGen Agent-->>autogen_workflow_team.py: Receive response
-    autogen_workflow_team.py-->>autogen_server.py: Return response
-    autogen_server.py-->>FastAPI: Return response
-    FastAPI-->>Client: Return response
+    C->>I: POST /chat/completions
+    I->>D: Orchestrate Workflow
+    D->>D: Planner: Generate Queries
+    loop Multi-agent Search
+        D->>Inf: Searcher: Execute Tool
+        Inf-->>D: Return Context
+    end
+    D->>D: QA: Final Synthesis
+    D-->>I: SSE Stream / JSON
+    I-->>C: Response
 ```
 
----
+# Project Structure
 
-### 4. **Implementing the Streaming Interface**
+```text
+src/
+├── application/         # DTOs and Shared Models
+├── domain/              # Core Business Logic & Orchestration
+├── infrastructure/      # External Clients & Tools
+├── interface/           # HTTP Boundary
+├── lib.rs               # Library Entry Point
+└── main.rs              # Application Entry Point
 
-- **FastAPI Application:**
-  - Routes are defined for features like redirecting to documentation (`GET /`), returning model information (`GET /models`), and handling chat completions (`POST /chat/completions`).
+tests/                   # DDD Testing Suite
+├── unit/                # Isolated Component Tests (Domain, App, Infra)
+├── integration/         # Multi-component API & Workflow Tests
+├── smoke/               # Zero-mock Production Tests
+├── security/            # Security, Auth, and Sanitization Tests
+├── common/              # Shared Test Utilities
+├── unit_tests.rs        # Unit Test Suite Entry Point
+└── integration_tests.rs # Integration Test Suite Entry Point
+```
 
-- **Data Models:**
-  - Uses Pydantic to define:
-    - `ModelInformation`: Stores model details.
-    - `Input`: Represents an OpenAI-compatible request.
-    - `Output`: Represents the response.
-    - `Message`: A message in the request.
+# Installation
 
-- **AutoGen Workflow:**
-  - Defines an interaction pattern between agents, such as `UserProxy` and AI agents like fictional comedians. Messages are processed via queues for streaming.
+### Prerequisites
 
-- **Queue Management:**
-  - Ensures real-time response by queueing intermediate messages for streaming to the client.
+- [Rust](https://www.rust-lang.org/tools/install) (latest stable)
+- Cargo
 
-- **Streaming Logic:**
-  - Uses **monkey patching** to modify the behavior of functions to stream responses.
+### Setup
 
----
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/lgcorzo/fastapi-autogen-team.git
+    cd fastapi-autogen-team
+    ```
 
-### 5. **Request Handling**
+2.  **Install dependencies**:
+    ```bash
+    sudo apt-get update
+    sudo apt-get install -y build-essential pkg-config libssl-dev
+    ```
 
-- **Serve Autogen:**
-  - Processes client requests, creating AutoGen workflows for streaming or non-streaming responses.
-- **Streaming Response:**
-  - Server-Sent Events (SSE) are implemented to send real-time updates for streaming requests.
-- **Non-Streaming Response:**
-  - A full response is returned in a single payload.
+3.  **Build the project**:
+    ```bash
+    cargo build --release
+    ```
 
----
+4.  **Run the service**:
+    ```bash
+    cargo run
+    ```
+    The server will start on `http://127.0.0.1:4100` by default.
 
-### 6. **Performance Optimization**
+# Configuration
 
-- The project uses **uvicorn** for improved scalability and efficiency, enabling multi-worker setups for FastAPI applications.
+The service is configured via environment variables. Create a `.env` file or export them directly:
 
----
+| Variable | Description |
+|----------|-------------|
+| `LITELLM_API_KEY` | API Key for the LLM backend (LiteLLM/OpenAI) |
+| `LITELLM_BASE_URL` | Base URL for the LLM API |
+| `R2R_URL` | URL for the R2R backend |
+| `R2R_USER` | R2R Username |
+| `R2R_PWD` | R2R Password |
+| `JIRA_INSTANCE_URL` | Your Jira Cloud URL (e.g., https://site.atlassian.net) |
+| `JIRA_USERNAME` | Jira account email |
+| `JIRA_API_TOKEN` | Jira API Token |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins |
 
-### 7. **Testing**
+# Usage
 
-- **Testing the Server:**
-  - Includes examples using `curl` to query the server for chat completions.
-- **Response Format:**
-  - Outputs data in a format compatible with OpenAI, supporting real-time updates for agent interactions.
-
----
-
-### 8. **Conclusion**
-
-Summarizes the significance of the streaming interface for enabling real-time interaction with OpenAI-compatible APIs. Links to additional resources like GitHub, AutoGen documentation, and FastAPI guides are provided.
-
----
-
-# Docker Image Build and Okteto Deployment Walkthrough
-
-Successfully built the `fastapi-autogen-team` Docker image and deployed it to the `llm-apps` namespace using Okteto.
-
-## Changes Made
-
-### build
-
-- Updated `okteto.yaml` to use the image `localhost:32000/fastapi-autogen-team:latest`.
-- Used `poetry run invoke containers.build` to build the Python package and Docker image.
-- Tagged and pushed the image to the local MicroK8s registry.
-
-## Verification Results
-
-### Build Verification
-
-The image was successfully built and pushed:
+### Chat Completions
 
 ```bash
-docker images | grep fastapi-autogen-team
-localhost:32000/fastapi-autogen-team   latest               97643934a37a   2 minutes ago   810MB
+curl -X POST "http://localhost:4100/autogen/api/v1beta/chat/completions" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "model": "gpt-4o",
+       "messages": [{"role": "user", "content": "Search for progress on EPIC-123 in Jira and related docs in R2R."}]
+     }'
 ```
 
-### Deployment Verification
-
-The pod is running in the `llm-apps` namespace:
+### Models Information
 
 ```bash
-kubectl get pods -n llm-apps | grep fastapi-autogen-team
-fastapi-autogen-team-okteto-767ffb6bbc-492dz   1/1     Running   0              2m
+curl http://localhost:4100/autogen/api/v1beta/models
 ```
 
-The development environment is active with port forwarding:
+# Testing and Quality Assurance
 
-- **Port Forwarding**: 8000 -> 8000 (Note: The app may need to be started manually in the Okteto shell or `okteto.yaml` updated to auto-start).
+The project follows a **Domain-Driven Design (DDD)** testing strategy, separating concerns into four distinct categories:
 
-## How to use
-
-Run `okteto up` to enter the development environment. Inside the shell, you can start the application:
-
+### 1. Unit Tests
+Isolated tests for individual components (Domain logic, DTOs, Tool mapping) with full mocking of dependencies.
 ```bash
-python -m fastapi_autogen_team.main
+cargo test --test unit_tests
 ```
 
-Or use the provided `run.sh` if environment variables are set.
+### 2. Integration Tests
+Verifies multi-component interactions and API contracts. Only external services are mocked using Mockito.
+```bash
+cargo test --test integration_tests
+```
 
-## References:
+### 3. Security Tests
+Focused on security headers, CORS policies, and input sanitization (payload size limits, JSON injection, empty content).
+```bash
+cargo test --test integration_tests security
+```
 
-https://github.com/lgcorzo/fastapi-autogen-team.wiki.git
-https://newsletter.victordibia.com/p/integrating-autogen-agents-into-your
-https://medium.com/@moustafa.abdelbaky/building-an-openai-compatible-streaming-interface-using-server-sent-events-with-fastapi-and-8f014420bca7
+### 4. Production Smoke Tests
+Zero-mock tests that verify live connectivity to LLM, Jira, and R2R. **Warning: Consumes real tokens.**
+```bash
+cargo test --test integration_tests smoke -- --ignored --nocapture
+```
+
+### Recommended Order
+For new developers, we recommend running the suites in the following order:
+1. `unit_tests`
+2. `integration_tests` (Standard)
+3. `integration_tests` (Security)
+4. `integration_tests` (Smoke)
+
+### Running Everything (Standard)
+To run all suites (excluding ignored smoke tests):
+```bash
+cargo test
+```
+
+# Automated Checks (CI)
+
+This project uses GitHub Actions to ensure code quality and stability. Every pull request and push to the `main` branch triggers the following checks:
+
+1.  **Format Check**: Ensures all code follows the Rust standard formatting.
+    ```bash
+    cargo fmt --check
+    ```
+2.  **Linting**: Uses Clippy to catch common mistakes and enforce best practices across all targets (library, binary, and tests).
+    ```bash
+    cargo clippy --all-targets -- -D warnings
+    ```
+3.  **Tests**: Executes the full unit and integration test suite (excluding smoke tests).
+    ```bash
+    cargo test --test unit_tests --test integration_tests
+    ```
+
+
+### Debugging
+
+- **Logging**: The application uses `tracing`. Control log verbosity with `RUST_LOG`:
+  ```bash
+  RUST_LOG=debug cargo run
+  ```
+- **Backtraces**: For detailed error stack traces:
+  ```bash
+  RUST_BACKTRACE=1 cargo run
+  ```
+- **Live Logs**: If running in the background, monitor `server.log`:
+  ```bash
+  tail -f server.log
+  ```
+
+# Deployment
+
+
+### Kubernetes
+
+The service is optimized for Kubernetes. Ensure environment variables (see [Configuration](#configuration)) are provided via ConfigMaps or Secrets.
+
+# Development in Kubernetes
+
+To develop directly inside your Kubernetes cluster, we recommend using [Okteto](https://www.okteto.com/).
+
+1.  **Start Development Mode**: `okteto up`
+2.  **Inside the Okteto shell**: `cargo run`
+
+# References
+
+- [Rig Documentation](https://0xplayground.github.io/rig/)
+- [Axum Documentation](https://docs.rs/axum/latest/axum/)
+- [LiteLLM](https://docs.litellm.ai/)

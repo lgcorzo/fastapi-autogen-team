@@ -1,21 +1,16 @@
-# Backlog for Class Diagram Implementation
+# Project Documentation Home
 
-- [Backlog for Class Diagram Implementation](#backlog-for-class-diagram-implementation)
-  - [**Features/packages**](#featurespackages)
-    - [**FE: main**](#fe-main)
-    - [**FE: Tasks for CI/CD**](#fe-tasks-for-cicd)
-  - [UML packages relations](#uml-packages-relations)
-- [📘 RAG with Confluence (AutoGen v2)](#-rag-with-confluence-autogen-v2)
-  - [🎯 Objective](#-objective)
-  - [🔐 Prerequisites](#-prerequisites)
-  - [🧱 `confluence_search_tool.py`: AutoGen Tool Example](#-confluence_search_toolpy-autogen-tool-example)
-  - [🤖 Integrating with an AutoGen Agent](#-integrating-with-an-autogen-agent)
-  - [🧪 Example Usage](#-example-usage)
-  - [🧠 CQL Translator Prompt Template (Agent)](#-cql-translator-prompt-template-agent)
-    - [Usage Example](#usage-example)
-  - [✅ Next Steps](#-next-steps)
+Welcome to the `fastapi-autogen-team` documentation. This project has been refactored into a high-performance Rust service following Domain-Driven Design (DDD) principles.
+
+## 🏗️ Rust Service Architecture
+
+For a deep dive into the system structure, layers, and execution flows, please visit:
+- **[Detailed Architecture Guide](architecture_detailed.md)**: Explains the DDD layers, structural UML, and multi-agent execution sequence.
 
 ---
+
+# Backlog for Class Diagram Implementation (Legacy Python)
+
 
 ## **Features/packages**
 
@@ -256,6 +251,45 @@ Then use it like this:
 query = "Show me documents about laser failures in the MANUALS space"
 CQL_translator.generate_reply(messages=[{"role": "user", "content": query}])
 ```
+
+---
+
+## 🚀 Getting Started & Testing
+
+To ensure the system is functioning correctly, follow this recommended test execution order:
+
+1.  **Unit Tests**: Verify individual components and domain logic.
+    ```bash
+    cargo test --test unit_tests
+    ```
+2.  **Integration Tests**: Verify API contracts and component interactions.
+    ```bash
+    cargo test --test integration_tests
+    ```
+3.  **Security Tests**: Specifically verify sanitization and rejection logic.
+    ```bash
+    cargo test --test integration_tests security
+    ```
+4.  **Smoke Tests (Live)**: Verify connectivity to real infrastructure (LiteLLM, Jira, R2R).
+    ```bash
+    cargo test --test integration_tests smoke -- --ignored --nocapture
+    ```
+
+---
+
+## 🖼️ Image Generation
+
+This project uses **Mermaid** for all architectural and flow diagrams.
+
+### Diagrams
+To update or generate static images from the diagrams:
+1.  Copy the Mermaid code block from the documentation.
+2.  Paste it into the [Mermaid Live Editor](https://mermaid.live/).
+3.  Download the result as PNG or SVG and place it in the `image/` directory if needed for external use.
+
+### Assets & Banners
+The project banner and assets were generated using AI-driven imaging tools. To generate or update assets:
+- Use a tool like **Antigravity** (AI Coding Assistant) with descriptive prompts (e.g., "Minimalist banner for a high-performance Rust multi-agent service, following DDD principles").
 
 ---
 

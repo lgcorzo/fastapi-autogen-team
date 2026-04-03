@@ -3,9 +3,7 @@ description: Setup for project workflows
 runs:
   using: composite
   steps:
-    - run: pipx install invoke poetry
-      shell: bash
-    - uses: actions/setup-python@v5
+    - uses: dtolnay/rust-toolchain@stable
       with:
-        python-version: 3.12
-        cache: poetry
+        components: rustfmt, clippy
+    - uses: Swatinem/rust-cache@v2

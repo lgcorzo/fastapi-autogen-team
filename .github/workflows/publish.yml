@@ -5,6 +5,7 @@ on:
     types:
       - edited
       - published
+  workflow_dispatch:
 
 env:
   DOCKER_IMAGE: lgcorzo/fastapi-autogen-team
@@ -29,16 +30,17 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/setup
 
-      - name: Install dependencies (with docs extras)
-        run: poetry install --with docs
-
       - name: Generate documentation
-        run: poetry run invoke docs
+        run: cargo doc --no-deps --all-features
+
+      - name: Fix permissions
+        run: |
+          chmod -v -R +rX "target/doc/" | head -n 20
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.7.3
         with:
-          folder: docs/
+          folder: target/doc/
           branch: gh-pages
 
   # Job para construir y publicar la imagen Docker
@@ -49,15 +51,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup environment
-        uses: ./.github/actions/setup
-
-      - name: Install dependencies (with dev extras)
-        run: poetry install --with dev
-
-      - name: Run packaging script
-        run: poetry run invoke packages
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
