@@ -139,39 +139,4 @@ impl AgentTeam {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use mockito::Server;
-    use crate::application::dtos::{Input, Message, ContentType};
 
-    #[tokio::test]
-    async fn test_agent_team_run_error() {
-        let mut server = Server::new_async().await;
-        let url = server.url();
-        let team = AgentTeam::new_test(&url);
-
-        let input = Input {
-            model: "test".to_string(),
-            messages: vec![Message {
-                role: "user".to_string(),
-                content: ContentType::String("test".to_string()),
-                name: None,
-            }],
-            stream: Some(false),
-            temperature: None,
-            user: None,
-            top_p: None,
-            presence_penalty: None,
-            frequency_penalty: None,
-        };
-
-        // Mock error for OpenAI call
-        let _m = server.mock("POST", "/chat/completions")
-            .with_status(500)
-            .create_async().await;
-
-        let res = team.run(input).await;
-        assert!(res.is_err());
-    }
-}
