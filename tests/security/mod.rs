@@ -98,3 +98,4 @@ async fn test_header_injection_sanitization() {
     // Verify that the http crate itself prevents header injection by returning an error
     assert!(res.is_err());
 }
+pub mod sanitization_test;

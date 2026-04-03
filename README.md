@@ -94,20 +94,20 @@ sequenceDiagram
 ```text
 src/
 ├── application/         # DTOs and Shared Models
-│   └── dtos.rs
 ├── domain/              # Core Business Logic & Orchestration
-│   └── agent/
-│       └── team.rs      # AgentTeam implementation
 ├── infrastructure/      # External Clients & Tools
-│   ├── tools/           # Jira, R2R, SearchTool
-│   └── telemetry.rs     # OTEL Setup
 ├── interface/           # HTTP Boundary
-│   └── http/
-│       ├── handlers.rs  # Axum Handlers
-│       ├── middleware.rs# Security/CORS
-│       └── routes.rs    # Router & AppState
 ├── lib.rs               # Library Entry Point
 └── main.rs              # Application Entry Point
+
+tests/                   # DDD Testing Suite
+├── unit/                # Isolated Component Tests (Domain, App, Infra)
+├── integration/         # Multi-component API & Workflow Tests
+├── smoke/               # Zero-mock Production Tests
+├── security/            # Security, Auth, and Sanitization Tests
+├── common/              # Shared Test Utilities
+├── unit_tests.rs        # Unit Test Suite Entry Point
+└── integration_tests.rs # Integration Test Suite Entry Point
 ```
 
 # Installation
@@ -177,19 +177,40 @@ curl -X POST "http://localhost:4100/autogen/api/v1beta/chat/completions" \
 curl http://localhost:4100/autogen/api/v1beta/models
 ```
 
-# Testing and Debugging
+# Testing and Quality Assurance
 
-### Running Tests
+The project follows a **Domain-Driven Design (DDD)** testing strategy, separating concerns into four distinct categories:
 
-To run all tests (unit, integration, and security):
+### 1. Unit Tests
+Isolated tests for individual components (Domain logic, DTOs, Tool mapping) with full mocking of dependencies.
+```bash
+cargo test --test unit_tests
+```
+
+### 2. Integration Tests
+Verifies multi-component interactions and API contracts. Only external services are mocked using Mockito.
+```bash
+cargo test --test integration_tests
+```
+
+### 3. Security Tests
+Focused on security headers, CORS policies, and input sanitization (payload size limits, JSON injection).
+```bash
+cargo test --test integration_tests security
+```
+
+### 4. Production Smoke Tests
+Zero-mock tests that verify live connectivity to LLM, Jira, and R2R. **Warning: Consumes real tokens.**
+```bash
+cargo test --test integration_tests smoke -- --ignored --nocapture
+```
+
+### Running Everything
+To run all suites (excluding ignored smoke tests):
 ```bash
 cargo test
 ```
 
-To run a specific test file:
-```bash
-cargo test --test security_tests
-```
 
 ### Debugging
 
