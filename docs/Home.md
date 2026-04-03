@@ -1,21 +1,16 @@
-# Backlog for Class Diagram Implementation
+# Project Documentation Home
 
-- [Backlog for Class Diagram Implementation](#backlog-for-class-diagram-implementation)
-  - [**Features/packages**](#featurespackages)
-    - [**FE: main**](#fe-main)
-    - [**FE: Tasks for CI/CD**](#fe-tasks-for-cicd)
-  - [UML packages relations](#uml-packages-relations)
-- [📘 RAG with Confluence (AutoGen v2)](#-rag-with-confluence-autogen-v2)
-  - [🎯 Objective](#-objective)
-  - [🔐 Prerequisites](#-prerequisites)
-  - [🧱 `confluence_search_tool.py`: AutoGen Tool Example](#-confluence_search_toolpy-autogen-tool-example)
-  - [🤖 Integrating with an AutoGen Agent](#-integrating-with-an-autogen-agent)
-  - [🧪 Example Usage](#-example-usage)
-  - [🧠 CQL Translator Prompt Template (Agent)](#-cql-translator-prompt-template-agent)
-    - [Usage Example](#usage-example)
-  - [✅ Next Steps](#-next-steps)
+Welcome to the `fastapi-autogen-team` documentation. This project has been refactored into a high-performance Rust service following Domain-Driven Design (DDD) principles.
+
+## 🏗️ Rust Service Architecture
+
+For a deep dive into the system structure, layers, and execution flows, please visit:
+- **[Detailed Architecture Guide](architecture_detailed.md)**: Explains the DDD layers, structural UML, and multi-agent execution sequence.
 
 ---
+
+# Backlog for Class Diagram Implementation (Legacy Python)
+
 
 ## **Features/packages**
 
