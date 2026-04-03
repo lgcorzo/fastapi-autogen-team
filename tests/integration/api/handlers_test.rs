@@ -2,6 +2,7 @@ use fastapi_autogen_team::interface::http::handlers::{docs_redirect, get_models,
 use fastapi_autogen_team::interface::http::routes::AppState;
 use fastapi_autogen_team::application::dtos::{Input, Message, ContentType};
 use fastapi_autogen_team::domain::agent::team::AgentTeam;
+use fastapi_autogen_team::interface::http::validation::ValidatedJson;
 use axum::{
     extract::State,
     Json,
@@ -46,7 +47,7 @@ async fn test_route_query_no_stream() {
     let mut headers = HeaderMap::new();
     headers.insert("authorization", "Bearer test".parse().unwrap());
 
-    let res = route_query(State(state), headers, Json(request)).await;
+    let res = route_query(State(state), headers, ValidatedJson(request)).await;
     let response = res.into_response();
     assert_eq!(response.status(), StatusCode::OK);
 }

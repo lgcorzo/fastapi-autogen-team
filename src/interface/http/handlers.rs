@@ -11,6 +11,7 @@ use serde_json::json;
 
 use crate::interface::http::routes::AppState;
 use crate::application::dtos::Input;
+use crate::interface::http::validation::ValidatedJson;
 
 pub async fn docs_redirect() -> impl IntoResponse {
     (StatusCode::SEE_OTHER, [("Location", "https://autogen-team.com/docs")])
@@ -37,10 +38,18 @@ pub async fn get_models() -> impl IntoResponse {
 pub async fn route_query(
     State(state): State<Arc<AppState>>,
     headers: HeaderMap,
-    Json(request): Json<Input>,
+    ValidatedJson(request): ValidatedJson<Input>,
 ) -> impl IntoResponse {
     // Basic Header Sanitization (example: carry over authorization if needed)
     let _auth = headers.get("authorization");
+    
+    // Validation: Empty messages
+    if request.messages.is_empty() {
+        return (StatusCode::UNPROCESSABLE_ENTITY, Json(json!({
+            "error": "Unprocessable Entity",
+            "details": "messages list cannot be empty"
+        }))).into_response();
+    }
     
     if request.stream.unwrap_or(false) {
         let stream = state.team.run_stream(request).await.unwrap();
