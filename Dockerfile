@@ -4,7 +4,7 @@ FROM rust:latest AS builder
 # Create a dummy project to cache dependencies
 WORKDIR /usr/src/app
 COPY Cargo.toml Cargo.lock ./
-RUN mkdir src && echo "fn main() {}" > src/main.rs
+RUN mkdir src && touch src/lib.rs && echo "fn main() {}" > src/main.rs
 RUN cargo build --release
 RUN rm -f target/release/deps/fastapi_autogen_team*
 
