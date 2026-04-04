@@ -8,14 +8,16 @@ async fn test_get_r2r_results_success() {
     let mut server = Server::new_async().await;
     let url = server.url();
 
-    let _m_login = server.mock("POST", "/v3/users/login")
+    let _m_login = server
+        .mock("POST", "/v3/users/login")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(r#"{"results": {"access_token": {"token": "test_token"}}}"#)
         .create_async()
         .await;
 
-    let _m_rag = server.mock("POST", "/v3/retrieval/rag")
+    let _m_rag = server
+        .mock("POST", "/v3/retrieval/rag")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(r#"{"results": {"generated_answer": "Test RAG Answer"}}"#)
@@ -35,11 +37,13 @@ async fn test_get_jira_results_success() {
     let mut server = Server::new_async().await;
     let url = server.url();
 
-    let _m_jira = server.mock("GET", "/rest/api/2/search")
+    let _m_jira = server
+        .mock("GET", "/rest/api/2/search")
         .match_query(mockito::Matcher::Any)
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{
+        .with_body(
+            r#"{
             "issues": [
                 {
                     "key": "TEST-1",
@@ -48,7 +52,8 @@ async fn test_get_jira_results_success() {
                     }
                 }
             ]
-        }"#)
+        }"#,
+        )
         .create_async()
         .await;
 
@@ -65,7 +70,8 @@ async fn test_get_jira_results_no_issues() {
     let mut server = Server::new_async().await;
     let url = server.url();
 
-    let _m_jira = server.mock("GET", "/rest/api/2/search")
+    let _m_jira = server
+        .mock("GET", "/rest/api/2/search")
         .match_query(mockito::Matcher::Any)
         .with_status(200)
         .with_header("content-type", "application/json")
