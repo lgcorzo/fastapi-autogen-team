@@ -59,21 +59,40 @@ pub async fn route_query(
     }
 
     if request.stream.unwrap_or(false) {
-        let stream = state.team.run_stream(request).await.unwrap();
-        let sse_stream = stream.map(|res| {
-            let content = res.unwrap_or_else(|e| format!("Error: {}", e));
-            let chunk = json!({
-                "choices": [{
-                    "delta": { "content": content },
-                    "index": 0,
-                    "finish_reason": if content.contains("TERMINATE") { Some("stop") } else { None }
-                }]
-            });
-            Ok::<Event, Infallible>(Event::default().data(chunk.to_string()))
-        });
-        return Sse::new(sse_stream)
-            .keep_alive(axum::response::sse::KeepAlive::default())
-            .into_response();
+        match state.team.run_stream(request).await {
+            Ok(stream) => {
+                let sse_stream = stream.map(|res| {
+                    let content = res.unwrap_or_else(|e| format!("Error: {}", e));
+                    let chunk = json!({
+                        "choices": [{
+                            "delta": { "content": content },
+                            "index": 0,
+                            "finish_reason": if content.contains("TERMINATE") { Some("stop") } else { None }
+                        }]
+                    });
+                    Ok::<Event, Infallible>(Event::default().data(chunk.to_string()))
+                });
+                return Sse::new(sse_stream)
+                    .keep_alive(axum::response::sse::KeepAlive::default())
+                    .into_response();
+            }
+            Err(e) => {
+                let error_msg = format!("Error initializing stream: {}", e);
+                let chunk = json!({
+                    "choices": [{
+                        "delta": { "content": error_msg },
+                        "index": 0,
+                        "finish_reason": Some("stop")
+                    }]
+                });
+                let once_stream = futures::stream::once(async move {
+                    Ok::<Event, Infallible>(Event::default().data(chunk.to_string()))
+                });
+                return Sse::new(once_stream)
+                    .keep_alive(axum::response::sse::KeepAlive::default())
+                    .into_response();
+            }
+        }
     }
 
     let response = state
@@ -104,3 +123,4 @@ pub async fn route_query(
 
     Json(output).into_response()
 }
+
