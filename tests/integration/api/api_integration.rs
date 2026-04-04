@@ -116,15 +116,15 @@ async fn test_chat_completions_route() {
 
     // 3. R2R Mocks
     let _m_r2r_login = server
-        .mock("POST", "/v2/users/login")
+        .mock("POST", "/v3/users/login")
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{"results": {"access_token": "mock_token"}}"#)
+        .with_body(r#"{"results": {"access_token": {"token": "mock_token"}}}"#)
         .create_async()
         .await;
 
     let _m_r2r_rag = server
-        .mock("POST", "/v2/retrieval/rag")
+        .mock("POST", "/v3/retrieval/rag")
         .with_status(200)
         .with_header("content-type", "application/json")
         .with_body(r#"{"results": {"generated_answer": "Mocked R2R results"}}"#)
