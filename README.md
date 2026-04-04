@@ -116,6 +116,8 @@ src/
 tests/                   # DDD Testing Suite
 ├── unit/                # Isolated Component Tests (Domain, App, Infra)
 ├── integration/         # Multi-component API & Workflow Tests
+│   ├── tools.rs         # Specific tests for R2R and Jira tools
+│   └── ...
 ├── smoke/               # Zero-mock Production Tests
 ├── security/            # Security, Auth, and Sanitization Tests
 ├── common/              # Shared Test Utilities
@@ -217,6 +219,13 @@ Zero-mock tests that verify live connectivity to LLM, Jira, and R2R. **Warning: 
 ```bash
 cargo test --test integration_tests smoke -- --ignored --nocapture
 ```
+
+### 5. Mock Services for Local Debugging
+To debug tool interactions locally without connecting to real services, you can run the standalone mock server:
+```bash
+./scripts/start_mocks.sh
+```
+This script starts a mock server on port 8081 and provides the necessary environment variables to point the main application to it.
 
 ### Recommended Order
 For new developers, we recommend running the suites in the following order:
