@@ -19,10 +19,10 @@ async fn test_get_r2r_results_success() {
         .await;
 
     let _m_rag = server
-        .mock("POST", "/v3/retrieval/rag")
+        .mock("POST", "/v3/retrieval/search")
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{"results": {"generated_answer": "Mocked answer"}}"#)
+        .with_body(r#"{"results": {"chunk_search_results": [{"text": "Mocked answer"}]}}"#)
         .create_async()
         .await;
 
