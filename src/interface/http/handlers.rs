@@ -123,4 +123,3 @@ pub async fn route_query(
 
     Json(output).into_response()
 }
-

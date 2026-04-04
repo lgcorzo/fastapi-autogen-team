@@ -107,7 +107,6 @@ impl AgentTeam {
         Ok(final_response)
     }
 
-
     pub async fn run_stream(
         &self,
         input: Input,
@@ -195,7 +194,6 @@ impl AgentTeam {
             Err(e) => Err(anyhow::anyhow!(e)),
         }))
     }
-
 
     pub fn new_mock() -> Self {
         let client = openai::Client::builder()
