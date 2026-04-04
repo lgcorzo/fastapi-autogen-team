@@ -123,11 +123,11 @@ async fn test_chat_completions_route() {
         .create_async()
         .await;
 
-    let _m_r2r_rag = server
-        .mock("POST", "/v3/retrieval/rag")
+    let _m_r2r_search = server
+        .mock("POST", "/v3/retrieval/search")
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{"results": {"generated_answer": "Mocked R2R results"}}"#)
+        .with_body(r#"{"results": {"chunk_search_results": [{"text": "Mocked R2R search results"}]}}"#)
         .create_async()
         .await;
 
