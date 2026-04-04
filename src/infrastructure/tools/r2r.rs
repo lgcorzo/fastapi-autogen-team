@@ -15,9 +15,28 @@ pub async fn get_r2r_results(url: &str, query: &str) -> anyhow::Result<String> {
         .send()
         .await?;
 
-    let login_data: serde_json::Value = login_res.json().await?;
-    let token = login_data["results"]["access_token"]["token"]
+    let login_status = login_res.status();
+    let login_body = login_res.text().await?;
+
+    if !login_status.is_success() {
+        anyhow::bail!(
+            "R2R login failed with status {}. Body: {}",
+            login_status,
+            login_body
+        );
+    }
+
+    let login_data: serde_json::Value = serde_json::from_str(&login_body).map_err(|e| {
+        anyhow::anyhow!(
+            "Failed to decode R2R login response: {}. Body: {}",
+            e,
+            login_body
+        )
+    })?;
+
+    let token = login_data["results"]["access_token"]
         .as_str()
+        .or_else(|| login_data["results"]["access_token"]["token"].as_str())
         .ok_or_else(|| {
             anyhow::anyhow!(
                 "Failed to retrieve access token from R2R. Response was: {}",

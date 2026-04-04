@@ -39,7 +39,7 @@ async fn test_production_pipeline_smoke() {
                 messages: vec![Message {
                     role: "user".to_string(),
                     content: ContentType::String(
-                        "que es el mlops y como se defien un proyecto por pasos".to_string(),
+                        "que es el mlops y como se define un proyecto por pasos".to_string(),
                     ),
                     name: None,
                 }],
