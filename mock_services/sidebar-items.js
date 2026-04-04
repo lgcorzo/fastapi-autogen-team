@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["jira_search","main","r2r_login","r2r_rag"],"struct":["AppState","JiraQueryParams"]};
+window.SIDEBAR_ITEMS = {"fn":["jira_search","main","r2r_login","r2r_rag","r2r_search"],"struct":["AppState","JiraQueryParams"]};
