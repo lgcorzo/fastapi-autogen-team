@@ -127,7 +127,9 @@ async fn test_chat_completions_route() {
         .mock("POST", "/v3/retrieval/search")
         .with_status(200)
         .with_header("content-type", "application/json")
-        .with_body(r#"{"results": {"chunk_search_results": [{"text": "Mocked R2R search results"}]}}"#)
+        .with_body(
+            r#"{"results": {"chunk_search_results": [{"text": "Mocked R2R search results"}]}}"#,
+        )
         .create_async()
         .await;
 
