@@ -26,6 +26,7 @@ async fn main() {
         // R2R Mocks
         .route("/v3/users/login", post(r2r_login))
         .route("/v3/retrieval/rag", post(r2r_rag))
+        .route("/v3/retrieval/search", post(r2r_search))
         // Jira Mocks
         .route("/rest/api/2/search", get(jira_search))
         .with_state(state);
@@ -52,6 +53,22 @@ async fn r2r_rag(Json(payload): Json<Value>) -> Json<Value> {
     Json(json!({
         "results": {
             "generated_answer": "This is a mocked R2R RAG response for internal documentation search."
+        }
+    }))
+}
+
+async fn r2r_search(Json(payload): Json<Value>) -> Json<Value> {
+    tracing::info!("R2R search called with: {}", payload);
+    Json(json!({
+        "results": {
+            "chunk_search_results": [
+                {
+                    "text": "This is the first piece of mocked search result content from R2R."
+                },
+                {
+                    "text": "This is the second piece of mocked search result content from R2R, providing more context."
+                }
+            ]
         }
     }))
 }

@@ -44,10 +44,10 @@ pub async fn get_r2r_results(url: &str, query: &str) -> anyhow::Result<String> {
             )
         })?;
 
-    // 2. Execute RAG query
-    let rag_url = format!("{}/v3/retrieval/rag", url.trim_end_matches('/'));
-    let rag_res = client
-        .post(&rag_url)
+    // 2. Execute search query
+    let search_url = format!("{}/v3/retrieval/search", url.trim_end_matches('/'));
+    let search_res = client
+        .post(&search_url)
         .bearer_auth(token)
         .json(&json!({
             "query": query,
@@ -61,30 +61,41 @@ pub async fn get_r2r_results(url: &str, query: &str) -> anyhow::Result<String> {
         .send()
         .await?;
 
-    let status = rag_res.status();
-    let body_text = rag_res.text().await?;
+    let status = search_res.status();
+    let body_text = search_res.text().await?;
 
     if !status.is_success() {
         anyhow::bail!(
-            "R2R RAG query failed with status {}. Body: {}",
+            "R2R search query failed with status {}. Body: {}",
             status,
             body_text
         );
     }
 
-    let rag_data: serde_json::Value = serde_json::from_str(&body_text).map_err(|e| {
+    let search_data: serde_json::Value = serde_json::from_str(&body_text).map_err(|e| {
         anyhow::anyhow!(
-            "Failed to decode R2R RAG response: {}. Body: {}",
+            "Failed to decode R2R search response: {}. Body: {}",
             e,
             body_text
         )
     })?;
 
-    let search_results = rag_data["results"]["generated_answer"]
-        .as_str()
-        .or_else(|| rag_data["generated_answer"].as_str())
-        .unwrap_or("No internal r2r result found")
-        .to_string();
+    // 3. Process search results
+    let mut combined_results = String::new();
+    if let Some(chunks) = search_data["results"]["chunk_search_results"].as_array() {
+        for chunk in chunks {
+            if let Some(text) = chunk["text"].as_str() {
+                if !combined_results.is_empty() {
+                    combined_results.push_str("\n\n---\n\n");
+                }
+                combined_results.push_str(text);
+            }
+        }
+    }
 
-    Ok(search_results)
+    if combined_results.is_empty() {
+        combined_results = "No internal r2r result found".to_string();
+    }
+
+    Ok(combined_results)
 }
