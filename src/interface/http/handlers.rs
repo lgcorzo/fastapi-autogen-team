@@ -62,7 +62,13 @@ pub async fn route_query(
         match state.team.run_stream(request).await {
             Ok(stream) => {
                 let sse_stream = stream.map(|res| {
-                    let content = res.unwrap_or_else(|e| format!("Error: {}", e));
+                    let content = match res {
+                        Ok(content) => content,
+                        Err(e) => {
+                            tracing::error!("Stream error: {}", e);
+                            "An error occurred while streaming the response.".to_string()
+                        }
+                    };
                     let chunk = json!({
                         "choices": [{
                             "delta": { "content": content },
@@ -77,10 +83,10 @@ pub async fn route_query(
                     .into_response();
             }
             Err(e) => {
-                let error_msg = format!("Error initializing stream: {}", e);
+                tracing::error!("Error initializing stream: {}", e);
                 let chunk = json!({
                     "choices": [{
-                        "delta": { "content": error_msg },
+                        "delta": { "content": "An error occurred while processing the request." },
                         "index": 0,
                         "finish_reason": Some("stop")
                     }]
@@ -95,11 +101,20 @@ pub async fn route_query(
         }
     }
 
-    let response = state
-        .team
-        .run(request)
-        .await
-        .unwrap_or_else(|e| format!("Error: {}", e));
+    let response = match state.team.run(request).await {
+        Ok(res) => res,
+        Err(e) => {
+            tracing::error!("Error running team: {}", e);
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({
+                    "error": "Internal Server Error",
+                    "details": "An error occurred while processing the request."
+                })),
+            )
+                .into_response();
+        }
+    };
 
     let output = json!({
         "id": "chatcmpl-default",
