@@ -8,6 +8,7 @@ use futures::StreamExt;
 use serde_json::json;
 use std::convert::Infallible;
 use std::sync::Arc;
+use tracing::error;
 
 use crate::application::dtos::Input;
 use crate::interface::http::routes::AppState;
@@ -62,7 +63,13 @@ pub async fn route_query(
         match state.team.run_stream(request).await {
             Ok(stream) => {
                 let sse_stream = stream.map(|res| {
-                    let content = res.unwrap_or_else(|e| format!("Error: {}", e));
+                    let content = match res {
+                        Ok(c) => c,
+                        Err(e) => {
+                            error!("Stream chunk error: {}", e);
+                            "An internal error occurred.".to_string()
+                        }
+                    };
                     let chunk = json!({
                         "choices": [{
                             "delta": { "content": content },
@@ -77,7 +84,8 @@ pub async fn route_query(
                     .into_response();
             }
             Err(e) => {
-                let error_msg = format!("Error initializing stream: {}", e);
+                error!("Error initializing stream: {}", e);
+                let error_msg = "An internal error occurred.";
                 let chunk = json!({
                     "choices": [{
                         "delta": { "content": error_msg },
@@ -95,11 +103,20 @@ pub async fn route_query(
         }
     }
 
-    let response = state
-        .team
-        .run(request)
-        .await
-        .unwrap_or_else(|e| format!("Error: {}", e));
+    let response = match state.team.run(request).await {
+        Ok(res) => res,
+        Err(e) => {
+            error!("Error running team: {}", e);
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({
+                    "error": "Internal Server Error",
+                    "details": "An internal error occurred."
+                })),
+            )
+                .into_response();
+        }
+    };
 
     let output = json!({
         "id": "chatcmpl-default",
