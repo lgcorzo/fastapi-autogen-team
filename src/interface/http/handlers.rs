@@ -8,7 +8,6 @@ use futures::StreamExt;
 use serde_json::json;
 use std::convert::Infallible;
 use std::sync::Arc;
-use tracing::error;
 
 use crate::application::dtos::Input;
 use crate::interface::http::routes::AppState;
