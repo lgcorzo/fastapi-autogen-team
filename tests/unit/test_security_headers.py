@@ -26,6 +26,10 @@ with (
         assert "strict-transport-security" in response.headers
         assert response.headers["strict-transport-security"] == "max-age=31536000; includeSubDomains"
 
+        # Check for Referrer-Policy
+        assert "referrer-policy" in response.headers
+        assert response.headers["referrer-policy"] == "strict-origin-when-cross-origin"
+
         # Check for Content-Security-Policy
         assert "content-security-policy" in response.headers
         assert (
