@@ -37,6 +37,10 @@ async fn test_security_headers_present() {
         .to_str()
         .unwrap()
         .contains("max-age=31536000"));
+    assert_eq!(
+        response.headers().get("referrer-policy").unwrap(),
+        "strict-origin-when-cross-origin"
+    );
 }
 
 #[tokio::test]
