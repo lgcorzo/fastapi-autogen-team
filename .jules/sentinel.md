@@ -99,3 +99,9 @@
 **Vulnerability:** The application accepted unbounded numeric inputs for `temperature`, `top_p`, `presence_penalty`, and `frequency_penalty` fields in the `Input` API payload. This exposed the system to Denial of Service (DoS) attacks or unpredictable behavior during downstream AI inference if given logically invalid or extremely large values.
 **Learning:** While string and list lengths are commonly limited to prevent DoS, numeric fields must also be strictly bounded to logically valid ranges to prevent downstream errors or excessive resource consumption.
 **Prevention:** Use Pydantic's `Field(ge=..., le=...)` constraints to explicitly restrict all numeric fields to their expected valid ranges (e.g., `temperature` 0.0 to 2.0).
+
+## 2026-04-07 - Prevent Role Spoofing Prompt Injection
+
+**Vulnerability:** The `sanitize_for_prompt` function in `autogen_server.py` mitigated structural delimiter prompt injections (e.g., `\n},\n`) but did not sanitize role indicators (e.g., `System:`, `User:`). This allowed users to inject fake roles into the prompt, overriding system instructions.
+**Learning:** Normalizing prompts by simply concatenating roles and messages (e.g., `f"{m['role']}: {m['text']}"`) leaves the system vulnerable to role spoofing if the text is not sanitized against these specific formatting patterns.
+**Prevention:** In addition to structural delimiters, sanitize user input to break any sequences that mimic the prompt's role definitions. I added a case-insensitive regex substitution (`re.sub(r"(?i)\b(system|user|assistant)\s*:", r"\1 :", text)`) to insert a space before the colon, neutralizing the spoofed role.
