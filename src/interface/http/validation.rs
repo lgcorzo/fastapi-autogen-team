@@ -25,9 +25,16 @@ where
                     StatusCode::PAYLOAD_TOO_LARGE => StatusCode::PAYLOAD_TOO_LARGE,
                     _ => StatusCode::UNPROCESSABLE_ENTITY,
                 };
+
+                let details = if status == StatusCode::PAYLOAD_TOO_LARGE {
+                    "Payload too large. Please send a smaller request.".to_string()
+                } else {
+                    "Invalid JSON payload. Please check your request format.".to_string()
+                };
+
                 let body = Json(serde_json::json!({
                     "error": status.canonical_reason().unwrap_or("Error"),
-                    "details": rejection.to_string()
+                    "details": details
                 }));
                 Err((status, body).into_response())
             }

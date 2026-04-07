@@ -40,8 +40,19 @@ pub fn cors_layer() -> Option<CorsLayer> {
             } else {
                 let origins = origins_str
                     .split(',')
-                    .map(|s| s.trim().parse::<HeaderValue>().unwrap())
+                    .filter_map(|s| {
+                        let trimmed = s.trim();
+                        if trimmed.is_empty() {
+                            None
+                        } else {
+                            trimmed.parse::<HeaderValue>().ok()
+                        }
+                    })
                     .collect::<Vec<_>>();
+
+                if origins.is_empty() {
+                    return None;
+                }
                 cors.allow_origin(AllowOrigin::list(origins))
             };
             return Some(cors);

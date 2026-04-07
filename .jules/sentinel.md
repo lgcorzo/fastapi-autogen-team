@@ -105,3 +105,13 @@
 **Vulnerability:** The application accepted an unbounded dictionary `Dict[str, str]` for the `image_url` property in the `ContentImage` model. This exposed the system to Denial of Service (DoS) attacks via memory exhaustion by allowing attackers to send payloads with massive base64 strings or an enormous number of keys.
 **Learning:** Pydantic's generic typing (like `Dict[str, str]`) provides no length or size constraints. For large, potentially malicious input like base64 image representations, explicitly bounded models are critical to prevent memory starvation and excessive JSON parsing overhead.
 **Prevention:** Replace unbounded dictionary types with strongly typed Pydantic sub-models (e.g., `ImageUrl`). Enforce strict `max_length` constraints on all fields (e.g., `url: str = Field(max_length=5000000)`) to validate and restrict the payload size at the schema level.
+
+## 2025-05-15 - Panic on Malformed CORS Origins
+**Vulnerability:** The application would panic and fail to start if the `ALLOWED_ORIGINS` environment variable contained invalid header values or empty strings (e.g., trailing commas), due to the use of `.unwrap()` on parsed values.
+**Learning:** Using `.unwrap()` when parsing environment variables into sensitive types like `HeaderValue` creates a Denial of Service (startup failure) vector if the configuration is slightly malformed.
+**Prevention:** Use safe parsing with `.filter_map(|s| s.trim().parse().ok())` and verify the resulting list is non-empty before applying the middleware.
+
+## 2025-05-15 - Information Leakage in JSON Validation
+**Vulnerability:** The `ValidatedJson` extractor was returning raw `rejection.to_string()` to the client. This leaked internal details about the expected JSON structure or fragments of the input payload when parsing failed.
+**Learning:** Default error representations from framework extractors (like Axum's `JsonRejection`) often contain internal logic details that should not be exposed to potential attackers.
+**Prevention:** Intercept rejections in custom extractors and return generic, sanitized messages (e.g., "Invalid JSON payload") while logging the full details server-side.

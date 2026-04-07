@@ -15,8 +15,8 @@ async fn test_large_payload_rejection() {
     });
     let app = create_app(state);
 
-    // Create a very large payload (e.g., 10MB)
-    let large_string = "A".repeat(10 * 1024 * 1024);
+    // Create a very large payload (e.g., 2.1MB)
+    let large_string = "A".repeat(2100 * 1024);
     let payload = json!({
         "model": "test",
         "messages": [{"role": "user", "content": large_string}]
@@ -37,9 +37,8 @@ async fn test_large_payload_rejection() {
     // Standard Axum/Tower-HTTP limit is usually around 2MB or similar by default if configured
     // If not configured, it might be OK, but for security, we should check for reasonable limits.
     // Here we check if the service handles it (either OK if under limit or PayloadTooLarge)
-    assert!(
-        response.status() == StatusCode::OK || response.status() == StatusCode::PAYLOAD_TOO_LARGE
-    );
+    // We want to ENFORCE a limit, so it should be PayloadTooLarge for 10MB
+    assert_eq!(response.status(), StatusCode::PAYLOAD_TOO_LARGE);
 }
 
 #[tokio::test]
