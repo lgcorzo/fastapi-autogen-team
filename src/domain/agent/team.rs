@@ -31,7 +31,7 @@ impl AgentTeam {
         let client = self.client.clone().completions_api();
 
         // 1. Planner Agent: Decomposed query (Strictly one-per-line)
-        let planner = client.agent("minimax-m2.7:cloud")
+        let planner = client.agent("ollama/qwen2.5:7b")
             .preamble("You are the Planner. Analyze the user message and break it down into AT MOST 5 focused search queries in English. \
                       Return ONLY the search queries, one per line. \
                       DO NOT return JSON. DO NOT return follow-up questions. DO NOT use markdown formatting. \
@@ -54,7 +54,7 @@ impl AgentTeam {
 
         // 2. RAG Searcher: Execute tools
         let rag_searcher = client
-            .agent("minimax-m2.7:cloud")
+            .agent("ollama/qwen2.5:7b")
             .preamble("You are the RAG_searcher. Use the search tool to find information. Once you have the results, summarize them and stop.")
             .tool(SearchTool)
             .default_max_turns(5)
@@ -89,7 +89,7 @@ impl AgentTeam {
         }
 
         // 3. QA Agent: Final Synthesis
-        let qa = client.agent("minimax-m2.7:cloud")
+        let qa = client.agent("ollama/qwen2.5:7b")
             .preamble("You are the Quality Assurance agent. Synthesize the results into a final response in the user's original language. \
                       Always provide a helpful answer based on the search results provided. \
                       If no relevant information was found, state it clearly. \
@@ -114,7 +114,7 @@ impl AgentTeam {
         let client = self.client.clone().completions_api();
 
         // 1. Planner Agent: Decomposed query (Strictly one-per-line)
-        let planner = client.agent("minimax-m2.7:cloud")
+        let planner = client.agent("ollama/qwen2.5:7b")
             .preamble("You are the Planner. Analyze the user message and break it down into AT MOST 5 focused search queries in English. \
                       Return ONLY the search queries, one per line. \
                       DO NOT return JSON. DO NOT return follow-up questions. DO NOT use markdown formatting. \
@@ -136,7 +136,7 @@ impl AgentTeam {
 
         // 2. RAG Searcher: Execute tools
         let rag_searcher = client
-            .agent("minimax-m2.7:cloud")
+            .agent("ollama/qwen2.5:7b")
             .preamble("You are the RAG_searcher. Use the search tool to find information. Once you have the results, summarize them and stop.")
             .tool(SearchTool)
             .default_max_turns(5)
@@ -171,7 +171,7 @@ impl AgentTeam {
         }
 
         // 3. QA Agent: Final Synthesis (Streaming)
-        let qa = client.agent("minimax-m2.7:cloud")
+        let qa = client.agent("ollama/qwen2.5:7b")
             .preamble("You are the Quality Assurance agent. Synthesize the results into a final response in the user's original language. \
                       Always provide a helpful answer based on the search results provided. \
                       If no relevant information was found, state it clearly. \
