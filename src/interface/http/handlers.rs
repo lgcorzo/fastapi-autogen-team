@@ -77,6 +77,7 @@ pub async fn route_query(
                                 "model": model,
                                 "choices": [{
                                     "delta": {
+                                        "content": format!("<think>[{}] {}</think>\n", stage, message),
                                         "reasoning_content": format!("[{}] {}\n", stage, message)
                                     },
                                     "index": 0,
