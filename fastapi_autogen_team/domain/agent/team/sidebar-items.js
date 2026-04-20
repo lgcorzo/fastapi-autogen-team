@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["AgentTeam"]};
+window.SIDEBAR_ITEMS = {"enum":["AgentEvent"],"struct":["AgentTeam"]};
