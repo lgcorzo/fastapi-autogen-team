@@ -96,9 +96,7 @@ pub async fn route_query(
                         }
 
                         // --- Done event: pipeline fully completed ---
-                        Ok(AgentEvent::Done) => {
-                            Ok(Event::default().data("[DONE]"))
-                        }
+                        Ok(AgentEvent::Done) => Ok(Event::default().data("[DONE]")),
 
                         // --- Error: surface as a delta with error content ---
                         Err(e) => {
