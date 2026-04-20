@@ -93,7 +93,7 @@ impl AgentTeam {
         tracing::info!("Planner queries: {}", queries);
 
         // Robust parsing: Handle accidental JSON structure from model
-        let mut raw_lines: Vec<String> = if queries.trim().starts_with('{') {
+        let raw_lines: Vec<String> = if queries.trim().starts_with('{') {
             match serde_json::from_str::<serde_json::Value>(&queries) {
                 Ok(v) => {
                     if let Some(arr) = v.get("follow_ups").and_then(|f| f.as_array()) {
@@ -211,7 +211,7 @@ impl AgentTeam {
         tracing::info!("Planner queries: {}", queries);
 
         // Robust parsing: Handle accidental JSON structure from model
-        let mut raw_lines: Vec<String> = if queries.trim().starts_with('{') {
+        let raw_lines: Vec<String> = if queries.trim().starts_with('{') {
             match serde_json::from_str::<serde_json::Value>(&queries) {
                 Ok(v) => {
                     if let Some(arr) = v.get("follow_ups").and_then(|f| f.as_array()) {
