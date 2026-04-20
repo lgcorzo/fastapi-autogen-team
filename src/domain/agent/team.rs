@@ -22,6 +22,28 @@ pub enum AgentEvent {
     Done,
 }
 
+/// Returns `true` when a planner output line is a valid standalone search query.
+/// Rejects: empty lines, JSON structural tokens, quoted strings, the literal
+/// TERMINATE keyword, and lines that are too short to be meaningful queries.
+fn is_valid_query_line(line: &str) -> bool {
+    let l = line.trim();
+    if l.len() < 5 {
+        return false;
+    }
+    if l.starts_with('{') || l.starts_with('}') || l.starts_with('[') || l.starts_with(']') {
+        return false;
+    }
+    // Reject JSON key/value fragments (e.g. `"title": "..."`, `"follow_ups":` etc.)
+    if l.starts_with('"') {
+        return false;
+    }
+    // Reject lines that are solely the TERMINATE stop-word
+    if l.eq_ignore_ascii_case("terminate") || l.ends_with("TERMINATE") {
+        return false;
+    }
+    true
+}
+
 pub struct AgentTeam {
     client: openai::Client,
 }
@@ -82,11 +104,7 @@ impl AgentTeam {
         let mut search_tasks = Vec::new();
         for query in queries.lines().take(5) {
             let trimmed = query.trim().to_string();
-            if trimmed.is_empty()
-                || trimmed.starts_with('{')
-                || trimmed.starts_with('}')
-                || trimmed.starts_with('[')
-            {
+            if !is_valid_query_line(&trimmed) {
                 continue;
             }
             let searcher = rag_searcher.clone();
@@ -167,13 +185,12 @@ impl AgentTeam {
         let queries = planner.prompt(&last_message).await?;
         tracing::info!("Planner queries: {}", queries);
 
-        // Collect valid query lines
+        // Collect valid query lines — uses the shared validator to reject JSON
+        // fragments, TERMINATE, and other planner noise.
         let query_lines: Vec<String> = queries
             .lines()
             .map(|l| l.trim().to_string())
-            .filter(|l| {
-                !l.is_empty() && !l.starts_with('{') && !l.starts_with('}') && !l.starts_with('[')
-            })
+            .filter(|l| is_valid_query_line(l))
             .take(5)
             .collect();
 
