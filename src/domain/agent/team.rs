@@ -8,6 +8,7 @@ use rig::providers::openai;
 use rig::streaming::{StreamedAssistantContent, StreamingPrompt};
 use std::env;
 use std::pin::Pin;
+use serde_json;
 
 /// Events emitted by the agent pipeline during SSE streaming.
 ///
@@ -70,7 +71,8 @@ impl AgentTeam {
             .agent("ollama/qwen2.5:7b")
             .preamble(
                 "You are the Planner. Analyze the user message and break it down into AT MOST 5 \
-                 focused search queries in English. Return ONLY the search queries, one per line. \
+                 focused search queries in English. \
+                 CRITICAL: Return ONLY the search queries, one per line. \
                  DO NOT return JSON. DO NOT return follow-up questions. \
                  DO NOT use markdown formatting. If you are done, simply return the queries. \
                  Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?",
@@ -90,6 +92,24 @@ impl AgentTeam {
         let queries = planner.prompt(&last_message).await?;
         tracing::info!("Planner queries: {}", queries);
 
+        // Robust parsing: Handle accidental JSON structure from model
+        let mut raw_lines: Vec<String> = if queries.trim().starts_with('{') {
+            match serde_json::from_str::<serde_json::Value>(&queries) {
+                Ok(v) => {
+                    if let Some(arr) = v.get("follow_ups").and_then(|f| f.as_array()) {
+                        arr.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect()
+                    } else if let Some(arr) = v.get("queries").and_then(|f| f.as_array()) {
+                        arr.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect()
+                    } else {
+                        queries.lines().map(|l| l.trim().to_string()).collect()
+                    }
+                }
+                Err(_) => queries.lines().map(|l| l.trim().to_string()).collect(),
+            }
+        } else {
+            queries.lines().map(|l| l.trim().to_string()).collect()
+        };
+
         // 2. RAG Searcher
         let rag_searcher = client
             .agent("ollama/qwen2.5:7b")
@@ -102,7 +122,7 @@ impl AgentTeam {
             .build();
 
         let mut search_tasks = Vec::new();
-        for query in queries.lines().take(5) {
+        for query in raw_lines.into_iter().take(5) {
             let trimmed = query.trim().to_string();
             if !is_valid_query_line(&trimmed) {
                 continue;
@@ -165,7 +185,8 @@ impl AgentTeam {
             .agent("ollama/qwen2.5:7b")
             .preamble(
                 "You are the Planner. Analyze the user message and break it down into AT MOST 5 \
-                 focused search queries in English. Return ONLY the search queries, one per line. \
+                 focused search queries in English. \
+                 CRITICAL: Return ONLY the search queries, one per line. \
                  DO NOT return JSON. DO NOT return follow-up questions. \
                  DO NOT use markdown formatting. If you are done, simply return the queries. \
                  Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?",
@@ -185,11 +206,28 @@ impl AgentTeam {
         let queries = planner.prompt(&last_message).await?;
         tracing::info!("Planner queries: {}", queries);
 
+        // Robust parsing: Handle accidental JSON structure from model
+        let mut raw_lines: Vec<String> = if queries.trim().starts_with('{') {
+            match serde_json::from_str::<serde_json::Value>(&queries) {
+                Ok(v) => {
+                    if let Some(arr) = v.get("follow_ups").and_then(|f| f.as_array()) {
+                        arr.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect()
+                    } else if let Some(arr) = v.get("queries").and_then(|f| f.as_array()) {
+                        arr.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect()
+                    } else {
+                        queries.lines().map(|l| l.trim().to_string()).collect()
+                    }
+                }
+                Err(_) => queries.lines().map(|l| l.trim().to_string()).collect(),
+            }
+        } else {
+            queries.lines().map(|l| l.trim().to_string()).collect()
+        };
+
         // Collect valid query lines — uses the shared validator to reject JSON
         // fragments, TERMINATE, and other planner noise.
-        let query_lines: Vec<String> = queries
-            .lines()
-            .map(|l| l.trim().to_string())
+        let query_lines: Vec<String> = raw_lines
+            .into_iter()
             .filter(|l| is_valid_query_line(l))
             .take(5)
             .collect();

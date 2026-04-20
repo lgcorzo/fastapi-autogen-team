@@ -66,7 +66,25 @@ pub async fn route_query(
                 let id = format!("chatcmpl-{}", chrono::Utc::now().timestamp_millis());
                 let created = chrono::Utc::now().timestamp() as u64;
 
-                let sse_stream = stream.map(move |res| -> Result<Event, Infallible> {
+                let id_role = id.clone();
+                let model_role = model.clone();
+                let role_chunk = json!({
+                    "id": id_role,
+                    "object": "chat.completion.chunk",
+                    "created": created,
+                    "model": model_role,
+                    "choices": [{
+                        "delta": { "role": "assistant" },
+                        "index": 0,
+                        "finish_reason": null
+                    }]
+                });
+
+                let role_stream = futures::stream::once(async move {
+                    Ok::<Event, Infallible>(Event::default().data(role_chunk.to_string()))
+                });
+
+                let content_stream = stream.map(move |res| -> Result<Event, Infallible> {
                     match res {
                         // --- Progress event: planner / searcher stage update ---
                         Ok(AgentEvent::Progress { stage, message }) => {
@@ -131,6 +149,8 @@ pub async fn route_query(
                         }
                     }
                 });
+
+                let sse_stream = role_stream.chain(content_stream);
                 return Sse::new(sse_stream)
                     .keep_alive(axum::response::sse::KeepAlive::default())
                     .into_response();
