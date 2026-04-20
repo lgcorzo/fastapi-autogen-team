@@ -93,7 +93,7 @@
 <a href=#93 id=93 data-nosnippet>93</a>        <span class="macro">tracing::info!</span>(<span class="string">"Planner queries: {}"</span>, queries);
 <a href=#94 id=94 data-nosnippet>94</a>
 <a href=#95 id=95 data-nosnippet>95</a>        <span class="comment">// Robust parsing: Handle accidental JSON structure from model
-<a href=#96 id=96 data-nosnippet>96</a>        </span><span class="kw">let </span><span class="kw-2">mut </span>raw_lines: Vec&lt;String&gt; = <span class="kw">if </span>queries.trim().starts_with(<span class="string">'{'</span>) {
+<a href=#96 id=96 data-nosnippet>96</a>        </span><span class="kw">let </span>raw_lines: Vec&lt;String&gt; = <span class="kw">if </span>queries.trim().starts_with(<span class="string">'{'</span>) {
 <a href=#97 id=97 data-nosnippet>97</a>            <span class="kw">match </span>serde_json::from_str::&lt;serde_json::Value&gt;(<span class="kw-2">&amp;</span>queries) {
 <a href=#98 id=98 data-nosnippet>98</a>                <span class="prelude-val">Ok</span>(v) =&gt; {
 <a href=#99 id=99 data-nosnippet>99</a>                    <span class="kw">if let </span><span class="prelude-val">Some</span>(arr) = v.get(<span class="string">"follow_ups"</span>).and_then(|f| f.as_array()) {
@@ -211,7 +211,7 @@
 <a href=#211 id=211 data-nosnippet>211</a>        <span class="macro">tracing::info!</span>(<span class="string">"Planner queries: {}"</span>, queries);
 <a href=#212 id=212 data-nosnippet>212</a>
 <a href=#213 id=213 data-nosnippet>213</a>        <span class="comment">// Robust parsing: Handle accidental JSON structure from model
-<a href=#214 id=214 data-nosnippet>214</a>        </span><span class="kw">let </span><span class="kw-2">mut </span>raw_lines: Vec&lt;String&gt; = <span class="kw">if </span>queries.trim().starts_with(<span class="string">'{'</span>) {
+<a href=#214 id=214 data-nosnippet>214</a>        </span><span class="kw">let </span>raw_lines: Vec&lt;String&gt; = <span class="kw">if </span>queries.trim().starts_with(<span class="string">'{'</span>) {
 <a href=#215 id=215 data-nosnippet>215</a>            <span class="kw">match </span>serde_json::from_str::&lt;serde_json::Value&gt;(<span class="kw-2">&amp;</span>queries) {
 <a href=#216 id=216 data-nosnippet>216</a>                <span class="prelude-val">Ok</span>(v) =&gt; {
 <a href=#217 id=217 data-nosnippet>217</a>                    <span class="kw">if let </span><span class="prelude-val">Some</span>(arr) = v.get(<span class="string">"follow_ups"</span>).and_then(|f| f.as_array()) {
