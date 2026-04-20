@@ -66,8 +66,16 @@ pub async fn route_query(
                     match res {
                         // --- Progress event: planner / searcher stage update ---
                         Ok(AgentEvent::Progress { stage, message }) => {
-                            let data = json!({"stage": stage, "message": message});
-                            Ok(Event::default().event("progress").data(data.to_string()))
+                            let chunk = json!({
+                                "choices": [{
+                                    "delta": {
+                                        "reasoning_content": format!("[{}] {}\n", stage, message)
+                                    },
+                                    "index": 0,
+                                    "finish_reason": null
+                                }]
+                            });
+                            Ok(Event::default().data(chunk.to_string()))
                         }
 
                         // --- Delta event: a single QA streaming token ---
@@ -84,13 +92,12 @@ pub async fn route_query(
                                     "finish_reason": finish_reason
                                 }]
                             });
-                            Ok(Event::default().event("delta").data(chunk.to_string()))
+                            Ok(Event::default().data(chunk.to_string()))
                         }
 
                         // --- Done event: pipeline fully completed ---
                         Ok(AgentEvent::Done) => {
-                            let data = json!({"finish_reason": "stop"});
-                            Ok(Event::default().event("done").data(data.to_string()))
+                            Ok(Event::default().data("[DONE]"))
                         }
 
                         // --- Error: surface as a delta with error content ---
@@ -99,13 +106,13 @@ pub async fn route_query(
                             let chunk = json!({
                                 "choices": [{
                                     "delta": {
-                                        "content": "An error occurred while streaming the response."
+                                        "content": format!("\nError: {}", e)
                                     },
                                     "index": 0,
                                     "finish_reason": "stop"
                                 }]
                             });
-                            Ok(Event::default().event("delta").data(chunk.to_string()))
+                            Ok(Event::default().data(chunk.to_string()))
                         }
                     }
                 });
@@ -115,9 +122,8 @@ pub async fn route_query(
             }
             Err(e) => {
                 tracing::error!("Error initializing stream: {}", e);
-                let data = json!({"finish_reason": "stop", "error": e.to_string()});
                 let once_stream = futures::stream::once(async move {
-                    Ok::<Event, Infallible>(Event::default().event("done").data(data.to_string()))
+                    Ok::<Event, Infallible>(Event::default().data("[DONE]"))
                 });
                 return Sse::new(once_stream)
                     .keep_alive(axum::response::sse::KeepAlive::default())

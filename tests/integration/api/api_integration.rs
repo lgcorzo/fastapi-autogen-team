@@ -365,18 +365,18 @@ async fn test_chat_completions_streaming_sse() {
 
     // axum emits `event: <type>` (with a space after the colon)
     assert!(
-        body_str.contains("event: progress"),
-        "SSE body must contain progress events.\nBody: {}",
+        body_str.contains("reasoning_content"),
+        "SSE body must contain reasoning_content.\nBody: {}",
         body_str
     );
     assert!(
-        body_str.contains("event: delta"),
-        "SSE body must contain delta events.\nBody: {}",
+        body_str.contains("\"content\":"),
+        "SSE body must contain content deltas.\nBody: {}",
         body_str
     );
     assert!(
-        body_str.contains("event: done"),
-        "SSE body must contain a done event.\nBody: {}",
+        body_str.contains("[DONE]"),
+        "SSE body must contain a [DONE] marker.\nBody: {}",
         body_str
     );
 }
