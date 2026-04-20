@@ -60,13 +60,21 @@ pub async fn route_query(
     }
 
     if request.stream.unwrap_or(false) {
+        let model = request.model.clone();
         match state.team.run_stream(request).await {
             Ok(stream) => {
-                let sse_stream = stream.map(|res| -> Result<Event, Infallible> {
+                let id = format!("chatcmpl-{}", chrono::Utc::now().timestamp_millis());
+                let created = chrono::Utc::now().timestamp() as u64;
+
+                let sse_stream = stream.map(move |res| -> Result<Event, Infallible> {
                     match res {
                         // --- Progress event: planner / searcher stage update ---
                         Ok(AgentEvent::Progress { stage, message }) => {
                             let chunk = json!({
+                                "id": id,
+                                "object": "chat.completion.chunk",
+                                "created": created,
+                                "model": model,
                                 "choices": [{
                                     "delta": {
                                         "reasoning_content": format!("[{}] {}\n", stage, message)
@@ -86,6 +94,10 @@ pub async fn route_query(
                                 None
                             };
                             let chunk = json!({
+                                "id": id,
+                                "object": "chat.completion.chunk",
+                                "created": created,
+                                "model": model,
                                 "choices": [{
                                     "delta": { "content": content },
                                     "index": 0,
@@ -102,6 +114,10 @@ pub async fn route_query(
                         Err(e) => {
                             tracing::error!("Stream error: {}", e);
                             let chunk = json!({
+                                "id": id,
+                                "object": "chat.completion.chunk",
+                                "created": created,
+                                "model": model,
                                 "choices": [{
                                     "delta": {
                                         "content": format!("\nError: {}", e)
