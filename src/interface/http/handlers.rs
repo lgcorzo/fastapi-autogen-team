@@ -10,6 +10,7 @@ use std::convert::Infallible;
 use std::sync::Arc;
 
 use crate::application::dtos::Input;
+use crate::domain::agent::team::AgentEvent;
 use crate::interface::http::routes::AppState;
 use crate::interface::http::validation::ValidatedJson;
 
@@ -43,7 +44,7 @@ pub async fn route_query(
     headers: HeaderMap,
     ValidatedJson(request): ValidatedJson<Input>,
 ) -> impl IntoResponse {
-    // Basic Header Sanitization (example: carry over authorization if needed)
+    // Basic Header Sanitization
     let _auth = headers.get("authorization");
 
     // Validation: Empty messages
@@ -61,22 +62,52 @@ pub async fn route_query(
     if request.stream.unwrap_or(false) {
         match state.team.run_stream(request).await {
             Ok(stream) => {
-                let sse_stream = stream.map(|res| {
-                    let content = match res {
-                        Ok(content) => content,
+                let sse_stream = stream.map(|res| -> Result<Event, Infallible> {
+                    match res {
+                        // --- Progress event: planner / searcher stage update ---
+                        Ok(AgentEvent::Progress { stage, message }) => {
+                            let data = json!({"stage": stage, "message": message});
+                            Ok(Event::default().event("progress").data(data.to_string()))
+                        }
+
+                        // --- Delta event: a single QA streaming token ---
+                        Ok(AgentEvent::Delta(content)) => {
+                            let finish_reason = if content.contains("TERMINATE") {
+                                Some("stop")
+                            } else {
+                                None
+                            };
+                            let chunk = json!({
+                                "choices": [{
+                                    "delta": { "content": content },
+                                    "index": 0,
+                                    "finish_reason": finish_reason
+                                }]
+                            });
+                            Ok(Event::default().event("delta").data(chunk.to_string()))
+                        }
+
+                        // --- Done event: pipeline fully completed ---
+                        Ok(AgentEvent::Done) => {
+                            let data = json!({"finish_reason": "stop"});
+                            Ok(Event::default().event("done").data(data.to_string()))
+                        }
+
+                        // --- Error: surface as a delta with error content ---
                         Err(e) => {
                             tracing::error!("Stream error: {}", e);
-                            "An error occurred while streaming the response.".to_string()
+                            let chunk = json!({
+                                "choices": [{
+                                    "delta": {
+                                        "content": "An error occurred while streaming the response."
+                                    },
+                                    "index": 0,
+                                    "finish_reason": "stop"
+                                }]
+                            });
+                            Ok(Event::default().event("delta").data(chunk.to_string()))
                         }
-                    };
-                    let chunk = json!({
-                        "choices": [{
-                            "delta": { "content": content },
-                            "index": 0,
-                            "finish_reason": if content.contains("TERMINATE") { Some("stop") } else { None }
-                        }]
-                    });
-                    Ok::<Event, Infallible>(Event::default().data(chunk.to_string()))
+                    }
                 });
                 return Sse::new(sse_stream)
                     .keep_alive(axum::response::sse::KeepAlive::default())
@@ -84,15 +115,9 @@ pub async fn route_query(
             }
             Err(e) => {
                 tracing::error!("Error initializing stream: {}", e);
-                let chunk = json!({
-                    "choices": [{
-                        "delta": { "content": "An error occurred while processing the request." },
-                        "index": 0,
-                        "finish_reason": Some("stop")
-                    }]
-                });
+                let data = json!({"finish_reason": "stop", "error": e.to_string()});
                 let once_stream = futures::stream::once(async move {
-                    Ok::<Event, Infallible>(Event::default().data(chunk.to_string()))
+                    Ok::<Event, Infallible>(Event::default().event("done").data(data.to_string()))
                 });
                 return Sse::new(once_stream)
                     .keep_alive(axum::response::sse::KeepAlive::default())
@@ -101,6 +126,7 @@ pub async fn route_query(
         }
     }
 
+    // Non-streaming path — unchanged
     let response = match state.team.run(request).await {
         Ok(res) => res,
         Err(e) => {

@@ -206,3 +206,177 @@ async fn test_chat_completions_route() {
         body_str
     );
 }
+
+/// Builds the full set of mockito mocks for the three-agent pipeline.
+async fn setup_pipeline_mocks(server: &mut Server) -> Vec<mockito::Mock> {
+    // 1. Planner response
+    let m1 = server
+        .mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(
+            r#"{"id":"p1","object":"chat.completion","created":1,"model":"test",
+               "choices":[{"message":{"content":"search query 1","role":"assistant"},
+               "index":0,"finish_reason":"stop"}],
+               "usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}"#,
+        )
+        .create_async()
+        .await;
+
+    // 2. RAG searcher — tool call trigger
+    let m2 = server
+        .mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(
+            r#"{"id":"s1","object":"chat.completion","created":1,"model":"test",
+               "choices":[{"message":{"role":"assistant","tool_calls":[{
+                   "id":"call_1","type":"function",
+                   "function":{"name":"search","arguments":"{\"query\":\"search query 1\"}"}}]},
+               "index":0,"finish_reason":"tool_calls"}],
+               "usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}"#,
+        )
+        .create_async()
+        .await;
+
+    // 3. R2R login
+    let m_r2r_login = server
+        .mock("POST", "/v3/users/login")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{"results":{"access_token":{"token":"mock_token"}}}"#)
+        .create_async()
+        .await;
+
+    // 4. R2R search
+    let m_r2r_search = server
+        .mock("POST", "/v3/retrieval/search")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{"results":{"chunk_search_results":[{"text":"Mocked R2R search results"}]}}"#)
+        .create_async()
+        .await;
+
+    // 5. Jira search
+    let m_jira = server
+        .mock("GET", "/rest/api/2/search")
+        .match_query(mockito::Matcher::Any)
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{"issues":[{"key":"PROJ-1","fields":{"summary":"Mocked Jira Issue"}}]}"#)
+        .create_async()
+        .await;
+
+    // 6. RAG searcher — final response after tool
+    let m3 = server
+        .mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(
+            r#"{"id":"s2","object":"chat.completion","created":1,"model":"test",
+               "choices":[{"message":{"content":"Search completed.","role":"assistant"},
+               "index":0,"finish_reason":"stop"}],
+               "usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}"#,
+        )
+        .create_async()
+        .await;
+
+    vec![m1, m2, m_r2r_login, m_r2r_search, m_jira, m3]
+}
+
+#[tokio::test]
+async fn test_chat_completions_streaming_sse() {
+    let mut server = Server::new_async().await;
+    let url = server.url();
+
+    env::set_var("LITELLM_API_KEY", "test_key");
+    env::set_var("LITELLM_BASE_URL", &url);
+    env::set_var("R2R_URL", &url);
+    env::set_var("JIRA_INSTANCE_URL", &url);
+    env::set_var("R2R_USER", "test_user");
+    env::set_var("R2R_PWD", "test_pwd");
+    env::set_var("JIRA_USERNAME", "test_user");
+    env::set_var("JIRA_API_TOKEN", "test_token");
+
+    let _mocks = setup_pipeline_mocks(&mut server).await;
+
+    // QA streaming response (SSE wire format)
+    let sse_body = concat!(
+        "data: {\"id\":\"c1\",\"object\":\"chat.completion.chunk\",\"created\":1,",
+        "\"model\":\"test\",\"choices\":[{\"delta\":{\"content\":\"Final answer TERMINATE\"},",
+        "\"index\":0,\"finish_reason\":null}]}\n\n",
+        "data: [DONE]\n\n"
+    );
+    let _m_qa = server
+        .mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "text/event-stream")
+        .with_body(sse_body)
+        .create_async()
+        .await;
+
+    let team = AgentTeam::new_test(&url);
+    let state = Arc::new(AppState { team });
+    let app = create_app(state);
+
+    let input = Input {
+        model: "test".to_string(),
+        user: None,
+        messages: vec![Message {
+            role: "user".to_string(),
+            content: ContentType::String("What is Rust?".to_string()),
+            name: None,
+        }],
+        temperature: None,
+        top_p: None,
+        presence_penalty: None,
+        frequency_penalty: None,
+        stream: Some(true),
+    };
+
+    let response = app
+        .oneshot(
+            Request::builder()
+                .method(http::Method::POST)
+                .uri("/autogen/api/v1beta/chat/completions")
+                .header(http::header::CONTENT_TYPE, "application/json")
+                .header(http::header::ACCEPT, "text/event-stream")
+                .body(Body::from(serde_json::to_vec(&input).unwrap()))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+
+    let content_type = response
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("");
+    assert!(
+        content_type.contains("text/event-stream"),
+        "Expected SSE content-type, got: {}",
+        content_type
+    );
+
+    let body_bytes = response.into_body().collect().await.unwrap().to_bytes();
+    let body_str = String::from_utf8_lossy(&body_bytes);
+
+    // axum emits `event: <type>` (with a space after the colon)
+    assert!(
+        body_str.contains("event: progress"),
+        "SSE body must contain progress events.\nBody: {}",
+        body_str
+    );
+    assert!(
+        body_str.contains("event: delta"),
+        "SSE body must contain delta events.\nBody: {}",
+        body_str
+    );
+    assert!(
+        body_str.contains("event: done"),
+        "SSE body must contain a done event.\nBody: {}",
+        body_str
+    );
+}

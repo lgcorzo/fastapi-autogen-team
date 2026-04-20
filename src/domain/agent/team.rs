@@ -1,12 +1,26 @@
 use crate::application::dtos::Input;
 use crate::infrastructure::tools::search::SearchTool;
-use futures::{future::join_all, StreamExt};
+use futures::{future::join_all, stream, Stream, StreamExt};
 use rig::agent::MultiTurnStreamItem;
 use rig::client::CompletionClient;
 use rig::completion::Prompt;
 use rig::providers::openai;
 use rig::streaming::{StreamedAssistantContent, StreamingPrompt};
 use std::env;
+use std::pin::Pin;
+
+/// Events emitted by the agent pipeline during SSE streaming.
+///
+/// `Progress` events are emitted after the planner and each RAG search.
+/// `Delta` events carry individual QA token chunks.
+/// `Done` signals end-of-stream.
+/// Progress events are **only** produced on the streaming path (`run_stream`).
+#[derive(Debug)]
+pub enum AgentEvent {
+    Progress { stage: String, message: String },
+    Delta(String),
+    Done,
+}
 
 pub struct AgentTeam {
     client: openai::Client,
@@ -18,7 +32,6 @@ impl AgentTeam {
         let base_url =
             env::var("LITELLM_BASE_URL").unwrap_or_else(|_| "http://litellm:4000/v1".to_string());
 
-        // Rig 0.34.0 OpenAI client builder
         let client = openai::Client::builder()
             .api_key(&api_key)
             .base_url(&base_url)
@@ -30,13 +43,16 @@ impl AgentTeam {
     pub async fn run(&self, input: Input) -> anyhow::Result<String> {
         let client = self.client.clone().completions_api();
 
-        // 1. Planner Agent: Decomposed query (Strictly one-per-line)
-        let planner = client.agent("ollama/qwen2.5:7b")
-            .preamble("You are the Planner. Analyze the user message and break it down into AT MOST 5 focused search queries in English. \
-                      Return ONLY the search queries, one per line. \
-                      DO NOT return JSON. DO NOT return follow-up questions. DO NOT use markdown formatting. \
-                      If you are done, simply return the queries. \
-                      Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?")
+        // 1. Planner Agent
+        let planner = client
+            .agent("ollama/qwen2.5:7b")
+            .preamble(
+                "You are the Planner. Analyze the user message and break it down into AT MOST 5 \
+                 focused search queries in English. Return ONLY the search queries, one per line. \
+                 DO NOT return JSON. DO NOT return follow-up questions. \
+                 DO NOT use markdown formatting. If you are done, simply return the queries. \
+                 Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?",
+            )
             .default_max_turns(5)
             .build();
 
@@ -52,10 +68,13 @@ impl AgentTeam {
         let queries = planner.prompt(&last_message).await?;
         tracing::info!("Planner queries: {}", queries);
 
-        // 2. RAG Searcher: Execute tools
+        // 2. RAG Searcher
         let rag_searcher = client
             .agent("ollama/qwen2.5:7b")
-            .preamble("You are the RAG_searcher. Use the search tool to find information. Once you have the results, summarize them and stop.")
+            .preamble(
+                "You are the RAG_searcher. Use the search tool to find information. \
+                 Once you have the results, summarize them and stop.",
+            )
             .tool(SearchTool)
             .default_max_turns(5)
             .build();
@@ -70,7 +89,6 @@ impl AgentTeam {
             {
                 continue;
             }
-
             let searcher = rag_searcher.clone();
             search_tasks.push(async move {
                 tracing::info!("Executing RAG search for: {}", trimmed);
@@ -89,11 +107,14 @@ impl AgentTeam {
         }
 
         // 3. QA Agent: Final Synthesis
-        let qa = client.agent("ollama/qwen2.5:7b")
-            .preamble("You are the Quality Assurance agent. Synthesize the results into a final response in the user's original language. \
-                      Always provide a helpful answer based on the search results provided. \
-                      If no relevant information was found, state it clearly. \
-                      IMPORTANT: End your response with the word: TERMINATE")
+        let qa = client
+            .agent("ollama/qwen2.5:7b")
+            .preamble(
+                "You are the Quality Assurance agent. Synthesize the results into a final \
+                 response in the user's original language. Always provide a helpful answer \
+                 based on the search results provided. If no relevant information was found, \
+                 state it clearly. IMPORTANT: End your response with the word: TERMINATE",
+            )
             .default_max_turns(5)
             .build();
 
@@ -107,19 +128,30 @@ impl AgentTeam {
         Ok(final_response)
     }
 
+    /// Run the agent pipeline with full SSE progress streaming.
+    ///
+    /// Emits:
+    /// - `AgentEvent::Progress` after the planner stage and after each RAG search.
+    /// - `AgentEvent::Delta` for each streaming token from the QA agent.
+    /// - `AgentEvent::Done` once all tokens have been emitted.
+    ///
+    /// Progress events are **not** produced by the non-streaming `run()` method.
     pub async fn run_stream(
         &self,
         input: Input,
-    ) -> anyhow::Result<impl futures::Stream<Item = anyhow::Result<String>>> {
+    ) -> anyhow::Result<Pin<Box<dyn Stream<Item = anyhow::Result<AgentEvent>> + Send>>> {
         let client = self.client.clone().completions_api();
 
-        // 1. Planner Agent: Decomposed query (Strictly one-per-line)
-        let planner = client.agent("ollama/qwen2.5:7b")
-            .preamble("You are the Planner. Analyze the user message and break it down into AT MOST 5 focused search queries in English. \
-                      Return ONLY the search queries, one per line. \
-                      DO NOT return JSON. DO NOT return follow-up questions. DO NOT use markdown formatting. \
-                      If you are done, simply return the queries. \
-                      Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?")
+        // 1. Planner Agent
+        let planner = client
+            .agent("ollama/qwen2.5:7b")
+            .preamble(
+                "You are the Planner. Analyze the user message and break it down into AT MOST 5 \
+                 focused search queries in English. Return ONLY the search queries, one per line. \
+                 DO NOT return JSON. DO NOT return follow-up questions. \
+                 DO NOT use markdown formatting. If you are done, simply return the queries. \
+                 Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?",
+            )
             .default_max_turns(5)
             .build();
 
@@ -133,26 +165,44 @@ impl AgentTeam {
             .unwrap_or_default();
 
         let queries = planner.prompt(&last_message).await?;
+        tracing::info!("Planner queries: {}", queries);
 
-        // 2. RAG Searcher: Execute tools
+        // Collect valid query lines
+        let query_lines: Vec<String> = queries
+            .lines()
+            .map(|l| l.trim().to_string())
+            .filter(|l| {
+                !l.is_empty() && !l.starts_with('{') && !l.starts_with('}') && !l.starts_with('[')
+            })
+            .take(5)
+            .collect();
+
+        let query_count = query_lines.len();
+
+        // Planner progress event
+        let mut progress_events: Vec<anyhow::Result<AgentEvent>> = vec![Ok(AgentEvent::Progress {
+            stage: "planner".to_string(),
+            message: format!(
+                "Planner generated {} search quer{}",
+                query_count,
+                if query_count == 1 { "y" } else { "ies" }
+            ),
+        })];
+
+        // 2. RAG Searcher
         let rag_searcher = client
             .agent("ollama/qwen2.5:7b")
-            .preamble("You are the RAG_searcher. Use the search tool to find information. Once you have the results, summarize them and stop.")
+            .preamble(
+                "You are the RAG_searcher. Use the search tool to find information. \
+                 Once you have the results, summarize them and stop.",
+            )
             .tool(SearchTool)
             .default_max_turns(5)
             .build();
 
         let mut search_tasks = Vec::new();
-        for query in queries.lines().take(5) {
-            let trimmed = query.trim().to_string();
-            if trimmed.is_empty()
-                || trimmed.starts_with('{')
-                || trimmed.starts_with('}')
-                || trimmed.starts_with('[')
-            {
-                continue;
-            }
-
+        for query in &query_lines {
+            let trimmed = query.clone();
             let searcher = rag_searcher.clone();
             search_tasks.push(async move {
                 tracing::info!("Executing RAG search for: {}", trimmed);
@@ -165,34 +215,49 @@ impl AgentTeam {
 
         let results = join_all(search_tasks).await;
         let mut all_results = String::new();
-        for res in results {
-            all_results.push_str(&res);
+        for (i, res) in results.iter().enumerate() {
+            all_results.push_str(res);
             all_results.push_str("\n---\n");
+            progress_events.push(Ok(AgentEvent::Progress {
+                stage: "searcher".to_string(),
+                message: format!("Search {}/{} completed", i + 1, query_count),
+            }));
         }
 
         // 3. QA Agent: Final Synthesis (Streaming)
-        let qa = client.agent("ollama/qwen2.5:7b")
-            .preamble("You are the Quality Assurance agent. Synthesize the results into a final response in the user's original language. \
-                      Always provide a helpful answer based on the search results provided. \
-                      If no relevant information was found, state it clearly. \
-                      IMPORTANT: End your response with the word: TERMINATE")
+        let qa = client
+            .agent("ollama/qwen2.5:7b")
+            .preamble(
+                "You are the Quality Assurance agent. Synthesize the results into a final \
+                 response in the user's original language. Always provide a helpful answer \
+                 based on the search results provided. If no relevant information was found, \
+                 state it clearly. IMPORTANT: End your response with the word: TERMINATE",
+            )
             .default_max_turns(5)
             .build();
 
-        let stream = qa
+        let qa_raw_stream = qa
             .stream_prompt(format!(
                 "User query: {}\n\nResults found:\n{}",
                 last_message, all_results
             ))
             .await;
 
-        Ok(stream.map(|res| match res {
+        let delta_stream = qa_raw_stream.map(|res| match res {
             Ok(MultiTurnStreamItem::StreamAssistantItem(StreamedAssistantContent::Text(text))) => {
-                Ok(text.text)
+                Ok(AgentEvent::Delta(text.text))
             }
-            Ok(_) => Ok("".to_string()),
+            Ok(_) => Ok(AgentEvent::Delta(String::new())),
             Err(e) => Err(anyhow::anyhow!(e)),
-        }))
+        });
+
+        let done_stream = stream::once(async { Ok::<AgentEvent, anyhow::Error>(AgentEvent::Done) });
+
+        let combined = stream::iter(progress_events)
+            .chain(delta_stream)
+            .chain(done_stream);
+
+        Ok(Box::pin(combined))
     }
 
     pub fn new_mock() -> Self {
