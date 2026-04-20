@@ -6,9 +6,9 @@ use rig::client::CompletionClient;
 use rig::completion::Prompt;
 use rig::providers::openai;
 use rig::streaming::{StreamedAssistantContent, StreamingPrompt};
+use serde_json;
 use std::env;
 use std::pin::Pin;
-use serde_json;
 
 /// Events emitted by the agent pipeline during SSE streaming.
 ///
@@ -97,9 +97,13 @@ impl AgentTeam {
             match serde_json::from_str::<serde_json::Value>(&queries) {
                 Ok(v) => {
                     if let Some(arr) = v.get("follow_ups").and_then(|f| f.as_array()) {
-                        arr.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect()
+                        arr.iter()
+                            .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                            .collect()
                     } else if let Some(arr) = v.get("queries").and_then(|f| f.as_array()) {
-                        arr.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect()
+                        arr.iter()
+                            .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                            .collect()
                     } else {
                         queries.lines().map(|l| l.trim().to_string()).collect()
                     }
@@ -211,9 +215,13 @@ impl AgentTeam {
             match serde_json::from_str::<serde_json::Value>(&queries) {
                 Ok(v) => {
                     if let Some(arr) = v.get("follow_ups").and_then(|f| f.as_array()) {
-                        arr.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect()
+                        arr.iter()
+                            .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                            .collect()
                     } else if let Some(arr) = v.get("queries").and_then(|f| f.as_array()) {
-                        arr.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect()
+                        arr.iter()
+                            .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                            .collect()
                     } else {
                         queries.lines().map(|l| l.trim().to_string()).collect()
                     }
