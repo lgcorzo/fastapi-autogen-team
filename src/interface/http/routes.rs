@@ -5,8 +5,8 @@ use axum::{
     routing::{get, post},
     Router,
 };
-use tower_http::trace::TraceLayer;
 use std::sync::Arc;
+use tower_http::trace::TraceLayer;
 
 pub struct AppState {
     pub team: AgentTeam,
