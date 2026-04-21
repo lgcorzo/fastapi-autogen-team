@@ -1,6 +1,7 @@
 use crate::application::dtos::Input;
 use crate::infrastructure::tools::search::SearchTool;
-use futures::{future::join_all, stream, Stream, StreamExt};
+use async_stream::stream;
+use futures::{future::join_all, Stream, StreamExt};
 use rig::agent::MultiTurnStreamItem;
 use rig::client::CompletionClient;
 use rig::completion::Prompt;
@@ -118,7 +119,7 @@ impl AgentTeam {
         let rag_searcher = client
             .agent("ollama/qwen2.5:7b")
             .preamble(
-                "You are the RAG_searcher. Use the search tool to find information. \
+                "You are the RAG_searcher. Use the 'search' tool to find information. \
                  Once you have the results, summarize them and stop.",
             )
             .tool(SearchTool)
@@ -182,145 +183,150 @@ impl AgentTeam {
         &self,
         input: Input,
     ) -> anyhow::Result<Pin<Box<dyn Stream<Item = anyhow::Result<AgentEvent>> + Send>>> {
-        let client = self.client.clone().completions_api();
+        let team_client = self.client.clone();
+        let client = team_client.completions_api();
 
-        // 1. Planner Agent
-        let planner = client
-            .agent("ollama/qwen2.5:7b")
-            .preamble(
-                "You are the Planner. Analyze the user message and break it down into AT MOST 5 \
-                 focused search queries in English. \
-                 CRITICAL: Return ONLY the search queries, one per line. \
-                 DO NOT return JSON. DO NOT return follow-up questions. \
-                 DO NOT use markdown formatting. If you are done, simply return the queries. \
-                 Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?",
-            )
-            .default_max_turns(5)
-            .build();
+        let s = stream! {
+            // 1. Planner Agent
+            let planner = client
+                .agent("ollama/qwen2.5:7b")
+                .preamble(
+                    "You are the Planner. Analyze the user message and break it down into AT MOST 5 \
+                     focused search queries in English. \
+                     CRITICAL: Return ONLY the search queries, one per line. \
+                     DO NOT return JSON. DO NOT return follow-up questions. \
+                     DO NOT use markdown formatting. If you are done, simply return the queries. \
+                     Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?",
+                )
+                .default_max_turns(5)
+                .build();
 
-        let last_message = input
-            .messages
-            .last()
-            .and_then(|m| match &m.content {
-                crate::application::dtos::ContentType::String(s) => Some(s.clone()),
-                _ => None,
-            })
-            .unwrap_or_default();
+            let last_message = input
+                .messages
+                .last()
+                .and_then(|m| match &m.content {
+                    crate::application::dtos::ContentType::String(s) => Some(s.clone()),
+                    _ => None,
+                })
+                .unwrap_or_default();
 
-        let queries = planner.prompt(&last_message).await?;
-        tracing::info!("Planner queries: {}", queries);
-
-        // Robust parsing: Handle accidental JSON structure from model
-        let raw_lines: Vec<String> = if queries.trim().starts_with('{') {
-            match serde_json::from_str::<serde_json::Value>(&queries) {
-                Ok(v) => {
-                    if let Some(arr) = v.get("follow_ups").and_then(|f| f.as_array()) {
-                        arr.iter()
-                            .filter_map(|v| v.as_str().map(|s| s.to_string()))
-                            .collect()
-                    } else if let Some(arr) = v.get("queries").and_then(|f| f.as_array()) {
-                        arr.iter()
-                            .filter_map(|v| v.as_str().map(|s| s.to_string()))
-                            .collect()
-                    } else {
-                        queries.lines().map(|l| l.trim().to_string()).collect()
-                    }
-                }
-                Err(_) => queries.lines().map(|l| l.trim().to_string()).collect(),
+            // Run planner
+            let planner_res = planner.prompt(&last_message).await;
+            if let Err(e) = planner_res {
+                yield Err::<AgentEvent, anyhow::Error>(anyhow::anyhow!("Planner error: {}", e));
+                return;
             }
-        } else {
-            queries.lines().map(|l| l.trim().to_string()).collect()
-        };
+            let queries = planner_res.unwrap();
+            tracing::info!("Planner queries: {}", queries);
 
-        // Collect valid query lines — uses the shared validator to reject JSON
-        // fragments, TERMINATE, and other planner noise.
-        let query_lines: Vec<String> = raw_lines
-            .into_iter()
-            .filter(|l| is_valid_query_line(l))
-            .take(5)
-            .collect();
-
-        let query_count = query_lines.len();
-
-        // Planner progress event
-        let mut progress_events: Vec<anyhow::Result<AgentEvent>> = vec![Ok(AgentEvent::Progress {
-            stage: "planner".to_string(),
-            message: format!(
-                "Planner generated {} search quer{}",
-                query_count,
-                if query_count == 1 { "y" } else { "ies" }
-            ),
-        })];
-
-        // 2. RAG Searcher
-        let rag_searcher = client
-            .agent("ollama/qwen2.5:7b")
-            .preamble(
-                "You are the RAG_searcher. Use the search tool to find information. \
-                 Once you have the results, summarize them and stop.",
-            )
-            .tool(SearchTool)
-            .default_max_turns(5)
-            .build();
-
-        let mut search_tasks = Vec::new();
-        for query in &query_lines {
-            let trimmed = query.clone();
-            let searcher = rag_searcher.clone();
-            search_tasks.push(async move {
-                tracing::info!("Executing RAG search for: {}", trimmed);
-                match searcher.prompt(trimmed).await {
-                    Ok(res) => res,
-                    Err(e) => format!("Search error: {}", e),
+            // Parsing logic (same as run)
+            let raw_lines: Vec<String> = if queries.trim().starts_with('{') {
+                match serde_json::from_str::<serde_json::Value>(&queries) {
+                    Ok(v) => {
+                        if let Some(arr) = v.get("follow_ups").and_then(|f| f.as_array()) {
+                            arr.iter()
+                                .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                                .collect()
+                        } else if let Some(arr) = v.get("queries").and_then(|f| f.as_array()) {
+                            arr.iter()
+                                .filter_map(|v| v.as_str().map(|s| s.to_string()))
+                                .collect()
+                        } else {
+                            queries.lines().map(|l| l.trim().to_string()).collect()
+                        }
+                    }
+                    Err(_) => queries.lines().map(|l| l.trim().to_string()).collect(),
                 }
+            } else {
+                queries.lines().map(|l| l.trim().to_string()).collect()
+            };
+
+            let query_lines: Vec<String> = raw_lines
+                .into_iter()
+                .filter(|l| is_valid_query_line(l))
+                .take(5)
+                .collect();
+
+            let query_count = query_lines.len();
+
+            // Yield planner progress immediately after planning
+            yield Ok::<AgentEvent, anyhow::Error>(AgentEvent::Progress {
+                stage: "planner".to_string(),
+                message: format!(
+                    "Planner generated {} search quer{}",
+                    query_count,
+                    if query_count == 1 { "y" } else { "ies" }
+                ),
             });
-        }
 
-        let results = join_all(search_tasks).await;
-        let mut all_results = String::new();
-        for (i, res) in results.iter().enumerate() {
-            all_results.push_str(res);
-            all_results.push_str("\n---\n");
-            progress_events.push(Ok(AgentEvent::Progress {
-                stage: "searcher".to_string(),
-                message: format!("Search {}/{} completed", i + 1, query_count),
-            }));
-        }
+            // 2. RAG Searcher
+            let rag_searcher = client
+                .agent("ollama/qwen2.5:7b")
+                .preamble(
+                    "You are the RAG_searcher. Use the 'search' tool to find information. \
+                     Once you have the results, summarize them and stop.",
+                )
+                .tool(SearchTool)
+                .default_max_turns(5)
+                .build();
 
-        // 3. QA Agent: Final Synthesis (Streaming)
-        let qa = client
-            .agent("ollama/qwen2.5:7b")
-            .preamble(
-                "You are the Quality Assurance agent. Synthesize the results into a final \
-                 response in the user's original language. Always provide a helpful answer \
-                 based on the search results provided. If no relevant information was found, \
-                 state it clearly. IMPORTANT: End your response with the word: TERMINATE",
-            )
-            .default_max_turns(5)
-            .build();
+            let mut all_results = String::new();
+            for (i, query) in query_lines.iter().enumerate() {
+                let trimmed = query.clone();
+                let searcher = rag_searcher.clone();
 
-        let qa_raw_stream = qa
-            .stream_prompt(format!(
+                tracing::info!("Executing RAG search for: {}", trimmed);
+                let res = match searcher.prompt(trimmed).await {
+                    Ok(r) => r,
+                    Err(e) => format!("Search error: {}", e),
+                };
+
+                all_results.push_str(&res);
+                all_results.push_str("\n---\n");
+
+                // Yield progress for each completed search
+                yield Ok::<AgentEvent, anyhow::Error>(AgentEvent::Progress {
+                    stage: "searcher".to_string(),
+                    message: format!("Search {}/{} completed", i + 1, query_count),
+                });
+            }
+
+            // 3. QA Agent: Final Synthesis (Streaming)
+            let qa = client
+                .agent("ollama/qwen2.5:7b")
+                .preamble(
+                    "You are the Quality Assurance agent. Synthesize the results into a final \
+                     response in the user's original language. Always provide a helpful answer \
+                     based on the search results provided. If no relevant information was found, \
+                     state it clearly. IMPORTANT: End your response with the word: TERMINATE",
+                )
+                .default_max_turns(5)
+                .build();
+
+            let mut qa_raw_stream = qa.stream_prompt(format!(
                 "User query: {}\n\nResults found:\n{}",
                 last_message, all_results
-            ))
-            .await;
+            )).await;
 
-        let delta_stream = qa_raw_stream.map(|res| match res {
-            Ok(MultiTurnStreamItem::StreamAssistantItem(StreamedAssistantContent::Text(text))) => {
-                Ok(AgentEvent::Delta(text.text))
+            while let Some(res) = qa_raw_stream.next().await {
+                match res {
+                    Ok(MultiTurnStreamItem::StreamAssistantItem(StreamedAssistantContent::Text(text))) => {
+                        yield Ok::<AgentEvent, anyhow::Error>(AgentEvent::Delta(text.text));
+                    }
+                    Ok(_) => {
+                        yield Ok::<AgentEvent, anyhow::Error>(AgentEvent::Delta(String::new()));
+                    }
+                    Err(e) => {
+                        yield Err(anyhow::anyhow!("QA stream error: {}", e));
+                    }
+                }
             }
-            Ok(_) => Ok(AgentEvent::Delta(String::new())),
-            Err(e) => Err(anyhow::anyhow!(e)),
-        });
 
-        let done_stream = stream::once(async { Ok::<AgentEvent, anyhow::Error>(AgentEvent::Done) });
+            yield Ok(AgentEvent::Done);
+        };
 
-        let combined = stream::iter(progress_events)
-            .chain(delta_stream)
-            .chain(done_stream);
-
-        Ok(Box::pin(combined))
+        let pinned_stream: Pin<Box<dyn Stream<Item = anyhow::Result<AgentEvent>> + Send>> = Box::pin(s);
+        Ok(pinned_stream)
     }
 
     pub fn new_mock() -> Self {
