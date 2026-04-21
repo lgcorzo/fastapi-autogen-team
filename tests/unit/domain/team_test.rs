@@ -49,11 +49,17 @@ async fn test_agent_team_run_stream_error_on_planner_failure() {
         .await;
 
     let res = team.run_stream(make_input("test")).await;
-    assert!(res.is_ok(), "run_stream should return Ok(stream) even if planner fails later");
+    assert!(
+        res.is_ok(),
+        "run_stream should return Ok(stream) even if planner fails later"
+    );
 
     let mut stream = res.unwrap();
     use futures::StreamExt;
     let first_item = stream.next().await;
     assert!(first_item.is_some());
-    assert!(first_item.unwrap().is_err(), "First stream item should be an error on planner failure");
+    assert!(
+        first_item.unwrap().is_err(),
+        "First stream item should be an error on planner failure"
+    );
 }

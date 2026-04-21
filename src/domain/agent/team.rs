@@ -325,7 +325,8 @@ impl AgentTeam {
             yield Ok(AgentEvent::Done);
         };
 
-        let pinned_stream: Pin<Box<dyn Stream<Item = anyhow::Result<AgentEvent>> + Send>> = Box::pin(s);
+        let pinned_stream: Pin<Box<dyn Stream<Item = anyhow::Result<AgentEvent>> + Send>> =
+            Box::pin(s);
         Ok(pinned_stream)
     }
 
