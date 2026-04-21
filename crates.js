@@ -1,2 +1,2 @@
-window.ALL_CRATES = ["fastapi_autogen_team","mock_services"];
-//{"start":21,"fragment_lengths":[22,16]}
+window.ALL_CRATES = ["mock_services","rust_agent_team"];
+//{"start":21,"fragment_lengths":[15,18]}

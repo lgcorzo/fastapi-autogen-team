@@ -1,2 +1,2 @@
-createSrcSidebar('[["fastapi_autogen_team",["",[["application",[],["dtos.rs","mod.rs"]],["domain",[["agent",[],["mod.rs","team.rs"]]],["mod.rs"]],["infrastructure",[["tools",[],["jira.rs","mod.rs","r2r.rs","search.rs"]]],["mod.rs","telemetry.rs"]],["interface",[["http",[],["handlers.rs","middleware.rs","mod.rs","routes.rs","validation.rs"]]],["mod.rs"]]],["lib.rs"]]],["mock_services",["",[],["mock_services.rs"]]]]');
-//{"start":19,"fragment_lengths":[350,47]}
+createSrcSidebar('[["mock_services",["",[],["mock_services.rs"]]],["rust_agent_team",["",[["application",[],["dtos.rs","mod.rs"]],["domain",[["agent",[],["mod.rs","team.rs"]]],["mod.rs"]],["infrastructure",[["tools",[],["jira.rs","mod.rs","r2r.rs","search.rs"]]],["mod.rs","telemetry.rs"]],["interface",[["http",[],["handlers.rs","middleware.rs","mod.rs","routes.rs","validation.rs"]]],["mod.rs"]]],["lib.rs"]]]]');
+//{"start":19,"fragment_lengths":[46,346]}
