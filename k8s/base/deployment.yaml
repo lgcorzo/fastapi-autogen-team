@@ -24,49 +24,49 @@ spec:
             - name: DEFAULT_OTEL_ENDPOINT
               valueFrom:
                 secretKeyRef:
-                  name: rust-agent-secrets
+                  name: fastapi-autogen-secrets
                   key: DEFAULT_OTEL_ENDPOINT
             - name: DEFAULT_HOST
               value: "0.0.0.0"
             - name: JIRA_API_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: rust-agent-secrets
+                  name: fastapi-autogen-secrets
                   key: JIRA_API_TOKEN
             - name: JIRA_CLOUD
               valueFrom:
                 secretKeyRef:
-                  name: rust-agent-secrets
+                  name: fastapi-autogen-secrets
                   key: JIRA_CLOUD
             - name: JIRA_INSTANCE_URL
               valueFrom:
                 secretKeyRef:
-                  name: rust-agent-secrets
+                  name: fastapi-autogen-secrets
                   key: JIRA_INSTANCE_URL
             - name: JIRA_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: rust-agent-secrets
+                  name: fastapi-autogen-secrets
                   key: JIRA_USERNAME
             - name: R2R_PWD
               valueFrom:
                 secretKeyRef:
-                  name: rust-agent-secrets
+                  name: fastapi-autogen-secrets
                   key: R2R_PWD
             - name: R2R_URL
               valueFrom:
                 secretKeyRef:
-                  name: rust-agent-secrets
+                  name: fastapi-autogen-secrets
                   key: R2R_URL
             - name: R2R_USER
               valueFrom:
                 secretKeyRef:
-                  name: rust-agent-secrets
+                  name: fastapi-autogen-secrets
                   key: R2R_USER
             - name: LITELLM_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: rust-agent-secrets
+                  name: fastapi-autogen-secrets
                   key: LITELLM_API_KEY
             - name: LITELLM_BASE_URL
               value: "http://litellm.llm-apps.svc.cluster.local/v1"
