@@ -2,8 +2,8 @@ use axum::{
     body::Body,
     http::{Request, StatusCode},
 };
-use fastapi_autogen_team::domain::agent::team::AgentTeam;
-use fastapi_autogen_team::{create_app, AppState};
+use rust_agent_team::domain::agent::team::AgentTeam;
+use rust_agent_team::{create_app, AppState};
 use serde_json::json;
 use std::sync::Arc;
 use tower::ServiceExt;
@@ -26,7 +26,7 @@ async fn test_large_payload_rejection() {
         .oneshot(
             Request::builder()
                 .method("POST")
-                .uri("/autogen/api/v1beta/chat/completions")
+                .uri("/agent/api/v1beta/chat/completions")
                 .header("Content-Type", "application/json")
                 .body(Body::from(payload.to_string()))
                 .unwrap(),
@@ -53,7 +53,7 @@ async fn test_invalid_json_rejection() {
         .oneshot(
             Request::builder()
                 .method("POST")
-                .uri("/autogen/api/v1beta/chat/completions")
+                .uri("/agent/api/v1beta/chat/completions")
                 .header("Content-Type", "application/json")
                 .body(Body::from("{ invalid json }"))
                 .unwrap(),
@@ -80,7 +80,7 @@ async fn test_empty_messages_validation() {
         .oneshot(
             Request::builder()
                 .method("POST")
-                .uri("/autogen/api/v1beta/chat/completions")
+                .uri("/agent/api/v1beta/chat/completions")
                 .header("Content-Type", "application/json")
                 .body(Body::from(payload.to_string()))
                 .unwrap(),

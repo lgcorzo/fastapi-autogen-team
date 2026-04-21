@@ -1,10 +1,10 @@
 [package]
-name = "fastapi-autogen-team"
+name = "rust-agent-team"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "fastapi_autogen_team"
+name = "rust_agent_team"
 path = "src/lib.rs"
 
 [dependencies]

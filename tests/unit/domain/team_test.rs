@@ -1,6 +1,6 @@
-use fastapi_autogen_team::application::dtos::{ContentType, Input, Message};
-use fastapi_autogen_team::domain::agent::team::AgentTeam;
 use mockito::Server;
+use rust_agent_team::application::dtos::{ContentType, Input, Message};
+use rust_agent_team::domain::agent::team::AgentTeam;
 
 fn make_input(text: &str) -> Input {
     Input {

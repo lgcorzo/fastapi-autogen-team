@@ -632,35 +632,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fastapi-autogen-team"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-stream",
- "async-trait",
- "axum 0.7.9",
- "chrono",
- "dotenvy",
- "futures",
- "http-body-util",
- "mockito",
- "opentelemetry",
- "opentelemetry-otlp",
- "opentelemetry_sdk",
- "reqwest 0.12.28",
- "rig-core",
- "serde",
- "serde_json",
- "thiserror 1.0.69",
- "tokio",
- "tower 0.5.3",
- "tower-http 0.5.2",
- "tracing",
- "tracing-opentelemetry",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "fastrand"
 version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2254,6 +2225,35 @@ dependencies = [
  "libc",
  "untrusted",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "rust-agent-team"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-stream",
+ "async-trait",
+ "axum 0.7.9",
+ "chrono",
+ "dotenvy",
+ "futures",
+ "http-body-util",
+ "mockito",
+ "opentelemetry",
+ "opentelemetry-otlp",
+ "opentelemetry_sdk",
+ "reqwest 0.12.28",
+ "rig-core",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+ "tokio",
+ "tower 0.5.3",
+ "tower-http 0.5.2",
+ "tracing",
+ "tracing-opentelemetry",
+ "tracing-subscriber",
 ]
 
 [[package]]

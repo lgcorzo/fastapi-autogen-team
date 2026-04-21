@@ -3,10 +3,10 @@ use axum::{
     http::{self, Request, StatusCode},
 };
 use dotenvy::dotenv;
-use fastapi_autogen_team::application::dtos::{ContentType, Input, Message};
-use fastapi_autogen_team::domain::agent::team::AgentTeam;
-use fastapi_autogen_team::{create_app, AppState};
 use http_body_util::BodyExt;
+use rust_agent_team::application::dtos::{ContentType, Input, Message};
+use rust_agent_team::domain::agent::team::AgentTeam;
+use rust_agent_team::{create_app, AppState};
 use std::sync::Arc;
 use tower::ServiceExt;
 
@@ -55,7 +55,7 @@ async fn test_production_pipeline_smoke() {
                 .oneshot(
                     Request::builder()
                         .method(http::Method::POST)
-                        .uri("/autogen/api/v1beta/chat/completions")
+                        .uri("/agent/api/v1beta/chat/completions")
                         .header(http::header::CONTENT_TYPE, "application/json")
                         .body(Body::from(serde_json::to_vec(&input).unwrap()))
                         .unwrap(),

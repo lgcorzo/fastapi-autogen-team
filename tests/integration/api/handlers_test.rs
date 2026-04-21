@@ -3,12 +3,12 @@ use axum::{
     http::{HeaderMap, StatusCode},
     response::IntoResponse,
 };
-use fastapi_autogen_team::application::dtos::{ContentType, Input, Message};
-use fastapi_autogen_team::domain::agent::team::AgentTeam;
-use fastapi_autogen_team::interface::http::handlers::{docs_redirect, get_models, route_query};
-use fastapi_autogen_team::interface::http::routes::AppState;
-use fastapi_autogen_team::interface::http::validation::ValidatedJson;
 use mockito::Server;
+use rust_agent_team::application::dtos::{ContentType, Input, Message};
+use rust_agent_team::domain::agent::team::AgentTeam;
+use rust_agent_team::interface::http::handlers::{docs_redirect, get_models, route_query};
+use rust_agent_team::interface::http::routes::AppState;
+use rust_agent_team::interface::http::validation::ValidatedJson;
 use std::sync::Arc;
 
 #[tokio::test]

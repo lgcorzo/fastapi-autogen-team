@@ -1,6 +1,6 @@
 # Project Documentation Home
 
-Welcome to the `fastapi-autogen-team` documentation. This project has been refactored into a high-performance Rust service following Domain-Driven Design (DDD) principles.
+Welcome to the `rust-agent-team` documentation. This project has been refactored into a high-performance Rust service following Domain-Driven Design (DDD) principles.
 
 ## 🏗️ Rust Service Architecture
 
@@ -74,7 +74,7 @@ To connect to Confluence, you'll need:
 
 ```python
 import requests
-from autogen import Tool
+from agent import Tool
 import base64
 from bs4 import BeautifulSoup
 
@@ -137,7 +137,7 @@ class ConfluenceSearchTool(Tool):
 ## 🤖 Integrating with an AutoGen Agent
 
 ```python
-from autogen import ConversableAgent
+from agent import ConversableAgent
 from confluence_search_tool import ConfluenceSearchTool
 
 confluence_tool = ConfluenceSearchTool(
@@ -232,7 +232,7 @@ Now process this user query:
 ### Usage Example
 
 ```python
-from autogen import ConversableAgent
+from agent import ConversableAgent
 
 CQL_translator = ConversableAgent(
     name="CQL_Translator",

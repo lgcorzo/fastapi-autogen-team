@@ -3,7 +3,7 @@ import json
 import os
 import sys
 
-def test_fastapi_autogen(prompt, model="internal-gpt4_v0.1"):
+def test_agent_team(prompt, model="internal-gpt4_v0.1"):
     url = "http://10.152.183.237/v1/chat/completions"
     headers = {
         "Content-Type": "application/json",
@@ -33,13 +33,13 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         prompt = sys.argv[1]
     
-    result = test_fastapi_autogen(prompt)
+    result = test_agent_team(prompt)
     if result:
         print("\n--- Response ---\n")
         print(result['choices'][0]['message']['content'])
         
         # Save to artifacts directory in the repo
-        output_dir = "/mnt/F024B17C24B145FE/Repos/fastapi-autogen-team/.artifacts"
+        output_dir = "/mnt/F024B17C24B145FE/Repos/rust-agent-team/.artifacts"
         os.makedirs(output_dir, exist_ok=True)
         import datetime
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")

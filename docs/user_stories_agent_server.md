@@ -1,10 +1,10 @@
-# US [Autogen Server](./backlog_mlops_regresion.md) : Serve Autogen workflows via FastAPI endpoints.
+# US [Agent Team Server](./backlog_mlops_regresion.md) : Serve Agent Team workflows via Rust endpoints.
 
-- [US Autogen Server : Serve Autogen workflows via FastAPI endpoints.](#us-autogen-server--serve-autogen-workflows-via-fastapi-endpoints)
+- [US Agent Team Server : Serve Agent Team workflows via Rust endpoints.](#us-agent-server--serve-agent-workflows-via-fastapi-endpoints)
   - [classes relations](#classes-relations)
-  - [**User Stories: Autogen Server Management**](#user-stories-autogen-server-management)
-    - [**1. User Story: Handle Responses from Autogen Workflow**](#1-user-story-handle-responses-from-autogen-workflow)
-    - [**2. User Story: Serve Autogen Workflow**](#2-user-story-serve-autogen-workflow)
+  - [**User Stories: Agent Team Server Management**](#user-stories-agent-server-management)
+    - [**1. User Story: Handle Responses from Agent Team Workflow**](#1-user-story-handle-responses-from-agent-workflow)
+    - [**2. User Story: Serve Agent Team Workflow**](#2-user-story-serve-agent-workflow)
     - [**3. User Story: Generate Streaming Response**](#3-user-story-generate-streaming-response)
     - [**4. User Story: Create Non-Streaming Response**](#4-user-story-create-non-streaming-response)
     - [**Common Acceptance Criteria**](#common-acceptance-criteria)
@@ -22,7 +22,7 @@ classDiagram
         +response: Output
         +(): dict
     }
-    class serve_autogen {
+    class serve_agent {
         +inp: Input
         +(): StreamingResponse | dict
     }
@@ -44,23 +44,23 @@ classDiagram
       +stream :bool
     }
     handle_response ..> Output : "uses"
-    serve_autogen ..> Input : "uses"
-    serve_autogen ..> AutogenWorkflow : "uses"
+    serve_agent ..> Input : "uses"
+    serve_agent ..> Agent TeamWorkflow : "uses"
     generate_streaming_response ..> Input : "uses"
     generate_streaming_response ..> Output : "uses"
     create_non_streaming_response ..> Output : "creates"
     create_non_streaming_response ..> handle_response : "uses"
 ```
 
-## **User Stories: Autogen Server Management**
+## **User Stories: Agent Team Server Management**
 
 ---
 
-### **1. User Story: Handle Responses from Autogen Workflow**
+### **1. User Story: Handle Responses from Agent Team Workflow**
 
-**Title:** As a **developer**, I want to handle responses from the Autogen workflow, validating their structure and serializing them for API delivery, so that I can ensure the API returns valid and consistent data.
+**Title:** As a **developer**, I want to handle responses from the Agent Team workflow, validating their structure and serializing them for API delivery, so that I can ensure the API returns valid and consistent data.
 
-**Description:** The `handle_response` function validates and processes the response object from the Autogen workflow, ensuring it's of the expected type and has the required attributes before serialization.
+**Description:** The `handle_response` function validates and processes the response object from the Agent Team workflow, ensuring it's of the expected type and has the required attributes before serialization.
 
 **Acceptance Criteria:**
 
@@ -71,25 +71,25 @@ classDiagram
 
 ---
 
-### **2. User Story: Serve Autogen Workflow**
+### **2. User Story: Serve Agent Team Workflow**
 
-**Title:** As a **user**, I want to access the Autogen workflow via an API endpoint, so that I can trigger the workflow and receive its results in either streaming or non-streaming format.
+**Title:** As a **user**, I want to access the Agent Team workflow via an API endpoint, so that I can trigger the workflow and receive its results in either streaming or non-streaming format.
 
-**Description:** The `serve_autogen` function serves the Autogen workflow based on the provided input, supporting both streaming and non-streaming responses.
+**Description:** The `serve_agent` function serves the Agent Team workflow based on the provided input, supporting both streaming and non-streaming responses.
 
 **Acceptance Criteria:**
 
 - The function accepts an `Input` object as input.
 - If `inp.stream` is True, the function returns a `StreamingResponse`.
 - If `inp.stream` is False, the function returns a dictionary.
-- The function uses the `AutogenWorkflow` class to execute the workflow.
-- Exceptions during Autogen processing are caught, logged, and re-raised as `HTTPException` with a 500 status code.
+- The function uses the `Agent TeamWorkflow` class to execute the workflow.
+- Exceptions during Agent Team processing are caught, logged, and re-raised as `HTTPException` with a 500 status code.
 
 ---
 
 ### **3. User Story: Generate Streaming Response**
 
-**Title:** As a **developer**, I want to generate a streaming response from the Autogen workflow, so that I can provide real-time updates to the user as the workflow progresses.
+**Title:** As a **developer**, I want to generate a streaming response from the Agent Team workflow, so that I can provide real-time updates to the user as the workflow progresses.
 
 **Description:** The `generate_streaming_response` function generates a streaming response from the message queue, yielding data chunks as they become available.
 
@@ -104,7 +104,7 @@ classDiagram
 
 ### **4. User Story: Create Non-Streaming Response**
 
-**Title:** As a **developer**, I want to create a non-streaming response from the Autogen workflow, so that I can provide a complete result to the user once the workflow has finished.
+**Title:** As a **developer**, I want to create a non-streaming response from the Agent Team workflow, so that I can provide a complete result to the user once the workflow has finished.
 
 **Description:** The `create_non_streaming_response` function creates a non-streaming response from the chat results, formatting the output according to the expected schema.
 
@@ -137,15 +137,15 @@ classDiagram
 
 ### **Definition of Done (DoD):**
 
-- All functions (`handle_response`, `serve_autogen`, `generate_streaming_response`, `create_non_streaming_response`) are implemented and tested.
+- All functions (`handle_response`, `serve_agent`, `generate_streaming_response`, `create_non_streaming_response`) are implemented and tested.
 - All unit tests pass successfully.
 - Code adheres to the project's coding standards and passes peer review.
 - Documentation is complete and up-to-date.
 
 ## Code location
 
-[src/fastapi_autogen_team/autogen_server.py](../src/fastapi_autogen_team/autogen_server.py)
+[src/rust_agent_team/agent_server.py](../src/rust_agent_team/agent_server.py)
 
 ## Test location
 
-[tests/autogen_server.py](../tests/test_autogen_server.py)
+[tests/agent_server.py](../tests/test_agent_server.py)

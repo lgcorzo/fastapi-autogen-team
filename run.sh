@@ -6,5 +6,5 @@ if [ -f .env ]; then
 fi
 
 # Run the Rust service in release mode
-echo "Starting Fastapi-Autogen-team Rust Service..."
+echo "Starting Rust-Agent-team Service..."
 cargo run --release

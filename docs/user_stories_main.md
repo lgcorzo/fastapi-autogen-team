@@ -1,8 +1,8 @@
-# US [FastAPI Application for Autogen Service](./backlog_mlops_regresion.md) : Run a FastAPI application that serves Autogen workflows with logging, tracing, and metrics.
+# US [Rust Application for Agent Team Service](./backlog_mlops_regresion.md) : Run a Rust application that serves Agent Team workflows with logging, tracing, and metrics.
 
-- [US FastAPI Application for Autogen Service : Run a FastAPI application that serves Autogen workflows with logging, tracing, and metrics.](#us-fastapi-application-for-autogen-service--run-a-fastapi-application-that-serves-autogen-workflows-with-logging-tracing-and-metrics)
+- [US Rust Application for Agent Team Service : Run a Rust application that serves Agent Team workflows with logging, tracing, and metrics.](#us-fastapi-application-for-agent-service--run-a-fastapi-application-that-serves-agent-workflows-with-logging-tracing-and-metrics)
   - [classes relations](#classes-relations)
-  - [**User Stories: FastAPI Application Management**](#user-stories-fastapi-application-management)
+  - [**User Stories: Rust Application Management**](#user-stories-fastapi-application-management)
     - [**1. User Story: Configure Application Settings from Environment Variables**](#1-user-story-configure-application-settings-from-environment-variables)
     - [**2. User Story: Set Up OpenTelemetry Tracing**](#2-user-story-set-up-opentelemetry-tracing)
     - [**3. User Story: Set Up OpenTelemetry Metrics**](#3-user-story-set-up-opentelemetry-metrics)
@@ -12,7 +12,7 @@
     - [**7. User Story: Define Model Information**](#7-user-story-define-model-information)
     - [**8. User Story: Define API Endpoints**](#8-user-story-define-api-endpoints)
     - [**9. User Story: Schedule Heartbeat Task**](#9-user-story-schedule-heartbeat-task)
-    - [**10. User Story: Run the FastAPI Application**](#10-user-story-run-the-fastapi-application)
+    - [**10. User Story: Run the Rust Application**](#10-user-story-run-the-fastapi-application)
     - [**Common Acceptance Criteria**](#common-acceptance-criteria)
     - [**Definition of Done (DoD):**](#definition-of-done-dod)
   - [Code location](#code-location)
@@ -24,7 +24,7 @@
 
 ```mermaid
 classDiagram
-    class FastAPI {
+    class Rust {
         +title: str
         +openapi_url: str
         +docs_url: str
@@ -55,19 +55,19 @@ classDiagram
         +run(app, host, port)
     }
 
-    FastAPI ..> RedirectResponse : "returns"
-    FastAPI ..> ModelInformation : "uses"
-    FastAPI ..> Input : "uses"
-    FastAPI ..> uvicorn : "uses"
+    Rust ..> RedirectResponse : "returns"
+    Rust ..> ModelInformation : "uses"
+    Rust ..> Input : "uses"
+    Rust ..> uvicorn : "uses"
 ```
 
-## **User Stories: FastAPI Application Management**
+## **User Stories: Rust Application Management**
 
 ---
 
 ### **1. User Story: Configure Application Settings from Environment Variables**
 
-**Title:** As a **system administrator**, I want to configure the FastAPI application using environment variables, so that I can easily manage settings across different environments.
+**Title:** As a **system administrator**, I want to configure the Rust application using environment variables, so that I can easily manage settings across different environments.
 
 **Description:** The application reads configuration settings from environment variables, allowing for flexible deployment and configuration management.
 
@@ -89,7 +89,7 @@ classDiagram
 - A `TracerProvider` is created and set as the global tracer provider.
 - An `OTLPSpanExporter` is configured to send traces to the specified endpoint.
 - A `BatchSpanProcessor` is used to batch and export spans.
-- The `FastAPIInstrumentor` is used to instrument the FastAPI application.
+- The `RustInstrumentor` is used to instrument the Rust application.
 
 ---
 
@@ -165,7 +165,7 @@ classDiagram
 
 ### **8. User Story: Define API Endpoints**
 
-**Title:** As a **developer**, I want to define API endpoints for accessing the Autogen service, so that users can interact with the workflow through HTTP requests.
+**Title:** As a **developer**, I want to define API endpoints for accessing the Agent Team service, so that users can interact with the workflow through HTTP requests.
 
 **Description:** The application defines API endpoints for documentation redirection, model information retrieval, and chat completion requests.
 
@@ -191,16 +191,16 @@ classDiagram
 
 ---
 
-### **10. User Story: Run the FastAPI Application**
+### **10. User Story: Run the Rust Application**
 
-**Title:** As a **system administrator**, I want to run the FastAPI application, so that the Autogen service is accessible to users.
+**Title:** As a **system administrator**, I want to run the Rust application, so that the Agent Team service is accessible to users.
 
-**Description:** The application uses Uvicorn to run the FastAPI application on a specified host and port.
+**Description:** The application uses Uvicorn to run the Rust application on a specified host and port.
 
 **Acceptance Criteria:**
 
 - The Uvicorn server is started with the specified host and port.
-- The FastAPI application is accessible through the defined API endpoints.
+- The Rust application is accessible through the defined API endpoints.
 
 ---
 
@@ -226,7 +226,7 @@ classDiagram
 
 ### **Definition of Done (DoD):**
 
-- The FastAPI application is fully configured and running.
+- The Rust application is fully configured and running.
 - OpenTelemetry tracing and metrics are correctly set up and exporting data.
 - Logging is configured to write to a file and export to OpenTelemetry.
 - All API endpoints are functional and return the expected responses.
@@ -234,7 +234,7 @@ classDiagram
 
 ## Code location
 
-[src/fastapi_autogen_team/main.py](../src/fastapi_autogen_team/main.py)
+[src/rust_agent_team/main.py](../src/rust_agent_team/main.py)
 
 ## Test location
 

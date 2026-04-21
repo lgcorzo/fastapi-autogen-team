@@ -1,6 +1,6 @@
 # Detailed Architecture Guide
 
-This document explains the relationship between the various elements of the `fastapi-autogen-team` project, following the **Domain-Driven Design (DDD)** standard.
+This document explains the relationship between the various elements of the `rust-agent-team` project, following the **Domain-Driven Design (DDD)** standard.
 
 ## DDD Layer Mapping
 
@@ -11,7 +11,7 @@ Handles the communication with external clients (REST API).
 - **`handlers.rs`**: Processes incoming HTTP requests and delegates work to the Domain layer.
 - **`routes.rs`**: Manages the application router and state.
 - **`middleware.rs`**: Implements security headers, CORS, and request sanitization.
-- **`validation.rs`**: Custom JSON extractor for FastAPI-compatible error reporting (422 Unprocessable Entity).
+- **`validation.rs`**: Custom JSON extractor for Rust-compatible error reporting (422 Unprocessable Entity).
 
 ### 2. Application Layer (`src/application/`)
 Defines the data formats and transformations used within the application.

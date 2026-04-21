@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_IMAGE: lgcorzo/fastapi-autogen-team
+  DOCKER_IMAGE: lgcorzo/rust-agent-team
 
 concurrency:
   group: publish-workflow

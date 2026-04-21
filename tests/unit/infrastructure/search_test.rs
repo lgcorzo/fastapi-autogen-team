@@ -1,5 +1,5 @@
-use fastapi_autogen_team::infrastructure::tools::search::SearchTool;
 use rig::tool::Tool;
+use rust_agent_team::infrastructure::tools::search::SearchTool;
 
 #[tokio::test]
 async fn test_search_tool_definition() {

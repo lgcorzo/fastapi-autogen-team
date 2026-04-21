@@ -171,7 +171,7 @@ classDiagram
 
 ## Code location
 
-[src/fastapi_autogen_team/data_model.py](../src/fastapi_autogen_team/data_model.py)
+[src/rust_agent_team/data_model.py](../src/rust_agent_team/data_model.py)
 
 ## Test location
 
