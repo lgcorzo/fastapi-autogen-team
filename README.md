@@ -1,18 +1,18 @@
-![Fastapi-Autogen-team Banner](image/README/banner.png)
+![Rust-Agent-team Banner](image/README/rust_banner.png)
 
-# Fastapi-Autogen-team Rust Service
+# Rust-Agent-team Service
 
-[![check.yml](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/check.yml/badge.svg)](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/check.yml)
-[![License](https://img.shields.io/github/license/lgcorzo/fastapi-autogen-team)](https://github.com/lgcorzo/fastapi-autogen-team/blob/main/LICENCE.txt)
-[![Release](https://img.shields.io/github/v/release/lgcorzo/fastapi-autogen-team)](https://github.com/lgcorzo/fastapi-autogen-team/releases)
+[![check.yml](https://github.com/lgcorzo/fastapi-agent-team/actions/workflows/check.yml/badge.svg)](https://github.com/lgcorzo/fastapi-agent-team/actions/workflows/check.yml)
+[![License](https://img.shields.io/github/license/lgcorzo/fastapi-agent-team)](https://github.com/lgcorzo/fastapi-agent-team/blob/main/LICENCE.txt)
+[![Release](https://img.shields.io/github/v/release/lgcorzo/fastapi-agent-team)](https://github.com/lgcorzo/fastapi-agent-team/releases)
 
-**This repository contains a high-performance Rust service designed as an MLOps template application following Domain-Driven Design (DDD) principles.** It uses the [Axum](https://github.com/tokio-rs/axum) web framework and the [Rig](https://github.com/0xPlayground/rig) LLM orchestration library.
+**This repository contains a high-performance Rust service designed as an MLOps template application following Domain-Driven Design (DDD) principles.** Originally a Python/FastAPI project using Microsoft's AutoGen, it has been fully refactored into a native Rust implementation using the [Axum](https://github.com/tokio-rs/axum) web framework and the [Rig](https://github.com/0xPlayground/rig) LLM orchestration library.
 
-It provides an OpenAI-compatible streaming interface for multi-agent workflows, enabling real-time interactions suitable for LiteLLM and other OpenAI-compatible integrations.
+It provides an OpenAI-compatible streaming interface for multi-agent workflows, leveraging **Qwen 2.5 7B** (running via Ollama and LiteLLM) to deliver fast and reliable reasoning.
 
 # Table of Contents
 
-- [Fastapi-Autogen-team Rust Service](#fastapi-autogen-team-rust-service)
+- [Rust-Agent Team-team Service](#rust-agent-team-service)
 - [Table of Contents](#table-of-contents)
 - [Overview](#overview)
 - [Architecture](#architecture)
@@ -136,8 +136,8 @@ tests/                   # DDD Testing Suite
 
 1.  **Clone the repository**:
     ```bash
-    git clone https://github.com/lgcorzo/fastapi-autogen-team.git
-    cd fastapi-autogen-team
+    git clone https://github.com/lgcorzo/fastapi-agent-team.git
+    cd fastapi-agent-team
     ```
 
 2.  **Install dependencies**:
@@ -178,10 +178,10 @@ The service is configured via environment variables. Create a `.env` file or exp
 ### Chat Completions
 
 ```bash
-curl -X POST "http://localhost:4100/autogen/api/v1beta/chat/completions" \
+curl -X POST "http://localhost:4100/agent/api/v1beta/chat/completions" \
      -H "Content-Type: application/json" \
      -d '{
-       "model": "gpt-4o",
+       "model": "qwen2.5:7b",
        "messages": [{"role": "user", "content": "Search for progress on EPIC-123 in Jira and related docs in R2R."}]
      }'
 ```
@@ -189,7 +189,7 @@ curl -X POST "http://localhost:4100/autogen/api/v1beta/chat/completions" \
 ### Models Information
 
 ```bash
-curl http://localhost:4100/autogen/api/v1beta/models
+curl http://localhost:4100/agent/api/v1beta/models
 ```
 
 # Testing and Quality Assurance

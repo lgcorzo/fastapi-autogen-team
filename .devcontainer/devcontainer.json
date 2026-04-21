@@ -1,20 +1,17 @@
 {
-    "name": "FastAPI AutoGen Team (K8s)",
+    "name": "Rust Agent Team (K8s)",
     "dockerFile": "Dockerfile",
     "context": "..",
     "workspaceFolder": "/app",
     "customizations": {
         "vscode": {
             "extensions": [
-                "ms-python.python",
-                "ms-python.vscode-pylance",
+                "rust-lang.rust-analyzer",
+                "tamasfe.even-better-toml",
                 "ms-kubernetes-tools.vscode-kubernetes-tools",
-                "okteto.remote-kubernetes",
-                "charliermarsh.ruff"
+                "okteto.remote-kubernetes"
             ],
             "settings": {
-                "python.defaultInterpreterPath": ".venv/bin/python",
-                "python.formatting.provider": "none",
                 "editor.formatOnSave": true
             }
         }

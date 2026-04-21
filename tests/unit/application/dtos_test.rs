@@ -1,4 +1,4 @@
-use fastapi_autogen_team::application::dtos::*;
+use rust_agent_team::application::dtos::*;
 use serde_json::json;
 
 #[test]

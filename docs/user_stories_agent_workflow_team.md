@@ -1,17 +1,17 @@
-# US [Autogen Workflow Team Management](./backlog_mlops_regresion.md) : Orchestrate Autogen agents for collaborative problem-solving.
+# US [Agent Team Workflow Team Management](./backlog_mlops_regresion.md) : Orchestrate Agent Team agents for collaborative problem-solving.
 
-- [US Autogen Workflow Team Management : Orchestrate Autogen agents for collaborative problem-solving.](#us-autogen-workflow-team-management--orchestrate-autogen-agents-for-collaborative-problem-solving)
+- [US Agent Team Workflow Team Management : Orchestrate Agent Team agents for collaborative problem-solving.](#us-agent-workflow-team-management--orchestrate-agent-agents-for-collaborative-problem-solving)
   - [classes relations](#classes-relations)
-  - [**User Stories: Autogen Workflow Management**](#user-stories-autogen-workflow-management)
-    - [**1. User Story: Configure LLM for Autogen Agents**](#1-user-story-configure-llm-for-autogen-agents)
+  - [**User Stories: Agent Team Workflow Management**](#user-stories-agent-workflow-management)
+    - [**1. User Story: Configure LLM for Agent Team Agents**](#1-user-story-configure-llm-for-agent-agents)
     - [**2. User Story: Stream Messages from Agents**](#2-user-story-stream-messages-from-agents)
     - [**3. User Story: Handle Tool Responses**](#3-user-story-handle-tool-responses)
     - [**4. User Story: Handle Function and Tool Calls**](#4-user-story-handle-function-and-tool-calls)
     - [**5. User Story: Manage Regular Messages**](#5-user-story-manage-regular-messages)
     - [**6. User Story: Manage Suggested Function Calls**](#6-user-story-manage-suggested-function-calls)
     - [**7. User Story: Manage Suggested Tool Calls**](#7-user-story-manage-suggested-tool-calls)
-    - [**8. User Story: Initialize Autogen Agents**](#8-user-story-initialize-autogen-agents)
-    - [**9. User Story: Execute Autogen Workflow**](#9-user-story-execute-autogen-workflow)
+    - [**8. User Story: Initialize Agent Team Agents**](#8-user-story-initialize-agent-agents)
+    - [**9. User Story: Execute Agent Team Workflow**](#9-user-story-execute-agent-workflow)
     - [**Common Acceptance Criteria**](#common-acceptance-criteria)
     - [**Definition of Done (DoD):**](#definition-of-done-dod)
   - [Code location](#code-location)
@@ -23,7 +23,7 @@
 
 ```mermaid
 classDiagram
-    class AutogenWorkflow {
+    class Agent TeamWorkflow {
         -queue: Queue
         +user_proxy: UserProxyAgent
         +developer: AssistantAgent
@@ -49,22 +49,22 @@ classDiagram
 
     }
 
-    AutogenWorkflow --> UserProxyAgent : "uses"
-    AutogenWorkflow --> AssistantAgent : "uses"
-    AutogenWorkflow --> GroupChat : "uses"
-    AutogenWorkflow --> GroupChatManager : "uses"
+    Agent TeamWorkflow --> UserProxyAgent : "uses"
+    Agent TeamWorkflow --> AssistantAgent : "uses"
+    Agent TeamWorkflow --> GroupChat : "uses"
+    Agent TeamWorkflow --> GroupChatManager : "uses"
 
 ```
 
-## **User Stories: Autogen Workflow Management**
+## **User Stories: Agent Team Workflow Management**
 
 ---
 
-### **1. User Story: Configure LLM for Autogen Agents**
+### **1. User Story: Configure LLM for Agent Team Agents**
 
-**Title:** As a **developer**, I want to configure the language model settings (temperature, API keys, etc.) for Autogen agents, so that I can control the behavior and performance of the agents.
+**Title:** As a **developer**, I want to configure the language model settings (temperature, API keys, etc.) for Agent Team agents, so that I can control the behavior and performance of the agents.
 
-**Description:** The `create_llm_config` function facilitates the configuration of language models for Autogen agents, allowing customization of settings such as temperature and API keys.
+**Description:** The `create_llm_config` function facilitates the configuration of language models for Agent Team agents, allowing customization of settings such as temperature and API keys.
 
 **Acceptance Criteria:**
 
@@ -76,9 +76,9 @@ classDiagram
 
 ### **2. User Story: Stream Messages from Agents**
 
-**Title:** As a **user**, I want to receive streamed messages from Autogen agents, so that I can see the agents' interactions in real-time.
+**Title:** As a **user**, I want to receive streamed messages from Agent Team agents, so that I can see the agents' interactions in real-time.
 
-**Description:** The `streamed_print_received_message` function prints messages received from Autogen agents with streaming support, providing a real-time view of agent interactions.
+**Description:** The `streamed_print_received_message` function prints messages received from Agent Team agents with streaming support, providing a real-time view of agent interactions.
 
 **Acceptance Criteria:**
 
@@ -90,7 +90,7 @@ classDiagram
 
 ### **3. User Story: Handle Tool Responses**
 
-**Title:** As a **developer**, I want to handle tool responses from Autogen agents, so that the agent can execute tools effectively.
+**Title:** As a **developer**, I want to handle tool responses from Agent Team agents, so that the agent can execute tools effectively.
 
 **Description:** The `handle_tool_responses` function manages messages containing tool responses, including printing and queuing.
 
@@ -103,7 +103,7 @@ classDiagram
 
 ### **4. User Story: Handle Function and Tool Calls**
 
-**Title:** As a **developer**, I want to handle function and tool calls from Autogen agents, so that the agent can execute functions effectively.
+**Title:** As a **developer**, I want to handle function and tool calls from Agent Team agents, so that the agent can execute functions effectively.
 
 **Description:** The `handle_function_tool_message` function processes messages from function or tool calls, displaying the function name and arguments.
 
@@ -116,9 +116,9 @@ classDiagram
 
 ### **5. User Story: Manage Regular Messages**
 
-**Title:** As a **developer**, I want to manage regular messages from Autogen agents (not tool or function calls), so that I can process and display the content.
+**Title:** As a **developer**, I want to manage regular messages from Agent Team agents (not tool or function calls), so that I can process and display the content.
 
-**Description:** The `handle_regular_message` function processes regular messages from Autogen agents, instantiating the content and handling function and tool calls.
+**Description:** The `handle_regular_message` function processes regular messages from Agent Team agents, instantiating the content and handling function and tool calls.
 
 **Acceptance Criteria:**
 
@@ -130,7 +130,7 @@ classDiagram
 
 ### **6. User Story: Manage Suggested Function Calls**
 
-**Title:** As a **developer**, I want to manage suggested function calls from Autogen agents, so that I can display the function name and arguments for user confirmation.
+**Title:** As a **developer**, I want to manage suggested function calls from Agent Team agents, so that I can display the function name and arguments for user confirmation.
 
 **Description:** The `handle_suggested_function_call` function processes suggested function calls, displaying the function name and arguments for user confirmation.
 
@@ -143,7 +143,7 @@ classDiagram
 
 ### **7. User Story: Manage Suggested Tool Calls**
 
-**Title:** As a **developer**, I want to manage suggested tool calls from Autogen agents, so that I can display the tool name and arguments for user confirmation.
+**Title:** As a **developer**, I want to manage suggested tool calls from Agent Team agents, so that I can display the tool name and arguments for user confirmation.
 
 **Description:** The `handle_suggested_tool_calls` function processes suggested tool calls, displaying the tool name and arguments for user confirmation.
 
@@ -154,29 +154,29 @@ classDiagram
 
 ---
 
-### **8. User Story: Initialize Autogen Agents**
+### **8. User Story: Initialize Agent Team Agents**
 
-**Title:** As a **developer**, I want to initialize a set of Autogen agents (UserProxy, Developer, Planner, Executor, Quality Assurance) with predefined roles and configurations, so that I can create a collaborative team for problem-solving.
+**Title:** As a **developer**, I want to initialize a set of Agent Team agents (UserProxy, Developer, Planner, Executor, Quality Assurance) with predefined roles and configurations, so that I can create a collaborative team for problem-solving.
 
-**Description:** The `AutogenWorkflow` class initializes a set of Autogen agents with specific roles and system messages, enabling collaborative problem-solving.
+**Description:** The `Agent TeamWorkflow` class initializes a set of Agent Team agents with specific roles and system messages, enabling collaborative problem-solving.
 
 **Acceptance Criteria:**
 
-- The `AutogenWorkflow` class creates instances of UserProxyAgent, AssistantAgent, and GroupChatManager.
+- The `Agent TeamWorkflow` class creates instances of UserProxyAgent, AssistantAgent, and GroupChatManager.
 - Each agent is initialized with specific roles, system messages, and configurations.
 - Agent transitions are properly defined.
 
 ---
 
-### **9. User Story: Execute Autogen Workflow**
+### **9. User Story: Execute Agent Team Workflow**
 
-**Title:** As a **user**, I want to execute the Autogen workflow with a given message, so that I can initiate the collaborative problem-solving process.
+**Title:** As a **user**, I want to execute the Agent Team workflow with a given message, so that I can initiate the collaborative problem-solving process.
 
-**Description:** The `run` method initiates the Autogen workflow, passing a message to the user proxy and returning the chat history.
+**Description:** The `run` method initiates the Agent Team workflow, passing a message to the user proxy and returning the chat history.
 
 **Acceptance Criteria:**
 
-- The `run` method initiates the Autogen workflow.
+- The `run` method initiates the Agent Team workflow.
 - The workflow can be executed in both streaming and non-streaming modes.
 - The function returns the chat history.
 ---
@@ -207,8 +207,8 @@ classDiagram
 
 ## Code location
 
-[src/fastapi_autogen_team/autogen_workflow_team.py](../src/fastapi_autogen_team/autogen_workflow_team.py)
+[src/rust_agent_team/agent_workflow_team.py](../src/rust_agent_team/agent_workflow_team.py)
 
 ## Test location
 
-[tests/core/test_schemas.py](../tests/test_autogen_workflow_team.py)
+[tests/core/test_schemas.py](../tests/test_agent_workflow_team.py)

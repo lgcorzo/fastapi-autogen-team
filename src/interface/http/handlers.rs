@@ -17,7 +17,7 @@ use crate::interface::http::validation::ValidatedJson;
 pub async fn docs_redirect() -> impl IntoResponse {
     (
         StatusCode::SEE_OTHER,
-        [("Location", "https://autogen-team.com/docs")],
+        [("Location", "https://agent-team.com/docs")],
     )
 }
 

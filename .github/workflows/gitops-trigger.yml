@@ -32,6 +32,6 @@ jobs:
           # but usually, we just commit a change to the GitOps repo 
           # or wait for the interval. 
           # For now, we will just log the trigger request.
-          echo "Triggering Flux reconciliation for fastapi-autogen"
+          echo "Triggering Flux reconciliation for fastapi-agent"
           # In a real scenario, you might use a webhook or commit a dummy file to the GitOps repo.
           # For this task, I'll provide a placeholder for the user to configure their preferred trigger method.

@@ -1,6 +1,6 @@
 # Module Architecture (DDD)
 
-The `fastapi-autogen-team` Rust service is architected using **Domain-Driven Design (DDD)** principles. This structure ensures that the core business logic (the "Domain") is isolated from external triggers (the "Interface") and external technical implementations (the "Infrastructure").
+The Rust Agent Team Team service is architected using **Domain-Driven Design (DDD)** principles.
 
 ## 🏗️ DDD Layered Hierarchy
 

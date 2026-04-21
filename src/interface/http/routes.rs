@@ -13,9 +13,13 @@ pub struct AppState {
 
 pub fn create_app(state: Arc<AppState>) -> Router {
     let mut router = Router::new()
-        .route("/autogen", get(docs_redirect))
-        .route("/autogen/api/v1beta/models", get(get_models))
-        .route("/autogen/api/v1beta/chat/completions", post(route_query))
+        .route("/agent", get(docs_redirect))
+        .nest(
+            "/agent/api/v1beta",
+            Router::new()
+                .route("/models", get(get_models))
+                .route("/chat/completions", post(route_query)),
+        )
         .with_state(state);
 
     // Apply security headers

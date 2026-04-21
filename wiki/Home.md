@@ -1,6 +1,6 @@
-# ⚙️ FastAPI Autogen Team (Rust Refresh)
+# ⚙️ Rust Agent Team Team
 
-Welcome to the documentation for the high-performance Rust service migration of the `fastapi-autogen-team`. This project has been fully rebuilt using **Axum**, **Rig**, and **Tokio** following **Domain-Driven Design (DDD)** principles to provide a type-safe, concurrent, and highly scalable agentic orchestration platform.
+Welcome to the documentation for the high-performance Rust service. This project has been fully built using **Axum**, **Rig**, and **Tokio** following **Domain-Driven Design (DDD)** principles to provide a type-safe, concurrent, and highly scalable agentic orchestration platform.
 
 ## 🎯 Project Goals
 The primary objective of this repository is to orchestrate a team of specialized AI agents to solve complex tasks involving Information Retrieval (RAG) and Issue Tracking (Jira).

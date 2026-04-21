@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fastapi-autogen-team
+  name: rust-agent-team
   labels:
-    app: fastapi-autogen-team
+    app: rust-agent-team
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: fastapi-autogen-team
+      app: rust-agent-team
   template:
     metadata:
       labels:
-        app: fastapi-autogen-team
+        app: rust-agent-team
     spec:
       containers:
-        - name: fastapi-autogen-team
-          image: lgcorzo/fastapi-autogen-team:latest
+        - name: rust-agent-team
+          image: lgcorzo/rust-agent-team:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 4100
@@ -24,49 +24,49 @@ spec:
             - name: DEFAULT_OTEL_ENDPOINT
               valueFrom:
                 secretKeyRef:
-                  name: fastapi-autogen-secrets
+                  name: rust-agent-secrets
                   key: DEFAULT_OTEL_ENDPOINT
             - name: DEFAULT_HOST
               value: "0.0.0.0"
             - name: JIRA_API_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: fastapi-autogen-secrets
+                  name: rust-agent-secrets
                   key: JIRA_API_TOKEN
             - name: JIRA_CLOUD
               valueFrom:
                 secretKeyRef:
-                  name: fastapi-autogen-secrets
+                  name: rust-agent-secrets
                   key: JIRA_CLOUD
             - name: JIRA_INSTANCE_URL
               valueFrom:
                 secretKeyRef:
-                  name: fastapi-autogen-secrets
+                  name: rust-agent-secrets
                   key: JIRA_INSTANCE_URL
             - name: JIRA_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: fastapi-autogen-secrets
+                  name: rust-agent-secrets
                   key: JIRA_USERNAME
             - name: R2R_PWD
               valueFrom:
                 secretKeyRef:
-                  name: fastapi-autogen-secrets
+                  name: rust-agent-secrets
                   key: R2R_PWD
             - name: R2R_URL
               valueFrom:
                 secretKeyRef:
-                  name: fastapi-autogen-secrets
+                  name: rust-agent-secrets
                   key: R2R_URL
             - name: R2R_USER
               valueFrom:
                 secretKeyRef:
-                  name: fastapi-autogen-secrets
+                  name: rust-agent-secrets
                   key: R2R_USER
             - name: LITELLM_API_KEY
               valueFrom:
                 secretKeyRef:
-                  name: fastapi-autogen-secrets
+                  name: rust-agent-secrets
                   key: LITELLM_API_KEY
             - name: LITELLM_BASE_URL
               value: "http://litellm.llm-apps.svc.cluster.local/v1"

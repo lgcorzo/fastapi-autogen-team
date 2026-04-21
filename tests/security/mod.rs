@@ -2,8 +2,8 @@ use axum::{
     body::Body,
     http::{Request, StatusCode},
 };
-use fastapi_autogen_team::domain::agent::team::AgentTeam;
-use fastapi_autogen_team::{create_app, AppState};
+use rust_agent_team::domain::agent::team::AgentTeam;
+use rust_agent_team::{create_app, AppState};
 use serde_json::json;
 use std::sync::Arc;
 use tower::ServiceExt;
@@ -18,7 +18,7 @@ async fn test_security_headers_present() {
     let response = app
         .oneshot(
             Request::builder()
-                .uri("/autogen/api/v1beta/models")
+                .uri("/agent/api/v1beta/models")
                 .body(Body::empty())
                 .unwrap(),
         )
@@ -57,7 +57,7 @@ async fn test_cors_specific_origins() {
         .oneshot(
             Request::builder()
                 .method("OPTIONS")
-                .uri("/autogen/api/v1beta/models")
+                .uri("/agent/api/v1beta/models")
                 .header("Origin", "https://good.com")
                 .header("Access-Control-Request-Method", "GET")
                 .body(Body::empty())
@@ -80,7 +80,7 @@ async fn test_cors_specific_origins() {
         .oneshot(
             Request::builder()
                 .method("OPTIONS")
-                .uri("/autogen/api/v1beta/models")
+                .uri("/agent/api/v1beta/models")
                 .header("Origin", "https://evil.com")
                 .header("Access-Control-Request-Method", "GET")
                 .body(Body::empty())
@@ -110,7 +110,7 @@ async fn test_header_injection_sanitization() {
 
     let res = Request::builder()
         .method("POST")
-        .uri("/autogen/api/v1beta/chat/completions")
+        .uri("/agent/api/v1beta/chat/completions")
         .header("Content-Type", "application/json")
         .header("x-openwebui-user-id", malicious_header)
         .body(Body::from(payload.to_string()));

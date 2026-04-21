@@ -1,6 +1,6 @@
 # GitOps Deployment Guide
 
-This guide explains how `fastapi-autogen-team` is integrated with the GitOps repository for automated deployments using FluxCD.
+This guide explains how `rust-agent-team` is integrated with the GitOps repository for automated deployments using FluxCD.
 
 ## Deployment Overview
 
@@ -13,8 +13,8 @@ The deployment follows a GitOps pattern where the Kubernetes state is synchroniz
 
 ### Kubernetes structure
 
-- **Namespace**: `fastapi-autogen`
-- **Deployment**: `fastapi-autogen-team` (Port 4100)
+- **Namespace**: `fastapi-agent`
+- **Deployment**: `rust-agent-team` (Port 4100)
 - **Overlay**: `k8s/overlays/gitops/kustomization.yaml`
 
 ---
@@ -37,7 +37,7 @@ The GitHub Action `gitops-trigger.yml` requires a secret named `GITOPS_TOKEN` to
 
 ### 2. Add the Secret to this Repository
 
-1. Go to the **Settings** tab of the `fastapi-autogen-team` repository.
+1. Go to the **Settings** tab of the `rust-agent-team` repository.
 2. On the left, click **Secrets and variables** -> **Actions**.
 3. Click **New repository secret**.
 4. **Name**: `GITOPS_TOKEN`
@@ -51,11 +51,11 @@ The GitHub Action `gitops-trigger.yml` requires a secret named `GITOPS_TOKEN` to
 While Flux automatically synchronizes every minute, you can force a reconciliation if you have `flux` installed and access to the cluster:
 
 ```bash
-flux reconcile kustomization fastapi-autogen --with-source
+flux reconcile kustomization fastapi-agent --with-source
 ```
 
 You can verify the status of the deployment with:
 
 ```bash
-kubectl get pods -n fastapi-autogen
+kubectl get pods -n fastapi-agent
 ```

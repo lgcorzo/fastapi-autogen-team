@@ -19,7 +19,9 @@ pub fn security_headers() -> Vec<SetResponseHeaderLayer<HeaderValue>> {
         ),
         SetResponseHeaderLayer::if_not_present(
             HeaderName::from_static("content-security-policy"),
-            HeaderValue::from_static("default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://fastapi.tiangolo.com;"),
+            HeaderValue::from_static(
+                "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self';",
+            ),
         ),
         SetResponseHeaderLayer::if_not_present(
             HeaderName::from_static("referrer-policy"),
