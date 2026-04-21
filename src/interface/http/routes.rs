@@ -5,6 +5,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
+use tower_http::trace::TraceLayer;
 use std::sync::Arc;
 
 pub struct AppState {
@@ -31,6 +32,5 @@ pub fn create_app(state: Arc<AppState>) -> Router {
     if let Some(cors) = cors_layer() {
         router = router.layer(cors);
     }
-
-    router
+    router.layer(TraceLayer::new_for_http())
 }
