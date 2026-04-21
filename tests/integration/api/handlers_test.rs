@@ -18,7 +18,7 @@ async fn test_docs_redirect() {
     assert_eq!(response.status(), StatusCode::SEE_OTHER);
     assert_eq!(
         response.headers().get("Location").unwrap(),
-        "https://autogen-team.com/docs"
+        "https://agent-team.com/docs"
     );
 }
 
