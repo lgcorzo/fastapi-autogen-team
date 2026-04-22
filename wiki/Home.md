@@ -8,7 +8,7 @@ The primary objective of this repository is to orchestrate a team of specialized
 ### Key Features
 - **🚀 DDD Architecture**: Clear separation into Interface, Application, Domain, and Infrastructure layers.
 - **🤖 Agentic Orchestration**: Uses the [Rig](https://github.com/0xPlaygrounds/rig) framework for multi-agent workflows.
-- **🔍 Advanced Search**: Integrated with R2R for vector-based RAG and Jira for project management.
+- **🔍 Advanced Search**: Integrated with R2R for vector-based RAG, Jira for project management, and Confluence for documentation.
 - **🛡️ Type Safety**: Full end-to-end type safety with Rust traits and structs.
 
 ---
@@ -20,14 +20,14 @@ The system follows a tiered DDD structure to decouple the web boundary, the core
 1. **[Interface Layer](v2_architecture.md#interface-layer)**: Handles HTTP requests, streaming responses, and middleware (Security/CORS).
 2. **[Application Layer](v2_architecture.md#application-layer)**: Defines DTOs and shared models for data transport.
 3. **[Domain Layer](v2_architecture.md#domain-layer)**: The orchestration heart, containing the `AgentTeam` (Planner, Searcher, QA).
-4. **[Infrastructure Layer](v2_architecture.md#infrastructure-layer)**: Implements concrete tools (Jira, R2R) and telemetry observers.
+4. **[Infrastructure Layer](v2_architecture.md#infrastructure-layer)**: Implements concrete tools (Jira, Confluence, R2R) and telemetry observers.
 
 ---
 
 ## 🗺️ Documentation Map
 - **[System Architecture](v2_architecture.md)**: Detailed design decisions and workflow descriptions.
 - **[Data Models](data_models.md)**: Struct definitions for API inputs and agent outputs.
-- **[Module Structure](architecture_modules.md)**: Visual map of the Rust DDD package hierarchy.
+- **[Module Structure](architecture_modules.md)**: Visual map of the Rust DDD package hierarchy including Confluence.
 - **[Deployment](../README.md#🚀-quick-start)**: How to build, test, and deploy the service.
 
 ---

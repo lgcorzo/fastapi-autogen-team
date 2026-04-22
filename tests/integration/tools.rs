@@ -38,7 +38,7 @@ async fn test_get_jira_results_success() {
     let url = server.url();
 
     let _m_jira = server
-        .mock("GET", "/rest/api/2/search")
+        .mock("GET", "/rest/api/3/search/jql")
         .match_query(mockito::Matcher::Any)
         .with_status(200)
         .with_header("content-type", "application/json")
@@ -71,7 +71,7 @@ async fn test_get_jira_results_no_issues() {
     let url = server.url();
 
     let _m_jira = server
-        .mock("GET", "/rest/api/2/search")
+        .mock("GET", "/rest/api/3/search/jql")
         .match_query(mockito::Matcher::Any)
         .with_status(200)
         .with_header("content-type", "application/json")

@@ -32,6 +32,7 @@ The core business logic and agent orchestration, located in `src/domain/agent/`.
 ### [Infrastructure Layer]
 Concrete implementations of external dependencies, located in `src/infrastructure/`.
 - **tools/jira.rs**: Jira JQL client for issue tracking.
+- **tools/confluence.rs**: Confluence CQL client for documentation search.
 - **tools/r2r.rs**: Client for R2R vector retrieval.
 - **tools/search.rs**: Unified SearchTool that provides a common interface for the agents.
 - **telemetry.rs**: Instrumentation for OpenTelemetry (tracing, metrics, and logs).
@@ -53,7 +54,7 @@ sequenceDiagram
     I->>D: Invoke AgentTeam::run_stream
     D->>D: Planner: Generate Instructions
     loop Agentic Execution
-        D->>Inf: Searcher: Call Tool (Jira/R2R)
+        D->>Inf: Searcher: Call Tool (Jira/Confluence/R2R)
         Inf-->>D: Return Raw Data / Context
     end
     D->>D: QA: Final Synthesis

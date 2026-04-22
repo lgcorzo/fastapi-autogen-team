@@ -11,7 +11,7 @@ async fn test_get_jira_results_success() {
     env::set_var("JIRA_API_TOKEN", "test_token");
 
     let _m = server
-        .mock("GET", "/rest/api/2/search")
+        .mock("GET", "/rest/api/3/search/jql")
         .match_query(mockito::Matcher::Any)
         .with_status(200)
         .with_header("content-type", "application/json")

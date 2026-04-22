@@ -30,7 +30,7 @@ It provides an OpenAI-compatible streaming interface for multi-agent workflows, 
 
 The project facilitates complex LLM orchestration through a "Team" of agents:
 1. **Planner**: Breaks down user requests into actionable search queries.
-2. **Searcher**: Executes searches across integrated tools (R2R and Jira).
+2. **Searcher**: Executes searches across integrated tools (R2R, Jira, and Confluence).
 3. **QA/Expert**: Synthesizes search results into a final answer.
 
 # Architecture
@@ -71,6 +71,7 @@ graph TD
         Infrastructure --> LiteLLM[LiteLLM Gateway]
         Infrastructure --> R2R[R2R RAG Tool]
         Infrastructure --> Jira[Jira Tool]
+        Infrastructure --> Confluence[Confluence Tool]
         Infrastructure --> Telemetry[OpenTelemetry]
     end
 
@@ -78,6 +79,7 @@ graph TD
     Planner --> LiteLLM
     Searcher --> R2R
     Searcher --> Jira
+    Searcher --> Confluence
     QA --> LiteLLM
 ```
 
@@ -116,7 +118,7 @@ src/
 tests/                   # DDD Testing Suite
 ├── unit/                # Isolated Component Tests (Domain, App, Infra)
 ├── integration/         # Multi-component API & Workflow Tests
-│   ├── tools.rs         # Specific tests for R2R and Jira tools
+│   ├── tools.rs         # Specific tests for R2R, Jira, and Confluence tools
 │   └── ...
 ├── smoke/               # Zero-mock Production Tests
 ├── security/            # Security, Auth, and Sanitization Tests
@@ -168,9 +170,9 @@ The service is configured via environment variables. Create a `.env` file or exp
 | `R2R_URL` | URL for the R2R backend |
 | `R2R_USER` | R2R Username |
 | `R2R_PWD` | R2R Password |
-| `JIRA_INSTANCE_URL` | Your Jira Cloud URL (e.g., https://site.atlassian.net) |
-| `JIRA_USERNAME` | Jira account email |
-| `JIRA_API_TOKEN` | Jira API Token |
+| `JIRA_INSTANCE_URL` | Your Atlassian Cloud URL (e.g., https://site.atlassian.net) |
+| `JIRA_USERNAME` | Atlassian account email (used for Jira & Confluence) |
+| `JIRA_API_TOKEN` | Atlassian API Token (used for Jira & Confluence) |
 | `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins |
 
 # Usage
@@ -182,7 +184,7 @@ curl -X POST "http://localhost:4100/agent/api/v1beta/chat/completions" \
      -H "Content-Type: application/json" \
      -d '{
        "model": "qwen2.5:7b",
-       "messages": [{"role": "user", "content": "Search for progress on EPIC-123 in Jira and related docs in R2R."}]
+       "messages": [{"role": "user", "content": "Search for progress on EPIC-123 in Jira, related docs in R2R, and design specs in Confluence."}]
      }'
 ```
 

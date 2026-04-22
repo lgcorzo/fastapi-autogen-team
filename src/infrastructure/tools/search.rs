@@ -1,3 +1,4 @@
+use crate::infrastructure::tools::confluence::get_confluence_results;
 use crate::infrastructure::tools::jira::get_jira_results;
 use crate::infrastructure::tools::r2r::get_r2r_results;
 use rig::completion::ToolDefinition;
@@ -16,6 +17,7 @@ pub struct SearchArgs {
 pub struct SearchResult {
     pub r2r: String,
     pub jira: String,
+    pub confluence: String,
 }
 
 #[derive(Debug, Error)]
@@ -39,7 +41,7 @@ impl Tool for SearchTool {
     async fn definition(&self, _prompt: String) -> ToolDefinition {
         ToolDefinition {
             name: "search".to_string(),
-            description: "Search for information in R2R (RAG) and Jira.".to_string(),
+            description: "Search for information in R2R (RAG), Jira, and Confluence.".to_string(),
             parameters: json!({
                 "type": "object",
                 "properties": {
@@ -70,9 +72,17 @@ impl Tool for SearchTool {
             SearchError::Other("An internal error occurred in Jira search".to_string())
         })?;
 
+        let confluence_res = get_confluence_results(&jira_url, &query)
+            .await
+            .map_err(|e| {
+                tracing::error!("Confluence error: {}", e);
+                SearchError::Other("An internal error occurred in Confluence search".to_string())
+            })?;
+
         Ok(SearchResult {
             r2r: r2r_res,
             jira: jira_res,
+            confluence: confluence_res,
         })
     }
 }
