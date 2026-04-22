@@ -23,6 +23,7 @@ graph TD
 
     subgraph "Infrastructure Layer (src/infrastructure)"
         Jira[tools/jira.rs]
+        Confluence[tools/confluence.rs]
         R2R[tools/r2r.rs]
         Search[tools/search.rs]
         Telemetry[telemetry.rs]
@@ -54,5 +55,5 @@ The core of the application. It contains the business rules and the `AgentTeam` 
 
 ### 4. Infrastructure Layer (`src/infrastructure`)
 Contains technical implementations of domain requirements.
-- **tools/**: Concrete tool logic for Jira JQL, R2R Vector Search, and the unified SearchTool.
+- **tools/**: Concrete tool logic for Jira JQL, Confluence CQL, R2R Vector Search, and the unified SearchTool.
 - **telemetry.rs**: Integration with OpenTelemetry for tracing and logging.
