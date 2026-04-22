@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["jira","r2r","search"]};
+window.SIDEBAR_ITEMS = {"mod":["confluence","jira","r2r","search"]};

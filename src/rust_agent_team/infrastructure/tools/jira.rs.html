@@ -13,11 +13,11 @@
 <a href=#13 id=13 data-nosnippet>13</a>        sanitized_query, sanitized_query
 <a href=#14 id=14 data-nosnippet>14</a>    );
 <a href=#15 id=15 data-nosnippet>15</a>
-<a href=#16 id=16 data-nosnippet>16</a>    <span class="kw">let </span>search_url = <span class="macro">format!</span>(<span class="string">"{}/rest/api/2/search"</span>, url.trim_end_matches(<span class="string">'/'</span>));
+<a href=#16 id=16 data-nosnippet>16</a>    <span class="kw">let </span>search_url = <span class="macro">format!</span>(<span class="string">"{}/rest/api/3/search/jql"</span>, url.trim_end_matches(<span class="string">'/'</span>));
 <a href=#17 id=17 data-nosnippet>17</a>    <span class="kw">let </span>res = client
 <a href=#18 id=18 data-nosnippet>18</a>        .get(<span class="kw-2">&amp;</span>search_url)
 <a href=#19 id=19 data-nosnippet>19</a>        .basic_auth(<span class="kw-2">&amp;</span>user, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>token))
-<a href=#20 id=20 data-nosnippet>20</a>        .query(<span class="kw-2">&amp;</span>[(<span class="string">"jql"</span>, <span class="kw-2">&amp;</span>jql)])
+<a href=#20 id=20 data-nosnippet>20</a>        .query(<span class="kw-2">&amp;</span>[(<span class="string">"jql"</span>, jql.as_str()), (<span class="string">"fields"</span>, <span class="string">"summary,key"</span>)])
 <a href=#21 id=21 data-nosnippet>21</a>        .send()
 <a href=#22 id=22 data-nosnippet>22</a>        .<span class="kw">await</span><span class="question-mark">?</span>;
 <a href=#23 id=23 data-nosnippet>23</a>
