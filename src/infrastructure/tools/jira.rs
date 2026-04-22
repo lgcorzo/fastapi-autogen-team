@@ -13,11 +13,11 @@ pub async fn get_jira_results(url: &str, query: &str) -> anyhow::Result<String> 
         sanitized_query, sanitized_query
     );
 
-    let search_url = format!("{}/rest/api/2/search", url.trim_end_matches('/'));
+    let search_url = format!("{}/rest/api/3/search/jql", url.trim_end_matches('/'));
     let res = client
         .get(&search_url)
         .basic_auth(&user, Some(&token))
-        .query(&[("jql", &jql)])
+        .query(&[("jql", jql.as_str()), ("fields", "summary,key")])
         .send()
         .await?;
 
