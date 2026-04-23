@@ -34,7 +34,7 @@ fn is_valid_query_line(line: &str) -> bool {
     if l.len() < 5 {
         return false;
     }
-    if l.starts_with('{') || l.starts_with('}') || l.starts_with('[') || l.starts_with(']') {
+    if l.starts_with('{') || l.starts_with('}') {
         return false;
     }
     // Reject JSON key/value fragments (e.g. `"title": "..."`, `"follow_ups":` etc.)
