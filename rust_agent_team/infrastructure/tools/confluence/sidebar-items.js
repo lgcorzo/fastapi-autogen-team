@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["get_confluence_results"]};
+window.SIDEBAR_ITEMS = {"enum":["ConfluenceError"],"fn":["get_confluence_results"],"struct":["ConfluenceArgs","ConfluenceTool"]};

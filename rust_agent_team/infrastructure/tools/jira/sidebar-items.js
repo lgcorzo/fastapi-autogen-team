@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["get_jira_results"]};
+window.SIDEBAR_ITEMS = {"enum":["JiraError"],"fn":["get_jira_results"],"struct":["JiraArgs","JiraTool"]};

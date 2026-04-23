@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["get_r2r_results"]};
+window.SIDEBAR_ITEMS = {"enum":["R2RError"],"fn":["get_r2r_results"],"struct":["R2RArgs","R2RTool"]};
