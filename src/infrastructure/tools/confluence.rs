@@ -1,4 +1,57 @@
+use rig::completion::ToolDefinition;
+use rig::tool::Tool;
+use serde::Deserialize;
+use serde_json::json;
 use std::env;
+use thiserror::Error;
+
+#[derive(Deserialize)]
+pub struct ConfluenceArgs {
+    pub query: String,
+}
+
+#[derive(Debug, Error)]
+pub enum ConfluenceError {
+    #[error("Environment variable missing: {0}")]
+    EnvVarMissing(#[from] env::VarError),
+    #[error("Request error: {0}")]
+    RequestError(#[from] reqwest::Error),
+    #[error("Other error: {0}")]
+    Other(String),
+}
+
+pub struct ConfluenceTool;
+
+impl Tool for ConfluenceTool {
+    const NAME: &'static str = "confluence_search";
+    type Error = ConfluenceError;
+    type Args = ConfluenceArgs;
+    type Output = String;
+
+    async fn definition(&self, _prompt: String) -> ToolDefinition {
+        ToolDefinition {
+            name: "confluence_search".to_string(),
+            description: "Search for documentation and pages in Confluence.".to_string(),
+            parameters: json!({
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The search query (CQL compatible keywords)."
+                    }
+                },
+                "required": ["query"]
+            }),
+        }
+    }
+
+    async fn call(&self, args: Self::Args) -> Result<Self::Output, Self::Error> {
+        let jira_url = env::var("JIRA_INSTANCE_URL").map_err(ConfluenceError::EnvVarMissing)?;
+        get_confluence_results(&jira_url, &args.query)
+            .await
+            .map_err(|e| ConfluenceError::Other(e.to_string()))
+    }
+}
 
 pub async fn get_confluence_results(url: &str, query: &str) -> anyhow::Result<String> {
     let user = env::var("JIRA_USERNAME")?;
