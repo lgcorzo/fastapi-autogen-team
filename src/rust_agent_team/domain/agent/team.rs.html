@@ -34,7 +34,7 @@
 <a href=#34 id=34 data-nosnippet>34</a>    <span class="kw">if </span>l.len() &lt; <span class="number">5 </span>{
 <a href=#35 id=35 data-nosnippet>35</a>        <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#36 id=36 data-nosnippet>36</a>    }
-<a href=#37 id=37 data-nosnippet>37</a>    <span class="kw">if </span>l.starts_with(<span class="string">'{'</span>) || l.starts_with(<span class="string">'}'</span>) || l.starts_with(<span class="string">'['</span>) || l.starts_with(<span class="string">']'</span>) {
+<a href=#37 id=37 data-nosnippet>37</a>    <span class="kw">if </span>l.starts_with(<span class="string">'{'</span>) || l.starts_with(<span class="string">'}'</span>) {
 <a href=#38 id=38 data-nosnippet>38</a>        <span class="kw">return </span><span class="bool-val">false</span>;
 <a href=#39 id=39 data-nosnippet>39</a>    }
 <a href=#40 id=40 data-nosnippet>40</a>    <span class="comment">// Reject JSON key/value fragments (e.g. `"title": "..."`, `"follow_ups":` etc.)
