@@ -1,5 +1,58 @@
+use rig::completion::ToolDefinition;
+use rig::tool::Tool;
+use serde::Deserialize;
 use serde_json::json;
 use std::env;
+use thiserror::Error;
+
+#[derive(Deserialize)]
+pub struct R2RArgs {
+    pub query: String,
+}
+
+#[derive(Debug, Error)]
+pub enum R2RError {
+    #[error("Environment variable missing: {0}")]
+    EnvVarMissing(#[from] env::VarError),
+    #[error("Request error: {0}")]
+    RequestError(#[from] reqwest::Error),
+    #[error("Other error: {0}")]
+    Other(String),
+}
+
+pub struct R2RTool;
+
+impl Tool for R2RTool {
+    const NAME: &'static str = "r2r_search";
+    type Error = R2RError;
+    type Args = R2RArgs;
+    type Output = String;
+
+    async fn definition(&self, _prompt: String) -> ToolDefinition {
+        ToolDefinition {
+            name: "r2r_search".to_string(),
+            description: "Search for general information and documents in the R2R (RAG) system."
+                .to_string(),
+            parameters: json!({
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The search query."
+                    }
+                },
+                "required": ["query"]
+            }),
+        }
+    }
+
+    async fn call(&self, args: Self::Args) -> Result<Self::Output, Self::Error> {
+        let r2r_url = env::var("R2R_URL").unwrap_or_else(|_| "http://r2r:7272".to_string());
+        get_r2r_results(&r2r_url, &args.query)
+            .await
+            .map_err(|e| R2RError::Other(e.to_string()))
+    }
+}
 
 pub async fn get_r2r_results(url: &str, query: &str) -> anyhow::Result<String> {
     let user = env::var("R2R_USER")?;

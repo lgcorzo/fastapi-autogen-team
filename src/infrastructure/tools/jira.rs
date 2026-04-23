@@ -1,4 +1,57 @@
+use rig::completion::ToolDefinition;
+use rig::tool::Tool;
+use serde::Deserialize;
+use serde_json::json;
 use std::env;
+use thiserror::Error;
+
+#[derive(Deserialize)]
+pub struct JiraArgs {
+    pub query: String,
+}
+
+#[derive(Debug, Error)]
+pub enum JiraError {
+    #[error("Environment variable missing: {0}")]
+    EnvVarMissing(#[from] env::VarError),
+    #[error("Request error: {0}")]
+    RequestError(#[from] reqwest::Error),
+    #[error("Other error: {0}")]
+    Other(String),
+}
+
+pub struct JiraTool;
+
+impl Tool for JiraTool {
+    const NAME: &'static str = "jira_search";
+    type Error = JiraError;
+    type Args = JiraArgs;
+    type Output = String;
+
+    async fn definition(&self, _prompt: String) -> ToolDefinition {
+        ToolDefinition {
+            name: "jira_search".to_string(),
+            description: "Search for tasks and issues in Jira.".to_string(),
+            parameters: json!({
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The search query (JQL compatible keywords)."
+                    }
+                },
+                "required": ["query"]
+            }),
+        }
+    }
+
+    async fn call(&self, args: Self::Args) -> Result<Self::Output, Self::Error> {
+        let jira_url = env::var("JIRA_INSTANCE_URL").map_err(JiraError::EnvVarMissing)?;
+        get_jira_results(&jira_url, &args.query)
+            .await
+            .map_err(|e| JiraError::Other(e.to_string()))
+    }
+}
 
 pub async fn get_jira_results(url: &str, query: &str) -> anyhow::Result<String> {
     let user = env::var("JIRA_USERNAME")?;

@@ -1,5 +1,7 @@
 use crate::application::dtos::Input;
-use crate::infrastructure::tools::search::SearchTool;
+use crate::infrastructure::tools::confluence::ConfluenceTool;
+use crate::infrastructure::tools::jira::JiraTool;
+use crate::infrastructure::tools::r2r::R2RTool;
 use async_stream::stream;
 use futures::{future::join_all, Stream, StreamExt};
 use rig::agent::MultiTurnStreamItem;
@@ -73,10 +75,15 @@ impl AgentTeam {
             .preamble(
                 "You are the Planner. Analyze the user message and break it down into AT MOST 5 \
                  focused search queries in English. \
-                 CRITICAL: Return ONLY the search queries, one per line. \
-                 DO NOT return JSON. DO NOT return follow-up questions. \
-                 DO NOT use markdown formatting. If you are done, simply return the queries. \
-                 Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?",
+                 For each query, decide which tool is best: \
+                 - Use [JIRA] for tasks, issues, or project management related queries. \
+                 - Use [CONFLUENCE] for documentation, wiki pages, or general project info. \
+                 - Use [R2R] for general knowledge or internal document search. \
+                 CRITICAL: Return ONLY the search queries prefixed with the tool name, one per line. \
+                 Example output: \
+                 [JIRA] status of task PROJ-123 \
+                 [CONFLUENCE] how to set up the dev environment \
+                 [R2R] latest advances in AI",
             )
             .default_max_turns(5)
             .build();
@@ -115,29 +122,49 @@ impl AgentTeam {
             queries.lines().map(|l| l.trim().to_string()).collect()
         };
 
-        // 2. RAG Searcher
-        let rag_searcher = client
-            .agent("ollama/qwen2.5:7b")
-            .preamble(
-                "You are the RAG_searcher. Use the 'search' tool to find information. \
-                 Once you have the results, summarize them and stop.",
-            )
-            .tool(SearchTool)
-            .default_max_turns(5)
-            .build();
+        // 2. Specialized RAG Searchers
+        let jira_searcher = client.agent("ollama/qwen2.5:7b")
+            .preamble("You are the Jira searcher. Use the 'jira_search' tool to find tasks or issues. Summarize the findings and stop.")
+            .tool(JiraTool).build();
+        let confluence_searcher = client.agent("ollama/qwen2.5:7b")
+            .preamble("You are the Confluence searcher. Use the 'confluence_search' tool to find documentation. Summarize the findings and stop.")
+            .tool(ConfluenceTool).build();
+        let r2r_searcher = client.agent("ollama/qwen2.5:7b")
+            .preamble("You are the R2R searcher. Use the 'r2r_search' tool to find internal information. Summarize the findings and stop.")
+            .tool(R2RTool).build();
 
         let mut search_tasks = Vec::new();
-        for query in raw_lines.into_iter().take(5) {
-            let trimmed = query.trim().to_string();
+        for query_line in raw_lines.into_iter().take(5) {
+            let trimmed = query_line.trim().to_string();
             if !is_valid_query_line(&trimmed) {
                 continue;
             }
-            let searcher = rag_searcher.clone();
+
+            let (tool_tag, actual_query) = if trimmed.starts_with("[JIRA]") {
+                ("JIRA", trimmed.trim_start_matches("[JIRA]").trim())
+            } else if trimmed.starts_with("[CONFLUENCE]") {
+                (
+                    "CONFLUENCE",
+                    trimmed.trim_start_matches("[CONFLUENCE]").trim(),
+                )
+            } else if trimmed.starts_with("[R2R]") {
+                ("R2R", trimmed.trim_start_matches("[R2R]").trim())
+            } else {
+                ("R2R", trimmed.as_str()) // Default to R2R if no tag
+            };
+
+            let searcher = match tool_tag {
+                "JIRA" => jira_searcher.clone(),
+                "CONFLUENCE" => confluence_searcher.clone(),
+                _ => r2r_searcher.clone(),
+            };
+
+            let q = actual_query.to_string();
             search_tasks.push(async move {
-                tracing::info!("Executing RAG search for: {}", trimmed);
-                match searcher.prompt(trimmed).await {
+                tracing::info!("Executing {} search for: {}", tool_tag, q);
+                match searcher.prompt(q).await {
                     Ok(res) => res,
-                    Err(e) => format!("Search error: {}", e),
+                    Err(e) => format!("{} search error: {}", tool_tag, e),
                 }
             });
         }
@@ -193,10 +220,15 @@ impl AgentTeam {
                 .preamble(
                     "You are the Planner. Analyze the user message and break it down into AT MOST 5 \
                      focused search queries in English. \
-                     CRITICAL: Return ONLY the search queries, one per line. \
-                     DO NOT return JSON. DO NOT return follow-up questions. \
-                     DO NOT use markdown formatting. If you are done, simply return the queries. \
-                     Example output:\nWhat is the weather in Tokyo?\nHow to make sushi?",
+                     For each query, decide which tool is best: \
+                     - Use [JIRA] for tasks, issues, or project management related queries. \
+                     - Use [CONFLUENCE] for documentation, wiki pages, or general project info. \
+                     - Use [R2R] for general knowledge or internal document search. \
+                     CRITICAL: Return ONLY the search queries prefixed with the tool name, one per line. \
+                     Example output: \
+                     [JIRA] status of task PROJ-123 \
+                     [CONFLUENCE] how to set up the dev environment \
+                     [R2R] latest advances in AI",
                 )
                 .default_max_turns(5)
                 .build();
@@ -259,26 +291,41 @@ impl AgentTeam {
                 ),
             });
 
-            // 2. RAG Searcher
-            let rag_searcher = client
-                .agent("ollama/qwen2.5:7b")
-                .preamble(
-                    "You are the RAG_searcher. Use the 'search' tool to find information. \
-                     Once you have the results, summarize them and stop.",
-                )
-                .tool(SearchTool)
-                .default_max_turns(5)
-                .build();
+            // 2. Specialized RAG Searchers
+            let jira_searcher = client.agent("ollama/qwen2.5:7b")
+                .preamble("You are the Jira searcher. Use the 'jira_search' tool to find tasks or issues. Summarize the findings and stop.")
+                .tool(JiraTool).build();
+            let confluence_searcher = client.agent("ollama/qwen2.5:7b")
+                .preamble("You are the Confluence searcher. Use the 'confluence_search' tool to find documentation. Summarize the findings and stop.")
+                .tool(ConfluenceTool).build();
+            let r2r_searcher = client.agent("ollama/qwen2.5:7b")
+                .preamble("You are the R2R searcher. Use the 'r2r_search' tool to find internal information. Summarize the findings and stop.")
+                .tool(R2RTool).build();
 
             let mut all_results = String::new();
-            for (i, query) in query_lines.iter().enumerate() {
-                let trimmed = query.clone();
-                let searcher = rag_searcher.clone();
+            for (i, query_line) in query_lines.iter().enumerate() {
+                let trimmed = query_line.trim().to_string();
 
-                tracing::info!("Executing RAG search for: {}", trimmed);
-                let res = match searcher.prompt(trimmed).await {
+                let (tool_tag, actual_query) = if trimmed.starts_with("[JIRA]") {
+                    ("JIRA", trimmed.trim_start_matches("[JIRA]").trim())
+                } else if trimmed.starts_with("[CONFLUENCE]") {
+                    ("CONFLUENCE", trimmed.trim_start_matches("[CONFLUENCE]").trim())
+                } else if trimmed.starts_with("[R2R]") {
+                    ("R2R", trimmed.trim_start_matches("[R2R]").trim())
+                } else {
+                    ("R2R", trimmed.as_str()) // Default to R2R if no tag
+                };
+
+                let searcher = match tool_tag {
+                    "JIRA" => jira_searcher.clone(),
+                    "CONFLUENCE" => confluence_searcher.clone(),
+                    _ => r2r_searcher.clone(),
+                };
+
+                tracing::info!("Executing {} search for: {}", tool_tag, actual_query);
+                let res = match searcher.prompt(actual_query.to_string()).await {
                     Ok(r) => r,
-                    Err(e) => format!("Search error: {}", e),
+                    Err(e) => format!("{} search error: {}", tool_tag, e),
                 };
 
                 all_results.push_str(&res);
@@ -287,7 +334,7 @@ impl AgentTeam {
                 // Yield progress for each completed search
                 yield Ok::<AgentEvent, anyhow::Error>(AgentEvent::Progress {
                     stage: "searcher".to_string(),
-                    message: format!("Search {}/{} completed", i + 1, query_count),
+                    message: format!("{} search {}/{} completed", tool_tag, i + 1, query_count),
                 });
             }
 
