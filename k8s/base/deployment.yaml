@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: rust-agent-team
-          image: lgcorzo/rust-agent-team:ab1cdc15
+          image: lgcorzo/rust-agent-team:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 4100
