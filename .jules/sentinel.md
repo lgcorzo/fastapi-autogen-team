@@ -105,3 +105,8 @@
 **Vulnerability:** The application accepted an unbounded dictionary `Dict[str, str]` for the `image_url` property in the `ContentImage` model. This exposed the system to Denial of Service (DoS) attacks via memory exhaustion by allowing attackers to send payloads with massive base64 strings or an enormous number of keys.
 **Learning:** Pydantic's generic typing (like `Dict[str, str]`) provides no length or size constraints. For large, potentially malicious input like base64 image representations, explicitly bounded models are critical to prevent memory starvation and excessive JSON parsing overhead.
 **Prevention:** Replace unbounded dictionary types with strongly typed Pydantic sub-models (e.g., `ImageUrl`). Enforce strict `max_length` constraints on all fields (e.g., `url: str = Field(max_length=5000000)`) to validate and restrict the payload size at the schema level.
+
+## 2024-10-25 - Prevent Panic in CORS Origin Parsing
+**Vulnerability:** The application was using `.unwrap()` when parsing comma-separated origins from the `ALLOWED_ORIGINS` environment variable into `HeaderValue`. If the environment variable contained malformed origins, the application would panic and fail to start or crash during middleware initialization.
+**Learning:** Configuration parsing must always be robust. Using `.unwrap()` on externally provided input (even environment variables) is a Denial of Service (DoS) risk.
+**Prevention:** Use safe parsing methods like `.parse().ok()` combined with `.filter_map()` to ignore invalid entries. Ensure that if no valid entries remain, the application falls back to a secure state (e.g., returning `None` for the CORS layer).

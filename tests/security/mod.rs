@@ -44,6 +44,60 @@ async fn test_security_headers_present() {
 }
 
 #[tokio::test]
+async fn test_cors_malformed_origins() {
+    // Malformed origin that would normally cause a panic with .unwrap()
+    std::env::set_var("ALLOWED_ORIGINS", "not a valid origin, https://good.com, ");
+    let state = Arc::new(AppState {
+        team: AgentTeam::new_mock(),
+    });
+    let app = create_app(state);
+
+    // Good origin from the list should still work
+    let response_good = app
+        .clone()
+        .oneshot(
+            Request::builder()
+                .method("OPTIONS")
+                .uri("/agent/api/v1beta/models")
+                .header("Origin", "https://good.com")
+                .header("Access-Control-Request-Method", "GET")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response_good.status(), StatusCode::OK);
+    assert_eq!(
+        response_good
+            .headers()
+            .get("access-control-allow-origin")
+            .unwrap(),
+        "https://good.com"
+    );
+
+    // Malformed one or empty one should be ignored
+    let response_bad = app
+        .oneshot(
+            Request::builder()
+                .method("OPTIONS")
+                .uri("/agent/api/v1beta/models")
+                .header("Origin", "not a valid origin")
+                .header("Access-Control-Request-Method", "GET")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(response_bad.status(), StatusCode::OK);
+    assert!(response_bad
+        .headers()
+        .get("access-control-allow-origin")
+        .is_none());
+}
+
+#[tokio::test]
 async fn test_cors_specific_origins() {
     std::env::set_var("ALLOWED_ORIGINS", "https://good.com,https://another.com");
     let state = Arc::new(AppState {
