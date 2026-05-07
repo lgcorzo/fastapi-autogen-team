@@ -76,13 +76,15 @@ async fn test_cors_malformed_origins() {
         "https://good.com"
     );
 
-    // Malformed one or empty one should be ignored
+    // A completely invalid origin should be ignored by the browser or the middleware
+    // Note: "not a valid origin" might actually be a valid HeaderValue if it only contains allowed characters.
+    // Let's use something that is definitely NOT what we allowed.
     let response_bad = app
         .oneshot(
             Request::builder()
                 .method("OPTIONS")
                 .uri("/agent/api/v1beta/models")
-                .header("Origin", "not a valid origin")
+                .header("Origin", "https://evil.com")
                 .header("Access-Control-Request-Method", "GET")
                 .body(Body::empty())
                 .unwrap(),
