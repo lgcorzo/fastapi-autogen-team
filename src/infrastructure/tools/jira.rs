@@ -61,10 +61,23 @@ pub async fn get_jira_results(url: &str, query: &str) -> anyhow::Result<String> 
 
     // JQL query
     let sanitized_query = query.replace('\\', "\\\\").replace('"', "\\\"");
-    let jql = format!(
-        "summary ~ \"{}\" OR description ~ \"{}\"",
-        sanitized_query, sanitized_query
-    );
+    let trimmed_query = sanitized_query.trim();
+
+    let jql = if trimmed_query
+        .chars()
+        .all(|c| c.is_alphanumeric() || c == '-')
+        && trimmed_query.contains('-')
+    {
+        format!(
+            "key = \"{}\" OR summary ~ \"{}\" OR description ~ \"{}\"",
+            trimmed_query, sanitized_query, sanitized_query
+        )
+    } else {
+        format!(
+            "summary ~ \"{}\" OR description ~ \"{}\"",
+            sanitized_query, sanitized_query
+        )
+    };
 
     let search_url = format!("{}/rest/api/3/search/jql", url.trim_end_matches('/'));
     let res = client
