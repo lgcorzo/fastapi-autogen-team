@@ -63,20 +63,42 @@ pub async fn get_jira_results(url: &str, query: &str) -> anyhow::Result<String> 
     let sanitized_query = query.replace('\\', "\\\\").replace('"', "\\\"");
     let trimmed_query = sanitized_query.trim();
 
-    let jql = if trimmed_query
-        .chars()
-        .all(|c| c.is_alphanumeric() || c == '-')
-        && trimmed_query.contains('-')
+    let trimmed_lower = trimmed_query.to_lowercase();
+    let jql = if trimmed_lower.starts_with("key")
+        && (trimmed_lower.contains('=') || trimmed_lower.contains('~'))
     {
-        format!(
-            "key = \"{}\" OR summary ~ \"{}\" OR description ~ \"{}\"",
-            trimmed_query, sanitized_query, sanitized_query
-        )
+        trimmed_query.to_string()
     } else {
-        format!(
-            "summary ~ \"{}\" OR description ~ \"{}\"",
-            sanitized_query, sanitized_query
-        )
+        // Extract any words that look like a Jira issue key (e.g., GITOPS-24, DA-14)
+        let issue_keys: Vec<&str> = trimmed_query
+            .split(|c: char| !c.is_alphanumeric() && c != '-')
+            .filter(|word| {
+                let parts: Vec<&str> = word.split('-').collect();
+                parts.len() == 2
+                    && !parts[0].is_empty()
+                    && parts[0].chars().all(|c| c.is_alphabetic())
+                    && !parts[1].is_empty()
+                    && parts[1].chars().all(|c| c.is_numeric())
+            })
+            .collect();
+
+        if !issue_keys.is_empty() {
+            let key_conditions: Vec<String> = issue_keys
+                .iter()
+                .map(|k| format!("key = \"{}\"", k))
+                .collect();
+            format!(
+                "{} OR summary ~ \"{}\" OR description ~ \"{}\"",
+                key_conditions.join(" OR "),
+                sanitized_query,
+                sanitized_query
+            )
+        } else {
+            format!(
+                "summary ~ \"{}\" OR description ~ \"{}\"",
+                sanitized_query, sanitized_query
+            )
+        }
     };
 
     let search_url = format!("{}/rest/api/3/search/jql", url.trim_end_matches('/'));
