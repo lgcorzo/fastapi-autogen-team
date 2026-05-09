@@ -222,7 +222,13 @@ Zero-mock tests that verify live connectivity to LLM, Jira, and R2R. **Warning: 
 cargo test --test integration_tests smoke -- --ignored --nocapture
 ```
 
-### 5. Mock Services for Local Debugging
+### 5. Kubernetes-Only Production Tests
+Production-grade tests designed to run specifically inside a Kubernetes cluster to verify real agent tool connectivity to R2R, JIRA, and Confluence via the live streaming chat completions API. These tests automatically skip when run outside a Kubernetes cluster.
+```bash
+cargo test --test integration_tests smoke::kubernetes -- --ignored --nocapture
+```
+
+### 6. Mock Services for Local Debugging
 To debug tool interactions locally without connecting to real services, you can run the standalone mock server:
 ```bash
 ./scripts/start_mocks.sh
@@ -235,6 +241,7 @@ For new developers, we recommend running the suites in the following order:
 2. `integration_tests` (Standard)
 3. `integration_tests` (Security)
 4. `integration_tests` (Smoke)
+5. `integration_tests` (Kubernetes-Only Smoke)
 
 ### Running Everything (Standard)
 To run all suites (excluding ignored smoke tests):
