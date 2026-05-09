@@ -28,7 +28,10 @@ async fn run_kubernetes_agent_test(prompt: &str, expected_tool_indicator: &str) 
     let team = match team_res {
         Ok(t) => t,
         Err(e) => {
-            panic!("Failed to initialize real AgentTeam in Kubernetes environment: {}", e);
+            panic!(
+                "Failed to initialize real AgentTeam in Kubernetes environment: {}",
+                e
+            );
         }
     };
 
@@ -63,7 +66,10 @@ async fn run_kubernetes_agent_test(prompt: &str, expected_tool_indicator: &str) 
                 match event {
                     AgentEvent::Progress { stage, message } => {
                         println!("Progress ({}): {}", stage, message);
-                        if message.to_uppercase().contains(&expected_tool_indicator.to_uppercase()) {
+                        if message
+                            .to_uppercase()
+                            .contains(&expected_tool_indicator.to_uppercase())
+                        {
                             tool_triggered = true;
                         }
                     }
@@ -171,27 +177,25 @@ async fn test_all_tools_access_in_kubernetes() {
 
     while let Some(res) = stream.next().await {
         match res {
-            Ok(event) => {
-                match event {
-                    AgentEvent::Progress { message, .. } => {
-                        println!("Progress: {}", message);
-                        let upper = message.to_uppercase();
-                        if upper.contains("JIRA") {
-                            found_jira = true;
-                        }
-                        if upper.contains("CONFLUENCE") {
-                            found_confluence = true;
-                        }
-                        if upper.contains("R2R") {
-                            found_r2r = true;
-                        }
+            Ok(event) => match event {
+                AgentEvent::Progress { message, .. } => {
+                    println!("Progress: {}", message);
+                    let upper = message.to_uppercase();
+                    if upper.contains("JIRA") {
+                        found_jira = true;
                     }
-                    AgentEvent::Delta(delta) => {
-                        final_response.push_str(&delta);
+                    if upper.contains("CONFLUENCE") {
+                        found_confluence = true;
                     }
-                    AgentEvent::Done => {}
+                    if upper.contains("R2R") {
+                        found_r2r = true;
+                    }
                 }
-            }
+                AgentEvent::Delta(delta) => {
+                    final_response.push_str(&delta);
+                }
+                AgentEvent::Done => {}
+            },
             Err(e) => {
                 panic!("Stream encountered an error: {:?}", e);
             }
@@ -199,7 +203,13 @@ async fn test_all_tools_access_in_kubernetes() {
     }
 
     assert!(found_jira, "Agent team should have accessed Jira");
-    assert!(found_confluence, "Agent team should have accessed Confluence");
+    assert!(
+        found_confluence,
+        "Agent team should have accessed Confluence"
+    );
     assert!(found_r2r, "Agent team should have accessed R2R");
-    assert!(!final_response.is_empty(), "Synthesis response should not be empty");
+    assert!(
+        !final_response.is_empty(),
+        "Synthesis response should not be empty"
+    );
 }
