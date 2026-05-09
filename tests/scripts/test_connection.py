@@ -39,7 +39,7 @@ if __name__ == "__main__":
         print(result['choices'][0]['message']['content'])
         
         # Save to artifacts directory in the repo
-        output_dir = "/mnt/F024B17C24B145FE/Repos/rust-agent-team/.artifacts"
+        output_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".artifacts")
         os.makedirs(output_dir, exist_ok=True)
         import datetime
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")

@@ -116,7 +116,7 @@ async fn test_r2r_access_in_kubernetes() {
 #[ignore]
 async fn test_jira_access_in_kubernetes() {
     run_kubernetes_agent_test(
-        "Get the status or summary of different JIRA tickets like GITOPS-1 or JIRA-123.",
+        "Get the details or status of Jira tickets DA-24 and DA-25.",
         "JIRA",
     )
     .await;
