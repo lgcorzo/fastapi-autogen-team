@@ -93,3 +93,5 @@ async fn test_production_pipeline_smoke() {
         }
     }
 }
+
+pub mod kubernetes;
