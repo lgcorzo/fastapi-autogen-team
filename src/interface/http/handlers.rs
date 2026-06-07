@@ -139,7 +139,7 @@ pub async fn route_query(
                                 "model": model,
                                 "choices": [{
                                     "delta": {
-                                        "content": format!("\nError: {}", e)
+                                        "content": "\nError: An error occurred while processing the request."
                                     },
                                     "index": 0,
                                     "finish_reason": "stop"
