@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rust-agent-team-nginx
+  labels:
+    app: rust-agent-team
+    component: proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rust-agent-team
+      component: proxy
+  template:
+    metadata:
+      labels:
+        app: rust-agent-team
+        component: proxy
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 4100
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+              readOnly: true
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: rust-agent-team-nginx-conf

@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rust-agent-team-nginx-conf
+  labels:
+    app: rust-agent-team
+    component: proxy
+data:
+  nginx.conf: |
+    events {
+        worker_connections 1024;
+    }
+    http {
+        server {
+            listen 4100;
+            
+            # Use Kubernetes DNS to resolve the backend service dynamically
+            resolver kube-dns.kube-system.svc.cluster.local valid=5s;
+            
+            location / {
+                # Force runtime resolution by using a variable
+                set $backend "http://rust-agent-team-backend.llm-apps.svc.cluster.local:4100";
+                proxy_pass $backend;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                
+                # Prevent connection reuse to upstream to ensure perfect round-robin across pods
+                proxy_http_version 1.0;
+                proxy_set_header Connection "";
+            }
+        }
+    }

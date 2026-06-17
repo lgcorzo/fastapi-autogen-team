@@ -5,14 +5,16 @@ metadata:
   labels:
     app: rust-agent-team
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: rust-agent-team
+      component: backend
   template:
     metadata:
       labels:
         app: rust-agent-team
+        component: backend
     spec:
       containers:
         - name: rust-agent-team

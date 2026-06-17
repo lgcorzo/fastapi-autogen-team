@@ -3,6 +3,9 @@ kind: Kustomization
 resources:
   - deployment.yaml
   - service.yaml
+  - backend-service.yaml
+  - nginx-configmap.yaml
+  - nginx-deployment.yaml
 
 namespace: llm-apps
 
