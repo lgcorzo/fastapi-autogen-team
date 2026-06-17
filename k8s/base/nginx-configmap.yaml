@@ -25,9 +25,16 @@ data:
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 
-                # Prevent connection reuse to upstream to ensure perfect round-robin across pods
-                proxy_http_version 1.0;
-                proxy_set_header Connection "";
+                # Use HTTP/1.1 for chunked transfer encoding support, but close connection to ensure round-robin
+                proxy_http_version 1.1;
+                proxy_set_header Connection "close";
+                
+                # Disable buffering to allow real-time streaming (SSE)
+                proxy_buffering off;
+                proxy_cache off;
+                
+                # Increase timeout for long-running LLM generations
+                proxy_read_timeout 300s;
             }
         }
     }
