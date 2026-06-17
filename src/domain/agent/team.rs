@@ -84,11 +84,14 @@ impl AgentTeam {
             .preamble(
                 "You are an expert translator. Translate the following user input into clear, \
                  concise English. If it is already in English, return it exactly as is. \
-                 Output ONLY the English text without any additional commentary."
+                 Output ONLY the English text without any additional commentary.",
             )
             .build();
 
-        let english_message = translator.prompt(&last_message).await.unwrap_or_else(|_| last_message.clone());
+        let english_message = translator
+            .prompt(&last_message)
+            .await
+            .unwrap_or_else(|_| last_message.clone());
         tracing::info!("Translated input: {}", english_message);
 
         // 1. Planner Agent
