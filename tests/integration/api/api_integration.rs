@@ -74,6 +74,18 @@ async fn test_chat_completions_route() {
     env::set_var("JIRA_USERNAME", "test_user");
     env::set_var("JIRA_API_TOKEN", "test_token");
 
+    // 0. Preprocessing (Language + Translation) Call
+    let _m0 = server.mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(r#"{
+            "id": "t1", "object": "chat.completion", "created": 12345, "model": "test",
+            "choices":[{"message":{"content":"English","role":"assistant"},"index":0,"finish_reason":"stop"}],
+            "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
+        }"#)
+        .expect(2)
+        .create_async().await;
+
     // 1. Planner Agent Call
     let _m1 = server.mock("POST", "/chat/completions")
         .with_status(200)
@@ -209,6 +221,21 @@ async fn test_chat_completions_route() {
 
 /// Builds the full set of mockito mocks for the three-agent pipeline.
 async fn setup_pipeline_mocks(server: &mut Server) -> Vec<mockito::Mock> {
+    // 0. Preprocessing (Language + Translation)
+    let m0 = server
+        .mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(
+            r#"{"id":"t1","object":"chat.completion","created":1,"model":"test",
+               "choices":[{"message":{"content":"English","role":"assistant"},
+               "index":0,"finish_reason":"stop"}],
+               "usage":{"prompt_tokens":0,"completion_tokens":0,"total_tokens":0}}"#,
+        )
+        .expect(2)
+        .create_async()
+        .await;
+
     // 1. Planner response
     let m1 = server
         .mock("POST", "/chat/completions")
@@ -281,7 +308,7 @@ async fn setup_pipeline_mocks(server: &mut Server) -> Vec<mockito::Mock> {
         .create_async()
         .await;
 
-    vec![m1, m2, m_r2r_login, m_r2r_search, m_jira, m3]
+    vec![m0, m1, m2, m_r2r_login, m_r2r_search, m_jira, m3]
 }
 
 #[tokio::test]

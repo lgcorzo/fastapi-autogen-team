@@ -78,7 +78,16 @@ impl AgentTeam {
             })
             .unwrap_or_default();
 
-        // 0. Translation Agent
+        // 0. Language Detection & Translation (Parallel)
+        let language_detector = client
+            .agent("ollama/qwen2.5:7b")
+            .preamble(
+                "You are an expert linguist. Identify the language of the following text. \
+                 Reply ONLY with the name of the language (e.g., Spanish, French, English) \
+                 and absolutely nothing else.",
+            )
+            .build();
+
         let translator = client
             .agent("ollama/qwen2.5:7b")
             .preamble(
@@ -88,10 +97,16 @@ impl AgentTeam {
             )
             .build();
 
-        let english_message = translator
-            .prompt(&last_message)
-            .await
-            .unwrap_or_else(|_| last_message.clone());
+        let (detected_language_res, english_message_res) = futures::join!(
+            async { language_detector.prompt(&last_message).await },
+            async { translator.prompt(&last_message).await }
+        );
+
+        let detected_language = detected_language_res.unwrap_or_else(|_| "English".to_string());
+        let detected_language = detected_language.trim().to_string();
+        let english_message = english_message_res.unwrap_or_else(|_| last_message.clone());
+
+        tracing::info!("Detected input language: {}", detected_language);
         tracing::info!("Translated input: {}", english_message);
 
         // 1. Planner Agent
@@ -193,15 +208,19 @@ impl AgentTeam {
         }
 
         // 3. QA Agent: Final Synthesis
+        let qa_preamble = format!(
+            "You are the Quality Assurance agent. Synthesize the search results into a helpful final \
+             response. You MUST reply in the language identified as: {}. \
+             Even if the search results are in English, your final response MUST be translated to {}. \
+             Always provide a helpful answer based on the search results provided. \
+             If no relevant information was found, state it clearly. \
+             IMPORTANT: End your response with the word: TERMINATE",
+            detected_language, detected_language
+        );
+
         let qa = client
             .agent("ollama/qwen2.5:7b")
-            .preamble(
-                "You are the Quality Assurance agent. Synthesize the search results into a helpful final \
-                 response. You MUST reply in the exact same language that was used in the 'Original User Query'. \
-                 Always provide a helpful answer based on the search results provided. \
-                 If no relevant information was found, state it clearly. \
-                 IMPORTANT: End your response with the word: TERMINATE",
-            )
+            .preamble(&qa_preamble)
             .default_max_turns(5)
             .build();
 
@@ -240,7 +259,16 @@ impl AgentTeam {
                 })
                 .unwrap_or_default();
 
-            // 0. Translation Agent
+            // 0. Language Detection & Translation (Parallel)
+            let language_detector = client
+                .agent("ollama/qwen2.5:7b")
+                .preamble(
+                    "You are an expert linguist. Identify the language of the following text. \
+                     Reply ONLY with the name of the language (e.g., Spanish, French, English) \
+                     and absolutely nothing else.",
+                )
+                .build();
+
             let translator = client
                 .agent("ollama/qwen2.5:7b")
                 .preamble(
@@ -250,12 +278,21 @@ impl AgentTeam {
                 )
                 .build();
 
-            let english_message = translator.prompt(&last_message).await.unwrap_or_else(|_| last_message.clone());
+            let (detected_language_res, english_message_res) = futures::join!(
+                async { language_detector.prompt(&last_message).await },
+                async { translator.prompt(&last_message).await }
+            );
+
+            let detected_language = detected_language_res.unwrap_or_else(|_| "English".to_string());
+            let detected_language = detected_language.trim().to_string();
+            let english_message = english_message_res.unwrap_or_else(|_| last_message.clone());
+
+            tracing::info!("Detected input language: {}", detected_language);
             tracing::info!("Translated input: {}", english_message);
 
             yield Ok::<AgentEvent, anyhow::Error>(AgentEvent::Progress {
-                stage: "translator".to_string(),
-                message: "Translated input to English".to_string(),
+                stage: "preprocessing".to_string(),
+                message: format!("Detected language: {}. Translated input to English.", detected_language),
             });
 
             // 1. Planner Agent
@@ -374,15 +411,19 @@ impl AgentTeam {
             }
 
             // 3. QA Agent: Final Synthesis (Streaming)
+            let qa_preamble = format!(
+                "You are the Quality Assurance agent. Synthesize the search results into a helpful final \
+                 response. You MUST reply in the language identified as: {}. \
+                 Even if the search results are in English, your final response MUST be translated to {}. \
+                 Always provide a helpful answer based on the search results provided. \
+                 If no relevant information was found, state it clearly. \
+                 IMPORTANT: End your response with the word: TERMINATE",
+                detected_language, detected_language
+            );
+
             let qa = client
                 .agent("ollama/qwen2.5:7b")
-                .preamble(
-                    "You are the Quality Assurance agent. Synthesize the search results into a helpful final \
-                     response. You MUST reply in the exact same language that was used in the 'Original User Query'. \
-                     Always provide a helpful answer based on the search results provided. \
-                     If no relevant information was found, state it clearly. \
-                     IMPORTANT: End your response with the word: TERMINATE",
-                )
+                .preamble(&qa_preamble)
                 .default_max_turns(5)
                 .build();
 

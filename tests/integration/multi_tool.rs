@@ -31,7 +31,7 @@ async fn test_multi_tool_call() {
             "usage": { "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0 }
         }"#,
         )
-        .expect(1)
+        .expect(2)
         .create_async()
         .await;
 
