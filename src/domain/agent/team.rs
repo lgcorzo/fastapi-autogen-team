@@ -69,6 +69,28 @@ impl AgentTeam {
     pub async fn run(&self, input: Input) -> anyhow::Result<String> {
         let client = self.client.clone().completions_api();
 
+        let last_message = input
+            .messages
+            .last()
+            .and_then(|m| match &m.content {
+                crate::application::dtos::ContentType::String(s) => Some(s.clone()),
+                _ => None,
+            })
+            .unwrap_or_default();
+
+        // 0. Translation Agent
+        let translator = client
+            .agent("ollama/qwen2.5:7b")
+            .preamble(
+                "You are an expert translator. Translate the following user input into clear, \
+                 concise English. If it is already in English, return it exactly as is. \
+                 Output ONLY the English text without any additional commentary."
+            )
+            .build();
+
+        let english_message = translator.prompt(&last_message).await.unwrap_or_else(|_| last_message.clone());
+        tracing::info!("Translated input: {}", english_message);
+
         // 1. Planner Agent
         let planner = client
             .agent("ollama/qwen2.5:7b")
@@ -88,16 +110,7 @@ impl AgentTeam {
             .default_max_turns(5)
             .build();
 
-        let last_message = input
-            .messages
-            .last()
-            .and_then(|m| match &m.content {
-                crate::application::dtos::ContentType::String(s) => Some(s.clone()),
-                _ => None,
-            })
-            .unwrap_or_default();
-
-        let queries = planner.prompt(&last_message).await?;
+        let queries = planner.prompt(&english_message).await?;
         tracing::info!("Planner queries: {}", queries);
 
         // Robust parsing: Handle accidental JSON structure from model
@@ -180,17 +193,18 @@ impl AgentTeam {
         let qa = client
             .agent("ollama/qwen2.5:7b")
             .preamble(
-                "You are the Quality Assurance agent. Synthesize the results into a final \
-                 response in the user's original language. Always provide a helpful answer \
-                 based on the search results provided. If no relevant information was found, \
-                 state it clearly. IMPORTANT: End your response with the word: TERMINATE",
+                "You are the Quality Assurance agent. Synthesize the search results into a helpful final \
+                 response. You MUST reply in the exact same language that was used in the 'Original User Query'. \
+                 Always provide a helpful answer based on the search results provided. \
+                 If no relevant information was found, state it clearly. \
+                 IMPORTANT: End your response with the word: TERMINATE",
             )
             .default_max_turns(5)
             .build();
 
         let final_response = qa
             .prompt(format!(
-                "User query: {}\n\nResults found:\n{}",
+                "Original User Query: {}\n\nSearch Results (in English):\n{}",
                 last_message, all_results
             ))
             .await?;
@@ -214,6 +228,33 @@ impl AgentTeam {
         let client = team_client.completions_api();
 
         let s = stream! {
+            let last_message = input
+                .messages
+                .last()
+                .and_then(|m| match &m.content {
+                    crate::application::dtos::ContentType::String(s) => Some(s.clone()),
+                    _ => None,
+                })
+                .unwrap_or_default();
+
+            // 0. Translation Agent
+            let translator = client
+                .agent("ollama/qwen2.5:7b")
+                .preamble(
+                    "You are an expert translator. Translate the following user input into clear, \
+                     concise English. If it is already in English, return it exactly as is. \
+                     Output ONLY the English text without any additional commentary."
+                )
+                .build();
+
+            let english_message = translator.prompt(&last_message).await.unwrap_or_else(|_| last_message.clone());
+            tracing::info!("Translated input: {}", english_message);
+
+            yield Ok::<AgentEvent, anyhow::Error>(AgentEvent::Progress {
+                stage: "translator".to_string(),
+                message: "Translated input to English".to_string(),
+            });
+
             // 1. Planner Agent
             let planner = client
                 .agent("ollama/qwen2.5:7b")
@@ -233,17 +274,8 @@ impl AgentTeam {
                 .default_max_turns(5)
                 .build();
 
-            let last_message = input
-                .messages
-                .last()
-                .and_then(|m| match &m.content {
-                    crate::application::dtos::ContentType::String(s) => Some(s.clone()),
-                    _ => None,
-                })
-                .unwrap_or_default();
-
             // Run planner
-            let planner_res = planner.prompt(&last_message).await;
+            let planner_res = planner.prompt(&english_message).await;
             if let Err(e) = planner_res {
                 yield Err::<AgentEvent, anyhow::Error>(anyhow::anyhow!("Planner error: {}", e));
                 return;
@@ -342,16 +374,17 @@ impl AgentTeam {
             let qa = client
                 .agent("ollama/qwen2.5:7b")
                 .preamble(
-                    "You are the Quality Assurance agent. Synthesize the results into a final \
-                     response in the user's original language. Always provide a helpful answer \
-                     based on the search results provided. If no relevant information was found, \
-                     state it clearly. IMPORTANT: End your response with the word: TERMINATE",
+                    "You are the Quality Assurance agent. Synthesize the search results into a helpful final \
+                     response. You MUST reply in the exact same language that was used in the 'Original User Query'. \
+                     Always provide a helpful answer based on the search results provided. \
+                     If no relevant information was found, state it clearly. \
+                     IMPORTANT: End your response with the word: TERMINATE",
                 )
                 .default_max_turns(5)
                 .build();
 
             let mut qa_raw_stream = qa.stream_prompt(format!(
-                "User query: {}\n\nResults found:\n{}",
+                "Original User Query: {}\n\nSearch Results (in English):\n{}",
                 last_message, all_results
             )).await;
 
