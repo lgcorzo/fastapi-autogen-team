@@ -9,6 +9,32 @@ async fn test_multi_tool_call() {
     let mut server = Server::new_async().await;
     let url = server.url();
 
+    // 0. Translator mock
+    let _m_translator = server
+        .mock("POST", "/chat/completions")
+        .with_status(200)
+        .with_header("content-type", "application/json")
+        .with_body(
+            r#"{
+            "id": "chatcmpl-0",
+            "object": "chat.completion",
+            "created": 1677652288,
+            "model": "test",
+            "choices": [{
+                "message": {
+                    "role": "assistant",
+                    "content": "Check all three systems"
+                },
+                "finish_reason": "stop",
+                "index": 0
+            }],
+            "usage": { "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0 }
+        }"#,
+        )
+        .expect(1)
+        .create_async()
+        .await;
+
     // 1. Planner mock (First call)
     let _m_planner = server
         .mock("POST", "/chat/completions")
