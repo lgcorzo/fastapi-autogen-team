@@ -56,7 +56,7 @@ async fn test_agent_team_run_stream_error_on_planner_failure() {
 
     let mut stream = res.unwrap();
     use futures::StreamExt;
-    
+
     // First item is now Translator progress because it falls back on 500 error
     let first_item = stream.next().await;
     assert!(first_item.is_some());
