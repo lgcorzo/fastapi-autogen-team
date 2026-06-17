@@ -37,7 +37,7 @@ impl Tool for ConfluenceTool {
                 "properties": {
                     "query": {
                         "type": "string",
-                        "description": "The search query (CQL compatible keywords)."
+                        "description": "The search keywords or phrase to look for. Provide ONLY the text to search for, DO NOT use CQL clauses like 'space:' or 'type:'."
                     }
                 },
                 "required": ["query"]
