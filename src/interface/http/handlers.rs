@@ -129,7 +129,7 @@ pub async fn route_query(
                         // --- Done event: pipeline fully completed ---
                         Ok(AgentEvent::Done) => Ok(Event::default().data("[DONE]")),
 
-                        // --- Error: surface as a delta with error content ---
+                        // --- Error: surface as a delta with generic error content to avoid info leakage ---
                         Err(e) => {
                             tracing::error!("Stream error: {}", e);
                             let chunk = json!({
@@ -139,7 +139,7 @@ pub async fn route_query(
                                 "model": model,
                                 "choices": [{
                                     "delta": {
-                                        "content": format!("\nError: {}", e)
+                                        "content": "\nAn error occurred while processing the request."
                                     },
                                     "index": 0,
                                     "finish_reason": "stop"

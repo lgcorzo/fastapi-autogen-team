@@ -91,3 +91,25 @@ async fn test_empty_messages_validation() {
     // Depending on validator, this should be an error
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
 }
+
+#[tokio::test]
+async fn test_cors_malformed_origins_no_panic() {
+    std::env::set_var("ALLOWED_ORIGINS", "invalid origin, , http://localhost:3000");
+    let state = Arc::new(AppState {
+        team: AgentTeam::new_mock(),
+    });
+    // This should not panic
+    let _app = create_app(state);
+    std::env::remove_var("ALLOWED_ORIGINS");
+}
+
+#[tokio::test]
+async fn test_cors_empty_origins_no_panic() {
+    std::env::set_var("ALLOWED_ORIGINS", ", , ");
+    let state = Arc::new(AppState {
+        team: AgentTeam::new_mock(),
+    });
+    // This should not panic
+    let _app = create_app(state);
+    std::env::remove_var("ALLOWED_ORIGINS");
+}
