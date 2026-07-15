@@ -105,3 +105,15 @@
 **Vulnerability:** The application accepted an unbounded dictionary `Dict[str, str]` for the `image_url` property in the `ContentImage` model. This exposed the system to Denial of Service (DoS) attacks via memory exhaustion by allowing attackers to send payloads with massive base64 strings or an enormous number of keys.
 **Learning:** Pydantic's generic typing (like `Dict[str, str]`) provides no length or size constraints. For large, potentially malicious input like base64 image representations, explicitly bounded models are critical to prevent memory starvation and excessive JSON parsing overhead.
 **Prevention:** Replace unbounded dictionary types with strongly typed Pydantic sub-models (e.g., `ImageUrl`). Enforce strict `max_length` constraints on all fields (e.g., `url: str = Field(max_length=5000000)`) to validate and restrict the payload size at the schema level.
+
+## 2025-05-15 - Information Leakage in Streaming Error Responses
+
+**Vulnerability:** The application was leaking raw error messages to clients in SSE streams in `src/interface/http/handlers.rs`. This could expose internal details of failures to attackers.
+**Learning:** Directly formatting error strings into streaming response chunks is insecure. Errors should be logged internally and masked for the client.
+**Prevention:** Return a generic error message (e.g., "An error occurred while processing the request.") in the SSE stream while logging the specific error details server-side.
+
+## 2025-05-15 - Application Panic via Malformed CORS Configuration
+
+**Vulnerability:** The application would panic and fail to start if the `ALLOWED_ORIGINS` environment variable contained malformed origins, due to an unsafe `.unwrap()` in `src/interface/http/middleware.rs`.
+**Learning:** Trusting environment variables to always be correctly formatted is a risk. Configuration parsing must be defensive to avoid Denial of Service (DoS) at the application level.
+**Prevention:** Use safe parsing (e.g., `.parse().ok()`) and `filter_map` when processing comma-separated configuration values. Return `None` or a safe default if no valid values are found.
