@@ -1,15 +1,20 @@
 ---
 type: class
-title: "AgentTeam"
-description: "Core orchestrator for multi-agent workflows handling RAG searches and query synthesis."
-tags: [domain, agent, orchestration, llm]
-last_verified_commit: "722dbbe"
+title: "Team"
+source_path: "src/domain/agent/team.rs"
+description: "Documentation for src/domain/agent/team.rs."
+tags: [class, rust]
+last_verified_commit: "cf3c1ee"
 ---
+Source File: `src/domain/agent/team.rs`
 
-# agent-team.rs
+## Component Overview
 
-This module defines the `AgentTeam` which orchestrates multi-agent tasks, handling streaming (`run_stream`) and non-streaming (`run`) operations for the LLM pipeline, integrating search tools.
+This module defines the `Team` component.
 
+## Architecture
+
+### Class Diagram
 ```mermaid
 classDiagram
     class AgentEvent {
@@ -30,7 +35,6 @@ classDiagram
 ```
 
 ### Execution Flow
-
 ```mermaid
 sequenceDiagram
     participant Client
@@ -59,3 +63,19 @@ sequenceDiagram
         AgentTeam-->>Client: Final complete String
     end
 ```
+
+## Dependencies
+- `crate::application::dtos::Input`
+- `crate::infrastructure::tools::confluence::ConfluenceTool`
+- `crate::infrastructure::tools::jira::JiraTool`
+- `crate::infrastructure::tools::r2r::R2RTool`
+- `async_stream::stream`
+- `futures::{future::join_all, Stream, StreamExt}`
+- `rig::agent::MultiTurnStreamItem`
+- `rig::client::CompletionClient`
+- `rig::completion::Prompt`
+- `rig::providers::openai`
+- `rig::streaming::{StreamedAssistantContent, StreamingPrompt}`
+- `serde_json`
+- `std::env`
+- `std::pin::Pin`

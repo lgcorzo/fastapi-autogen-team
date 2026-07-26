@@ -1,15 +1,20 @@
 ---
-type: module
-title: "dtos.rs"
-description: "Data Transfer Objects (DTOs) for the Application Layer."
-tags: [application, dtos, models]
-last_verified_commit: "722dbbe"
+type: class
+title: "Dtos"
+source_path: "src/application/dtos.rs"
+description: "Documentation for src/application/dtos.rs."
+tags: [class, rust]
+last_verified_commit: "cf3c1ee"
 ---
+Source File: `src/application/dtos.rs`
 
-# dtos.rs
+## Component Overview
 
-This module defines the Data Transfer Objects (DTOs) used for API communication, representing inputs, outputs, messages, and model information.
+This module defines the `Dtos` component.
 
+## Architecture
+
+### Class Diagram
 ```mermaid
 classDiagram
     class ImageUrl {
@@ -71,3 +76,15 @@ classDiagram
         +default() Output$
     }
 ```
+
+### Execution Flow
+```mermaid
+flowchart TD
+    Start --> default
+    default --> End
+```
+
+## Dependencies
+- `serde::{Deserialize, Serialize}`
+- `serde_json::Value`
+- `std::collections::HashMap`
