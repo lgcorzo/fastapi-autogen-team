@@ -23,19 +23,19 @@ classDiagram
 ### Execution Flow
 ```mermaid
 flowchart TD
-    Req[Incoming HTTP Request]
+    Req["Incoming HTTP Request"]
 
-    Req --> MiddlewareStack[Axum Middleware Stack]
+    Req --> MiddlewareStack["Axum Middleware Stack"]
 
     MiddlewareStack --> CorsLayer["cors_layer()"]
     CorsLayer --> CheckEnv{"ALLOWED_ORIGINS"}
-    CheckEnv -- Not Set / Empty --> DenyCors[No CORS Layer Appended]
-    CheckEnv -- "*" --> AllowAll[Allow All Origins]
-    CheckEnv -- "Specific Domains" --> ParseOrigins[Parse HeaderValues safely]
-    ParseOrigins --> AllowSpecific[Allow Configured Origins]
+    CheckEnv -- Not Set / Empty --> DenyCors["No CORS Layer Appended"]
+    CheckEnv -- "*" --> AllowAll["Allow All Origins"]
+    CheckEnv -- "Specific Domains" --> ParseOrigins["Parse HeaderValues safely"]
+    ParseOrigins --> AllowSpecific["Allow Configured Origins"]
 
     MiddlewareStack --> SecurityHeaders["security_headers()"]
-    SecurityHeaders --> AddHeaders[Append Static Security Headers]
+    SecurityHeaders --> AddHeaders["Append Static Security Headers"]
 
     AddHeaders --> ContentTypeOptions["X-Content-Type-Options: nosniff"]
     AddHeaders --> FrameOptions["X-Frame-Options: DENY"]
@@ -43,7 +43,7 @@ flowchart TD
     AddHeaders --> CSP["Content-Security-Policy: default-src 'self'..."]
     AddHeaders --> ReferrerPolicy["Referrer-Policy: strict-origin-when-cross-origin"]
 
-    AddHeaders --> Handlers[Forward to Route Handlers]
+    AddHeaders --> Handlers["Forward to Route Handlers"]
 ```
 
 ## Dependencies

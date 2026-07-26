@@ -23,15 +23,15 @@ classDiagram
 
     class JiraError {
         <<enumeration>>
-        EnvVarMissing(VarError)
-        RequestError(reqwest::Error)
-        Other(String)
+        EnvVarMissing
+        RequestError
+        Other
     }
 
     class JiraTool {
         +NAME: &'static str$
         +definition(String prompt) ToolDefinition
-        +call(JiraArgs args) Result~String, JiraError~
+        +call(JiraArgs args) Result~String_JiraError~
     }
 ```
 
@@ -39,8 +39,8 @@ classDiagram
 ```mermaid
 flowchart TD
     Start --> definition
-    definition --> call
-    call --> get_jira_results
+    definition --> call_node["call"]
+    call_node["call"] --> get_jira_results
     get_jira_results --> End
 ```
 

@@ -24,8 +24,8 @@ classDiagram
 
     class Content {
         <<enumeration>>
-        Image(ImageUrl image_url)
-        Text(String text)
+        Image
+        Text
     }
     Content *-- ImageUrl : contains
 
@@ -33,11 +33,11 @@ classDiagram
         +String id
         +String name
         +String description
-        +HashMap~String, Value~ pricing
+        +HashMap~String_Value~ pricing
         +u32 context_length
-        +HashMap~String, Value~ architecture
-        +HashMap~String, Value~ top_provider
-        +Option~HashMap~String, Value~~ per_request_limits
+        +HashMap~String_Value~ architecture
+        +HashMap~String_Value~ top_provider
+        +Option~HashMap_String_Value_~ per_request_limits
     }
 
     class Message {
@@ -49,8 +49,8 @@ classDiagram
 
     class ContentType {
         <<enumeration>>
-        String(String)
-        List(Vec~Content~)
+        String
+        List
     }
     ContentType *-- Content : contains list of
 
@@ -71,8 +71,8 @@ classDiagram
         +String object
         +i64 created
         +String model
-        +Vec~HashMap~String, Value~~ choices
-        +HashMap~String, Value~ usage
+        +Vec~HashMap_String_Value_~ choices
+        +HashMap~String_Value~ usage
         +default() Output$
     }
 ```
@@ -80,8 +80,8 @@ classDiagram
 ### Execution Flow
 ```mermaid
 flowchart TD
-    Start --> default
-    default --> End
+    Start --> default_node["default"]
+    default_node["default"] --> End
 ```
 
 ## Dependencies

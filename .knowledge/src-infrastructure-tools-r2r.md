@@ -23,15 +23,15 @@ classDiagram
 
     class R2RError {
         <<enumeration>>
-        EnvVarMissing(VarError)
-        RequestError(reqwest::Error)
-        Other(String)
+        EnvVarMissing
+        RequestError
+        Other
     }
 
     class R2RTool {
         +NAME: &'static str$
         +definition(String prompt) ToolDefinition
-        +call(R2RArgs args) Result~String, R2RError~
+        +call(R2RArgs args) Result~String_R2RError~
     }
 ```
 
@@ -39,8 +39,8 @@ classDiagram
 ```mermaid
 flowchart TD
     Start --> definition
-    definition --> call
-    call --> get_r2r_results
+    definition --> call_node["call"]
+    call_node["call"] --> get_r2r_results
     get_r2r_results --> End
 ```
 

@@ -23,15 +23,15 @@ classDiagram
 
     class ConfluenceError {
         <<enumeration>>
-        EnvVarMissing(VarError)
-        RequestError(reqwest::Error)
-        Other(String)
+        EnvVarMissing
+        RequestError
+        Other
     }
 
     class ConfluenceTool {
         +NAME: &'static str$
         +definition(String prompt) ToolDefinition
-        +call(ConfluenceArgs args) Result~String, ConfluenceError~
+        +call(ConfluenceArgs args) Result~String_ConfluenceError~
     }
 ```
 
@@ -39,8 +39,8 @@ classDiagram
 ```mermaid
 flowchart TD
     Start --> definition
-    definition --> call
-    call --> get_confluence_results
+    definition --> call_node["call"]
+    call_node["call"] --> get_confluence_results
     get_confluence_results --> End
 ```
 

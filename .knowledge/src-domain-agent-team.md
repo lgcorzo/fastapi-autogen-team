@@ -19,18 +19,18 @@ This module defines the `Team` component.
 classDiagram
     class AgentEvent {
         <<enumeration>>
-        Progress(String stage, String message)
-        Delta(String)
+        Progress
+        Delta
         Done
     }
 
     class AgentTeam {
         -openai::Client client
-        +new() Result~Self, anyhow::Error~$
+        +new() Result~Self_anyhow::Error~$
         +new_mock() Self$
         +new_test(String base_url) Self$
-        +run(Input input) Result~String, anyhow::Error~
-        +run_stream(Input input) Stream~Item = Result~AgentEvent, Infallible~~
+        +run(Input input) Result~String_anyhow::Error~
+        +run_stream(Input input) Stream~Item_Result_AgentEvent_Infallible_~
     }
 ```
 
