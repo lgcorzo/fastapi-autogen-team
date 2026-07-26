@@ -1,16 +1,16 @@
 ---
 type: class
-title: "Confluence"
+title: "ConfluenceTool"
 source_path: "src/infrastructure/tools/confluence.rs"
 description: "Documentation for src/infrastructure/tools/confluence.rs."
-tags: [class, rust]
-last_verified_commit: "cf3c1ee"
+tags: [class, rust, tool]
+last_verified_commit: "1997254"
 ---
 Source File: `src/infrastructure/tools/confluence.rs`
 
 ## Component Overview
 
-This module defines the `Confluence` component.
+This module defines the `ConfluenceTool` component which integrates with the Rig framework to execute searches in Confluence using CQL.
 
 ## Architecture
 
@@ -29,19 +29,32 @@ classDiagram
     }
 
     class ConfluenceTool {
-        +NAME: &'static str$
-        +definition(String prompt) ToolDefinition
+        +NAME: &'static str
+        +definition(String _prompt) ToolDefinition
         +call(ConfluenceArgs args) Result~String_ConfluenceError~
+    }
+
+    class Functions {
+        <<module>>
+        +get_confluence_results(String url, String query) Result~String_anyhow::Error~
     }
 ```
 
 ### Execution Flow
 ```mermaid
-flowchart TD
-    Start --> definition
-    definition --> call_node["call"]
-    call_node["call"] --> get_confluence_results
-    get_confluence_results --> End
+sequenceDiagram
+    participant Agent
+    participant ConfluenceTool
+    participant ConfluenceAPI
+
+    Agent->>ConfluenceTool: call(args)
+    ConfluenceTool->>ConfluenceTool: get env JIRA_INSTANCE_URL
+    ConfluenceTool->>ConfluenceAPI: get_confluence_results(url, query)
+    ConfluenceAPI->>ConfluenceAPI: build CQL (text ~ "query" OR title ~ "query")
+    ConfluenceAPI->>ConfluenceAPI: build URL (append /wiki/rest/api/content/search)
+    ConfluenceAPI-->>ConfluenceAPI: GET with Basic Auth
+    ConfluenceAPI-->>ConfluenceTool: JSON Response
+    ConfluenceTool-->>Agent: Formatted List of Confluence Pages or "No results"
 ```
 
 ## Dependencies
@@ -51,3 +64,5 @@ flowchart TD
 - `serde_json::json`
 - `std::env`
 - `thiserror::Error`
+- `reqwest`
+- `anyhow`

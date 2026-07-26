@@ -4,27 +4,36 @@ title: "Main"
 source_path: "src/main.rs"
 description: "Documentation for src/main.rs."
 tags: [script, rust]
-last_verified_commit: "cf3c1ee"
+last_verified_commit: "1997254"
 ---
 Source File: `src/main.rs`
 
 ## Component Overview
 
-This module defines the `Main` component.
+This module is the entry point of the application. It initializes the environment, telemetry, shared state, and starts the Axum web server.
 
 ## Architecture
 
 ### Class Diagram
 ```mermaid
 classDiagram
-    class EmptyComponent
+    class Main {
+        +main() Result~(), anyhow::Error~
+    }
 ```
 
 ### Execution Flow
 ```mermaid
 flowchart TD
-    Start --> main
-    main --> End
+    Start --> LoadEnv[dotenv().ok()]
+    LoadEnv --> GetVars[Read ENV vars (APP_NAME, DEFAULT_OTEL_ENDPOINT, DEFAULT_HOST, DEFAULT_PORT)]
+    GetVars --> InitTelemetry[telemetry::init_telemetry]
+    InitTelemetry --> InitTeam[AgentTeam::new().await]
+    InitTeam --> BuildState[Arc::new(AppState { team })]
+    BuildState --> Routing[create_app(state)]
+    Routing --> BindAddr[TcpListener::bind]
+    BindAddr --> Serve[axum::serve(listener, app)]
+    Serve --> End
 ```
 
 ## Dependencies

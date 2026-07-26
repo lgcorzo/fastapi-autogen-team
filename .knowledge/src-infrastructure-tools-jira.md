@@ -1,16 +1,16 @@
 ---
 type: class
-title: "Jira"
+title: "JiraTool"
 source_path: "src/infrastructure/tools/jira.rs"
 description: "Documentation for src/infrastructure/tools/jira.rs."
-tags: [class, rust]
-last_verified_commit: "cf3c1ee"
+tags: [class, rust, tool]
+last_verified_commit: "1997254"
 ---
 Source File: `src/infrastructure/tools/jira.rs`
 
 ## Component Overview
 
-This module defines the `Jira` component.
+This module defines the `JiraTool` component which integrates with the Rig framework to execute searches in Jira using JQL.
 
 ## Architecture
 
@@ -29,19 +29,39 @@ classDiagram
     }
 
     class JiraTool {
-        +NAME: &'static str$
-        +definition(String prompt) ToolDefinition
+        +NAME: &'static str
+        +definition(String _prompt) ToolDefinition
         +call(JiraArgs args) Result~String_JiraError~
+    }
+
+    class Functions {
+        <<module>>
+        +get_jira_results(String url, String query) Result~String_anyhow::Error~
     }
 ```
 
 ### Execution Flow
 ```mermaid
-flowchart TD
-    Start --> definition
-    definition --> call_node["call"]
-    call_node["call"] --> get_jira_results
-    get_jira_results --> End
+sequenceDiagram
+    participant Agent
+    participant JiraTool
+    participant JiraAPI
+
+    Agent->>JiraTool: call(args)
+    JiraTool->>JiraTool: get env JIRA_INSTANCE_URL
+    JiraTool->>JiraAPI: get_jira_results(url, query)
+    JiraAPI->>JiraAPI: sanitize query
+
+    alt query contains issue keys (e.g. PROJ-123)
+        JiraAPI->>JiraAPI: extract keys and build JQL with 'key =' condition
+    else query is normal text
+        JiraAPI->>JiraAPI: build JQL (summary ~ "query" OR description ~ "query")
+    end
+
+    JiraAPI->>JiraAPI: build URL (append /rest/api/3/search/jql)
+    JiraAPI-->>JiraAPI: GET with Basic Auth
+    JiraAPI-->>JiraTool: JSON Response
+    JiraTool-->>Agent: Formatted List of Jira Issues or "No results"
 ```
 
 ## Dependencies
@@ -51,3 +71,5 @@ flowchart TD
 - `serde_json::json`
 - `std::env`
 - `thiserror::Error`
+- `reqwest`
+- `anyhow`

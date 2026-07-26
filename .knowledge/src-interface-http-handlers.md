@@ -1,52 +1,60 @@
 ---
-type: api
-title: "Handlers"
+type: module
+title: "HTTP Handlers"
 source_path: "src/interface/http/handlers.rs"
 description: "Documentation for src/interface/http/handlers.rs."
-tags: [api, rust]
-last_verified_commit: "cf3c1ee"
+tags: [module, rust, web]
+last_verified_commit: "1997254"
 ---
 Source File: `src/interface/http/handlers.rs`
 
 ## Component Overview
 
-This module defines the `Handlers` component.
+This module contains the Axum HTTP handlers for the application API, primarily routing requests to the domain agent and formatting responses.
 
 ## Architecture
 
 ### Class Diagram
 ```mermaid
 classDiagram
-    class EmptyComponent
+    class Handlers {
+        <<module>>
+        +docs_redirect() impl IntoResponse
+        +get_models() impl IntoResponse
+        +route_query(State state, HeaderMap headers, ValidatedJson request) impl IntoResponse
+    }
 ```
 
 ### Execution Flow
 ```mermaid
-flowchart TD
-    Req["Incoming HTTP Request"]
+sequenceDiagram
+    participant Client
+    participant Handlers
+    participant ValidatedJson
+    participant AgentTeam
 
-    Req --> RouteQuery["route_query()"]
-    Req --> GetModels["get_models()"]
-    Req --> DocsRedirect["docs_redirect()"]
-
-    RouteQuery --> Validate["Validate JSON Input"]
-    Validate -- Valid --> AgentRun{"Is Streaming?"}
-    Validate -- Invalid --> ErrorResp["400 Bad Request"]
-
-    AgentRun -- Stream = true --> AgentTeamRunStream["AgentTeam::run_stream()"]
-    AgentTeamRunStream --> EmitSSE["Yield SSE Events"]
-    EmitSSE --> ResponseStream["Streaming Response"]
-
-    AgentRun -- Stream = false / None --> AgentTeamRun["AgentTeam::run()"]
-    AgentTeamRun --> JsonResponse["JSON Completion Output"]
-
-    GetModels --> StaticModels["Return hardcoded mock model data"]
-
-    DocsRedirect --> Http303["303 See Other Redirect"]
+    Client->>Handlers: POST /chat/completions (route_query)
+    Handlers->>ValidatedJson: extract and validate request
+    alt Invalid Request
+        ValidatedJson-->>Client: 422 Unprocessable Entity
+    else Valid Request
+        alt stream == true
+            Handlers->>AgentTeam: run_stream(request)
+            AgentTeam-->>Handlers: Stream of AgentEvents (Progress, Delta, Done)
+            loop over stream
+                Handlers->>Handlers: Map AgentEvent to chat.completion.chunk JSON
+                Handlers-->>Client: Yield SSE Event
+            end
+        else stream == false
+            Handlers->>AgentTeam: run(request)
+            AgentTeam-->>Handlers: Result string
+            Handlers-->>Client: Return JSON chat.completion
+        end
+    end
 ```
 
 ## Dependencies
-- `axum::{ extract::State, http::{HeaderMap, StatusCode}, response::{sse::Event, IntoResponse, Sse}, Json, }`
+- `axum::{extract::State, http::{HeaderMap, StatusCode}, response::{sse::Event, IntoResponse, Sse}, Json}`
 - `futures::StreamExt`
 - `serde_json::json`
 - `std::convert::Infallible`
