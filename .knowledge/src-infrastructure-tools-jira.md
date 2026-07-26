@@ -39,8 +39,8 @@ classDiagram
 ```mermaid
 flowchart TD
     Start --> definition
-    definition --> call
-    call --> get_jira_results
+    definition --> call_node["call"]
+    call_node["call"] --> get_jira_results
     get_jira_results --> End
 ```
 

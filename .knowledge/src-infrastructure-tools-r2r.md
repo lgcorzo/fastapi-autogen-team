@@ -39,8 +39,8 @@ classDiagram
 ```mermaid
 flowchart TD
     Start --> definition
-    definition --> call
-    call --> get_r2r_results
+    definition --> call_node["call"]
+    call_node["call"] --> get_r2r_results
     get_r2r_results --> End
 ```
 

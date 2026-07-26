@@ -39,8 +39,8 @@ classDiagram
 ```mermaid
 flowchart TD
     Start --> definition
-    definition --> call
-    call --> get_confluence_results
+    definition --> call_node["call"]
+    call_node["call"] --> get_confluence_results
     get_confluence_results --> End
 ```
 

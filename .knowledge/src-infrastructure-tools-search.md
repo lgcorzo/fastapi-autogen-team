@@ -45,8 +45,8 @@ classDiagram
 ```mermaid
 flowchart TD
     Start --> definition
-    definition --> call
-    call --> End
+    definition --> call_node["call"]
+    call_node["call"] --> End
 ```
 
 ## Dependencies
