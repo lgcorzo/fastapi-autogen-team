@@ -1,15 +1,26 @@
 ---
 type: module
-title: "HTTP Middleware"
-description: "Middleware configuration for CORS and standard security headers."
-tags: [interface, http, middleware, security, cors]
-last_verified_commit: "722dbbe"
+title: "Middleware"
+source_path: "src/interface/http/middleware.rs"
+description: "Documentation for src/interface/http/middleware.rs."
+tags: [module, rust]
+last_verified_commit: "cf3c1ee"
 ---
+Source File: `src/interface/http/middleware.rs`
 
-# middleware.rs
+## Component Overview
 
-This module defines Tower middleware layers that are applied globally to Axum routes to enforce security boundaries and configure Cross-Origin Resource Sharing (CORS).
+This module defines the `Middleware` component.
 
+## Architecture
+
+### Class Diagram
+```mermaid
+classDiagram
+    class EmptyComponent
+```
+
+### Execution Flow
 ```mermaid
 flowchart TD
     Req[Incoming HTTP Request]
@@ -34,3 +45,9 @@ flowchart TD
 
     AddHeaders --> Handlers[Forward to Route Handlers]
 ```
+
+## Dependencies
+- `axum::http::{HeaderName, HeaderValue}`
+- `std::env`
+- `tower_http::cors::{AllowOrigin, CorsLayer}`
+- `tower_http::set_header::SetResponseHeaderLayer`
