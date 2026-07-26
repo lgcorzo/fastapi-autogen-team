@@ -23,15 +23,15 @@ classDiagram
 
     class ConfluenceError {
         <<enumeration>>
-        EnvVarMissing(VarError)
-        RequestError(reqwest::Error)
-        Other(String)
+        EnvVarMissing
+        RequestError
+        Other
     }
 
     class ConfluenceTool {
         +NAME: &'static str$
         +definition(String prompt) ToolDefinition
-        +call(ConfluenceArgs args) Result~String, ConfluenceError~
+        +call(ConfluenceArgs args) Result~String_ConfluenceError~
     }
 ```
 

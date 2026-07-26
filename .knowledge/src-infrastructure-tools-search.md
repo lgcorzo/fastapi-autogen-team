@@ -29,15 +29,15 @@ classDiagram
 
     class SearchError {
         <<enumeration>>
-        EnvVarMissing(VarError)
-        RequestError(reqwest::Error)
-        Other(String)
+        EnvVarMissing
+        RequestError
+        Other
     }
 
     class SearchTool {
         +NAME: &'static str$
         +definition(String prompt) ToolDefinition
-        +call(SearchArgs args) Result~SearchResult, SearchError~
+        +call(SearchArgs args) Result~SearchResult_SearchError~
     }
 ```
 

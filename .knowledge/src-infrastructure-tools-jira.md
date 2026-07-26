@@ -23,15 +23,15 @@ classDiagram
 
     class JiraError {
         <<enumeration>>
-        EnvVarMissing(VarError)
-        RequestError(reqwest::Error)
-        Other(String)
+        EnvVarMissing
+        RequestError
+        Other
     }
 
     class JiraTool {
         +NAME: &'static str$
         +definition(String prompt) ToolDefinition
-        +call(JiraArgs args) Result~String, JiraError~
+        +call(JiraArgs args) Result~String_JiraError~
     }
 ```
 
