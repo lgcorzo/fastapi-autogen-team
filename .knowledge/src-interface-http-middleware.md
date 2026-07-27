@@ -1,49 +1,36 @@
 ---
 type: module
-title: "Middleware"
+title: "HTTP Middleware"
 source_path: "src/interface/http/middleware.rs"
 description: "Documentation for src/interface/http/middleware.rs."
-tags: [module, rust]
-last_verified_commit: "cf3c1ee"
+tags: [module, rust, web, security]
+last_verified_commit: "1997254"
 ---
 Source File: `src/interface/http/middleware.rs`
 
 ## Component Overview
 
-This module defines the `Middleware` component.
+This module provides Axum middleware layers for adding standard HTTP security headers and configuring Cross-Origin Resource Sharing (CORS).
 
 ## Architecture
 
 ### Class Diagram
 ```mermaid
 classDiagram
-    class EmptyComponent
+    class Middleware {
+        <<module>>
+        +security_headers() Vec~SetResponseHeaderLayer_HeaderValue_~
+        +cors_layer() Option~CorsLayer~
+    }
 ```
 
 ### Execution Flow
 ```mermaid
 flowchart TD
-    Req["Incoming HTTP Request"]
-
-    Req --> MiddlewareStack["Axum Middleware Stack"]
-
-    MiddlewareStack --> CorsLayer["cors_layer()"]
-    CorsLayer --> CheckEnv{"ALLOWED_ORIGINS"}
-    CheckEnv -- Not Set / Empty --> DenyCors["No CORS Layer Appended"]
-    CheckEnv -- "*" --> AllowAll["Allow All Origins"]
-    CheckEnv -- "Specific Domains" --> ParseOrigins["Parse HeaderValues safely"]
-    ParseOrigins --> AllowSpecific["Allow Configured Origins"]
-
-    MiddlewareStack --> SecurityHeaders["security_headers()"]
-    SecurityHeaders --> AddHeaders["Append Static Security Headers"]
-
-    AddHeaders --> ContentTypeOptions["X-Content-Type-Options: nosniff"]
-    AddHeaders --> FrameOptions["X-Frame-Options: DENY"]
-    AddHeaders --> HSTS["Strict-Transport-Security: max-age=..."]
-    AddHeaders --> CSP["Content-Security-Policy: default-src 'self'..."]
-    AddHeaders --> ReferrerPolicy["Referrer-Policy: strict-origin-when-cross-origin"]
-
-    AddHeaders --> Handlers["Forward to Route Handlers"]
+    Req[Incoming Request] --> CORS[cors_layer: Check ALLOWED_ORIGINS]
+    CORS --> Handlers[Axum Route Handlers]
+    Handlers --> SecHeaders[security_headers: Set NOSNIFF, DENY, HSTS, CSP]
+    SecHeaders --> Res[Outgoing Response]
 ```
 
 ## Dependencies

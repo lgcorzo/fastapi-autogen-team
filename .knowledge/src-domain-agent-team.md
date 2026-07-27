@@ -4,7 +4,7 @@ title: "Team"
 source_path: "src/domain/agent/team.rs"
 description: "Documentation for src/domain/agent/team.rs."
 tags: [class, rust]
-last_verified_commit: "cf3c1ee"
+last_verified_commit: "1997254"
 ---
 Source File: `src/domain/agent/team.rs`
 
@@ -39,21 +39,40 @@ classDiagram
 sequenceDiagram
     participant Client
     participant AgentTeam
+    participant LanguageDetector
+    participant Translator
     participant PlannerAgent
     participant SearchTools
     participant ExpertAgent
 
     Client->>AgentTeam: run(input) / run_stream(input)
-    AgentTeam->>PlannerAgent: Generate independent search queries
-    PlannerAgent-->>AgentTeam: List of queries
 
-    loop For each valid query
-        AgentTeam->>SearchTools: Execute searches (R2R, Jira, Confluence)
-        SearchTools-->>AgentTeam: Aggregated Results
-        AgentTeam->>Client: (Streaming) emit Progress
+    par Language Processing
+        AgentTeam->>LanguageDetector: Detect input language
+        AgentTeam->>Translator: Translate to English (if needed)
     end
 
-    AgentTeam->>ExpertAgent: Synthesize final answer using search results
+    AgentTeam->>Client: (Streaming) emit Progress (Language Detected & Translated)
+
+    AgentTeam->>PlannerAgent: Generate up to 5 independent search queries based on English text
+    PlannerAgent-->>AgentTeam: List of queries tagged with [JIRA], [CONFLUENCE], or [R2R]
+
+    AgentTeam->>Client: (Streaming) emit Progress (Planner queries generated)
+
+    loop For each valid query (up to 5)
+        alt is [JIRA]
+            AgentTeam->>SearchTools: Jira Search
+        else is [CONFLUENCE]
+            AgentTeam->>SearchTools: Confluence Search
+        else is [R2R] or Default
+            AgentTeam->>SearchTools: R2R Search
+        end
+
+        SearchTools-->>AgentTeam: Search Results
+        AgentTeam->>Client: (Streaming) emit Progress (Search completed)
+    end
+
+    AgentTeam->>ExpertAgent: Synthesize final answer using search results & translate back to original language
     ExpertAgent-->>AgentTeam: Synthesized Response / Streamed Tokens
 
     alt Streaming Mode
