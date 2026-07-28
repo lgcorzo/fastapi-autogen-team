@@ -4,7 +4,7 @@ title: "DomainModule"
 source_path: "src/domain/mod.rs"
 description: "Documentation for src/domain/mod.rs."
 tags: [class, rust]
-last_verified_commit: "cf3c1ee"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/domain/mod.rs`
 

@@ -4,7 +4,7 @@ title: "R2RTool"
 source_path: "src/infrastructure/tools/r2r.rs"
 description: "Documentation for src/infrastructure/tools/r2r.rs."
 tags: [class, rust, tool]
-last_verified_commit: "1997254"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/infrastructure/tools/r2r.rs`
 

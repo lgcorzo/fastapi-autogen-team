@@ -4,7 +4,7 @@ title: "HTTP Middleware"
 source_path: "src/interface/http/middleware.rs"
 description: "Documentation for src/interface/http/middleware.rs."
 tags: [module, rust, web, security]
-last_verified_commit: "1997254"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/interface/http/middleware.rs`
 

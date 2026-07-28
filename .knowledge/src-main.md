@@ -4,7 +4,7 @@ title: "Main"
 source_path: "src/main.rs"
 description: "Documentation for src/main.rs."
 tags: [script, rust]
-last_verified_commit: "1997254"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/main.rs`
 
