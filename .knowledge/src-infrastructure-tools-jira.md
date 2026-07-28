@@ -4,7 +4,7 @@ title: "JiraTool"
 source_path: "src/infrastructure/tools/jira.rs"
 description: "Documentation for src/infrastructure/tools/jira.rs."
 tags: [class, rust, tool]
-last_verified_commit: "1997254"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/infrastructure/tools/jira.rs`
 
@@ -71,5 +71,3 @@ sequenceDiagram
 - `serde_json::json`
 - `std::env`
 - `thiserror::Error`
-- `reqwest`
-- `anyhow`

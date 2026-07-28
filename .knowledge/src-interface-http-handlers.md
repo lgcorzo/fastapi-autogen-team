@@ -4,7 +4,7 @@ title: "HTTP Handlers"
 source_path: "src/interface/http/handlers.rs"
 description: "Documentation for src/interface/http/handlers.rs."
 tags: [module, rust, web]
-last_verified_commit: "1997254"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/interface/http/handlers.rs`
 
@@ -54,7 +54,7 @@ sequenceDiagram
 ```
 
 ## Dependencies
-- `axum::{extract::State, http::{HeaderMap, StatusCode}, response::{sse::Event, IntoResponse, Sse}, Json}`
+- `axum::{ extract::State, http::{HeaderMap, StatusCode}, response::{sse::Event, IntoResponse, Sse}, Json, }`
 - `futures::StreamExt`
 - `serde_json::json`
 - `std::convert::Infallible`

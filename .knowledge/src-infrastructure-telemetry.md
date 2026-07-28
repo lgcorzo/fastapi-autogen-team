@@ -4,7 +4,7 @@ title: "Telemetry"
 source_path: "src/infrastructure/telemetry.rs"
 description: "Documentation for src/infrastructure/telemetry.rs."
 tags: [module, rust]
-last_verified_commit: "cf3c1ee"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/infrastructure/telemetry.rs`
 

@@ -4,7 +4,7 @@ title: "HttpModule"
 source_path: "src/interface/http/mod.rs"
 description: "Documentation for src/interface/http/mod.rs."
 tags: [module, rust]
-last_verified_commit: "cf3c1ee"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/interface/http/mod.rs`
 
@@ -27,4 +27,4 @@ flowchart TD
 ```
 
 ## Dependencies
-No direct internal dependencies.
+None

@@ -4,7 +4,7 @@ title: "ApplicationModule"
 source_path: "src/application/mod.rs"
 description: "Documentation for src/application/mod.rs."
 tags: [module, rust]
-last_verified_commit: "cf3c1ee"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/application/mod.rs`
 
@@ -27,4 +27,4 @@ flowchart TD
 ```
 
 ## Dependencies
-No direct internal dependencies.
+None

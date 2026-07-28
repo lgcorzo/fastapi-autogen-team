@@ -4,7 +4,7 @@ title: "AgentModule"
 source_path: "src/domain/agent/mod.rs"
 description: "Documentation for src/domain/agent/mod.rs."
 tags: [class, rust]
-last_verified_commit: "cf3c1ee"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/domain/agent/mod.rs`
 
@@ -27,4 +27,4 @@ flowchart TD
 ```
 
 ## Dependencies
-No direct internal dependencies.
+None
