@@ -4,7 +4,7 @@ title: "HTTP Routes"
 source_path: "src/interface/http/routes.rs"
 description: "Documentation for src/interface/http/routes.rs."
 tags: [module, rust, web]
-last_verified_commit: "1997254"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/interface/http/routes.rs`
 

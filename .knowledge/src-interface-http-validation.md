@@ -4,7 +4,7 @@ title: "Validation"
 source_path: "src/interface/http/validation.rs"
 description: "Documentation for src/interface/http/validation.rs."
 tags: [module, rust]
-last_verified_commit: "cf3c1ee"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/interface/http/validation.rs`
 

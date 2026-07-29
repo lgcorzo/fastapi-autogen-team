@@ -4,7 +4,7 @@ title: "Lib"
 source_path: "src/lib.rs"
 description: "Documentation for src/lib.rs."
 tags: [module, rust]
-last_verified_commit: "cf3c1ee"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/lib.rs`
 

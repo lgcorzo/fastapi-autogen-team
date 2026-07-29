@@ -4,7 +4,7 @@ title: "Team"
 source_path: "src/domain/agent/team.rs"
 description: "Documentation for src/domain/agent/team.rs."
 tags: [class, rust]
-last_verified_commit: "1997254"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/domain/agent/team.rs`
 

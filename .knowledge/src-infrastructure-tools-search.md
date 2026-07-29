@@ -4,7 +4,7 @@ title: "SearchTool"
 source_path: "src/infrastructure/tools/search.rs"
 description: "Documentation for src/infrastructure/tools/search.rs."
 tags: [class, rust, tool]
-last_verified_commit: "1997254"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/infrastructure/tools/search.rs`
 

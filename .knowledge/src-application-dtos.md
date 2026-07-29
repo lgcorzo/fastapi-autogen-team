@@ -4,7 +4,7 @@ title: "Dtos"
 source_path: "src/application/dtos.rs"
 description: "Documentation for src/application/dtos.rs."
 tags: [class, rust]
-last_verified_commit: "cf3c1ee"
+last_verified_commit: "cfcd09b"
 ---
 Source File: `src/application/dtos.rs`
 
