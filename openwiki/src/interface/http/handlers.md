@@ -3,7 +3,7 @@ type: "module-architecture"
 title: "Handlers"
 description: "Technical architecture and class hierarchy for Handlers"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T19:23:37Z"
+timestamp: "2026-07-30T20:32:40Z"
 ---
 
 # Module Name: Handlers
@@ -39,8 +39,8 @@ classDiagram
 
 ## 3. Package & Class Relations
 
-* **Inheritance & Polymorphism:** Diagram depicts detected traits, realizations, and abstractions.
-* **Dependencies:** Defined by import structures across the boundary.
+* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides.
+* **Dependencies:** How classes within this package collaborate externally.
 
 ## 4. Execution Flow & Runtime Behavior
 
@@ -52,11 +52,10 @@ sequenceDiagram
     participant Caller as Client Interface
     participant Svc as Handlers
     Caller->>Svc: docs_redirect()
-    Note over Svc: Internal execution
-    Svc-->>Caller: Returns
+    Svc-->>Caller: Returns execution status
     Caller->>Svc: get_models()
-    Note over Svc: Internal execution
-    Svc-->>Caller: Returns
+    Svc->>Svc: Json()
+    Svc-->>Caller: Returns execution status
 ```
 
 

@@ -3,7 +3,7 @@ type: "module-architecture"
 title: "R2r"
 description: "Technical architecture and class hierarchy for R2r"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T19:23:37Z"
+timestamp: "2026-07-30T20:32:40Z"
 ---
 
 # Module Name: R2r
@@ -32,14 +32,15 @@ classDiagram
     class R2RError {
         <<enumeration>>
     }
+    R2RArgs --> String : Association
     Tool <|.. R2RTool : Realization
 ```
 
 
 ## 3. Package & Class Relations
 
-* **Inheritance & Polymorphism:** Diagram depicts detected traits, realizations, and abstractions.
-* **Dependencies:** Defined by import structures across the boundary.
+* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides.
+* **Dependencies:** How classes within this package collaborate externally.
 
 ## 4. Execution Flow & Runtime Behavior
 
@@ -51,8 +52,10 @@ sequenceDiagram
     participant Caller as Client Interface
     participant Svc as R2RArgs
     Caller->>Svc: get_r2r_results()
-    Note over Svc: Internal execution
-    Svc-->>Caller: Returns
+    Svc->>Svc: var()
+    Svc->>Svc: var()
+    Svc->>Svc: new()
+    Svc-->>Caller: Returns execution status
 ```
 
 
@@ -61,6 +64,4 @@ sequenceDiagram
 * **Source Citations:**
 * Class `R2RArgs`: `src/infrastructure/tools/r2r.rs:9`
 * Class `R2RError`: `src/infrastructure/tools/r2r.rs:14`
-* Method `definition` in `R2RTool`: `src/infrastructure/tools/r2r.rs:29`
-* Method `call` in `R2RTool`: `src/infrastructure/tools/r2r.rs:45`
 * Method `get_r2r_results`: `src/infrastructure/tools/r2r.rs:57`

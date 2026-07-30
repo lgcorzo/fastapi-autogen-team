@@ -3,7 +3,7 @@ type: "module-architecture"
 title: "Mock_services"
 description: "Technical architecture and class hierarchy for Mock_services"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T19:23:37Z"
+timestamp: "2026-07-30T20:32:40Z"
 ---
 
 # Module Name: Mock_services
@@ -31,13 +31,14 @@ classDiagram
     class JiraQueryParams {
         +Option~String~, jql
     }
+    JiraQueryParams --> Option : Association
 ```
 
 
 ## 3. Package & Class Relations
 
-* **Inheritance & Polymorphism:** Diagram depicts detected traits, realizations, and abstractions.
-* **Dependencies:** Defined by import structures across the boundary.
+* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides.
+* **Dependencies:** How classes within this package collaborate externally.
 
 ## 4. Execution Flow & Runtime Behavior
 
@@ -49,14 +50,22 @@ sequenceDiagram
     participant Caller as Client Interface
     participant Svc as AppState
     Caller->>Svc: main()
-    Note over Svc: Internal execution
-    Svc-->>Caller: Returns
+    Svc->>Svc: registry()
+    Svc->>Svc: with()
+    Svc->>Svc: layer()
+    Svc-->>Caller: Returns execution status
     Caller->>Svc: r2r_login()
-    Note over Svc: Internal execution
-    Svc-->>Caller: Returns
+    Svc->>Svc: Json()
+    Svc-->>Caller: Returns execution status
     Caller->>Svc: r2r_rag()
-    Note over Svc: Internal execution
-    Svc-->>Caller: Returns
+    Svc->>Svc: Json()
+    Svc-->>Caller: Returns execution status
+    Caller->>Svc: r2r_search()
+    Svc->>Svc: Json()
+    Svc-->>Caller: Returns execution status
+    Caller->>Svc: jira_search()
+    Svc->>Svc: Json()
+    Svc-->>Caller: Returns execution status
 ```
 
 
