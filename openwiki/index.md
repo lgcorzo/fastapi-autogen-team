@@ -1,0 +1,25 @@
+# OpenWiki Technical Index
+
+## Modules
+
+- [dtos.rs](./src/application/dtos.md) (Source: `src/application/dtos.rs`)
+- [mod.rs](./src/application/mod.md) (Source: `src/application/mod.rs`)
+- [mock_services.rs](./src/bin/mock_services.md) (Source: `src/bin/mock_services.rs`)
+- [mod.rs](./src/domain/agent/mod.md) (Source: `src/domain/agent/mod.rs`)
+- [team.rs](./src/domain/agent/team.md) (Source: `src/domain/agent/team.rs`)
+- [mod.rs](./src/domain/mod.md) (Source: `src/domain/mod.rs`)
+- [mod.rs](./src/infrastructure/mod.md) (Source: `src/infrastructure/mod.rs`)
+- [telemetry.rs](./src/infrastructure/telemetry.md) (Source: `src/infrastructure/telemetry.rs`)
+- [confluence.rs](./src/infrastructure/tools/confluence.md) (Source: `src/infrastructure/tools/confluence.rs`)
+- [jira.rs](./src/infrastructure/tools/jira.md) (Source: `src/infrastructure/tools/jira.rs`)
+- [mod.rs](./src/infrastructure/tools/mod.md) (Source: `src/infrastructure/tools/mod.rs`)
+- [r2r.rs](./src/infrastructure/tools/r2r.md) (Source: `src/infrastructure/tools/r2r.rs`)
+- [search.rs](./src/infrastructure/tools/search.md) (Source: `src/infrastructure/tools/search.rs`)
+- [handlers.rs](./src/interface/http/handlers.md) (Source: `src/interface/http/handlers.rs`)
+- [middleware.rs](./src/interface/http/middleware.md) (Source: `src/interface/http/middleware.rs`)
+- [mod.rs](./src/interface/http/mod.md) (Source: `src/interface/http/mod.rs`)
+- [routes.rs](./src/interface/http/routes.md) (Source: `src/interface/http/routes.rs`)
+- [validation.rs](./src/interface/http/validation.md) (Source: `src/interface/http/validation.rs`)
+- [mod.rs](./src/interface/mod.md) (Source: `src/interface/mod.rs`)
+- [lib.rs](./src/lib.md) (Source: `src/lib.rs`)
+- [main.rs](./src/main.md) (Source: `src/main.rs`)
