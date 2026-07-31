@@ -1,12 +1,17 @@
 # OpenWiki Changelog
 
-## Update: 2026-07-30T19:23:37Z
+---
+iso_doc_type: "Report"
+iso_viewpoint: "History"
+type: "log"
+title: "Incremental Audit Log & Git Diff History"
+description: "Log of documentation generation"
+tags: ["iso15289", "log", "okf"]
+timestamp: "2026-07-31T20:24:30Z"
+---
+
+## Update: 2026-07-31T20:24:30Z
 
 - Synchronized `21` files from source code to OpenWiki structure.
-## Update: 2026-07-30T20:29:44Z
+- Commit hash: `3c7e8ef`
 
-- Synchronized `21` files from source code to OpenWiki structure.
-
-## Update: 2026-07-30T20:32:40Z
-
-- Synchronized `21` files from source code to OpenWiki structure.
