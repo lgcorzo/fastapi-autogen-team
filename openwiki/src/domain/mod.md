@@ -3,7 +3,7 @@ type: "module-architecture"
 title: "DomainModule"
 description: "Technical architecture and class hierarchy for DomainModule"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T20:32:40Z"
+timestamp: "2026-07-31T08:02:02Z"
 ---
 
 # Module Name: DomainModule
