@@ -1,23 +1,22 @@
 ---
 type: "module-architecture"
 title: "DomainModule"
-description: "Technical architecture and class hierarchy for DomainModule"
-tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T20:32:40Z"
+description: "Technical architecture, API specification, and UML 2.0 diagrams for DomainModule"
+tags: ["architecture", "uml2", "okf", "openwiki", "polyglot"]
+timestamp: "2026-07-31T12:51:19Z"
 ---
 
-# Module Name: DomainModule
+# Module Architecture: DomainModule
 
-* **Source Directory Reference:** `src/domain/`
-* **Package Dependency:**
-- None
+* **Source File Reference:** `src/domain/mod.rs`
+* **Package Dependencies:** Upstream: None
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `DomainModule` module extracted directly from the codebase.
 
-## 2. UML 2.0 Class & Inheritance Architecture (Deterministic)
-The following class diagram models the object-oriented structure, explicit inheritance hierarchies, and polymorphic interface implementations derived from local AST analysis:
+## 2. UML 2.0 Diagrams
 
+### Class / Struct Architecture
 ```mermaid
 classDiagram
     direction BT
@@ -27,15 +26,7 @@ classDiagram
 ```
 
 
-## 3. Package & Class Relations
-
-* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides.
-* **Dependencies:** How classes within this package collaborate externally.
-
-## 4. Execution Flow & Runtime Behavior
-
-The following sequence diagram outlines the execution lifecycle and message passing during core operations:
-
+### Runtime Sequence Diagram
 ```mermaid
 sequenceDiagram
     autonumber
@@ -44,7 +35,20 @@ sequenceDiagram
 ```
 
 
+## 3. Data Structures, Structs & Class Properties
+
+| Property / Field | Type | Visibility | Description | Source Reference |
+| :--- | :--- | :--- | :--- | :--- |
+| - | - | - | No properties extracted | - |
+
+
+## 4. Comprehensive Methods & Functions Breakdown
+
+No direct functions or methods extracted.
+
+
 ---
 
-* **Source Citations:**
+## 5. Source Code Citations & Index
+* Module File: `src/domain/mod.rs`
 * Class `DomainModule`: `src/domain/mod.rs:1`

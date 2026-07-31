@@ -1,26 +1,22 @@
 ---
 type: "module-architecture"
 title: "Middleware"
-description: "Technical architecture and class hierarchy for Middleware"
-tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T20:32:40Z"
+description: "Technical architecture, API specification, and UML 2.0 diagrams for Middleware"
+tags: ["architecture", "uml2", "okf", "openwiki", "polyglot"]
+timestamp: "2026-07-31T12:51:19Z"
 ---
 
-# Module Name: Middleware
+# Module Architecture: Middleware
 
-* **Source Directory Reference:** `src/interface/http/`
-* **Package Dependency:**
-- `axum::http::{HeaderName, HeaderValue}`
-- `std::env`
-- `tower_http::cors::{AllowOrigin, CorsLayer}`
-- `tower_http::set_header::SetResponseHeaderLayer`
+* **Source File Reference:** `src/interface/http/middleware.rs`
+* **Package Dependencies:** Upstream: `[[{HeaderName, HeaderValue}]]` | `[[env]]` | `[[{AllowOrigin, CorsLayer}]]` | `[[SetResponseHeaderLayer]]`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Middleware` module extracted directly from the codebase.
 
-## 2. UML 2.0 Class & Inheritance Architecture (Deterministic)
-The following class diagram models the object-oriented structure, explicit inheritance hierarchies, and polymorphic interface implementations derived from local AST analysis:
+## 2. UML 2.0 Diagrams
 
+### Class / Struct Architecture
 ```mermaid
 classDiagram
     direction BT
@@ -32,15 +28,7 @@ classDiagram
 ```
 
 
-## 3. Package & Class Relations
-
-* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides.
-* **Dependencies:** How classes within this package collaborate externally.
-
-## 4. Execution Flow & Runtime Behavior
-
-The following sequence diagram outlines the execution lifecycle and message passing during core operations:
-
+### Runtime Sequence Diagram
 ```mermaid
 sequenceDiagram
     autonumber
@@ -59,9 +47,53 @@ sequenceDiagram
 ```
 
 
+## 3. Data Structures, Structs & Class Properties
+
+| Property / Field | Type | Visibility | Description | Source Reference |
+| :--- | :--- | :--- | :--- | :--- |
+| - | - | - | No properties extracted | - |
+
+
+## 4. Comprehensive Methods & Functions Breakdown
+
+### Function / Method: `security_headers()`
+* **Source Reference:** `src/interface/http/middleware.rs:6`
+* **Visibility / Scope:** Public (`+`)
+* **Behavioral Overview:** Extracted method logic.
+
+#### Input Parameters
+| Parameter | Type | Required / Default | Description |
+| :--- | :--- | :--- | :--- |
+| None | - | - | No parameters. |
+
+#### Output & Return Values
+| Return Type | Condition / Scenario | Description |
+| :--- | :--- | :--- |
+| `Vec<SetResponseHeaderLayer<HeaderValue>>` | Standard Execution | Derived return type. |
+
+
+### Function / Method: `cors_layer()`
+* **Source Reference:** `src/interface/http/middleware.rs:33`
+* **Visibility / Scope:** Public (`+`)
+* **Behavioral Overview:** Extracted method logic.
+
+#### Input Parameters
+| Parameter | Type | Required / Default | Description |
+| :--- | :--- | :--- | :--- |
+| None | - | - | No parameters. |
+
+#### Output & Return Values
+| Return Type | Condition / Scenario | Description |
+| :--- | :--- | :--- |
+| `Option<CorsLayer>` | Standard Execution | Derived return type. |
+
+
+
+
 ---
 
-* **Source Citations:**
+## 5. Source Code Citations & Index
+* Module File: `src/interface/http/middleware.rs`
 * Class `Middleware`: `src/interface/http/middleware.rs:1`
 * Method `security_headers`: `src/interface/http/middleware.rs:6`
 * Method `cors_layer`: `src/interface/http/middleware.rs:33`

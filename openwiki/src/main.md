@@ -1,28 +1,22 @@
 ---
 type: "module-architecture"
 title: "Main"
-description: "Technical architecture and class hierarchy for Main"
-tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T20:32:40Z"
+description: "Technical architecture, API specification, and UML 2.0 diagrams for Main"
+tags: ["architecture", "uml2", "okf", "openwiki", "polyglot"]
+timestamp: "2026-07-31T12:51:19Z"
 ---
 
-# Module Name: Main
+# Module Architecture: Main
 
-* **Source Directory Reference:** `src/`
-* **Package Dependency:**
-- `dotenvy::dotenv`
-- `rust_agent_team::domain::agent::team::AgentTeam`
-- `rust_agent_team::infrastructure::telemetry`
-- `rust_agent_team::{create_app, AppState}`
-- `std::env`
-- `std::sync::Arc`
+* **Source File Reference:** `src/main.rs`
+* **Package Dependencies:** Upstream: `[[dotenv]]` | `[[AgentTeam]]` | `[[telemetry]]` | `[[{create_app, AppState}]]` | `[[env]]` | `[[Arc]]`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Main` module extracted directly from the codebase.
 
-## 2. UML 2.0 Class & Inheritance Architecture (Deterministic)
-The following class diagram models the object-oriented structure, explicit inheritance hierarchies, and polymorphic interface implementations derived from local AST analysis:
+## 2. UML 2.0 Diagrams
 
+### Class / Struct Architecture
 ```mermaid
 classDiagram
     direction BT
@@ -33,15 +27,7 @@ classDiagram
 ```
 
 
-## 3. Package & Class Relations
-
-* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides.
-* **Dependencies:** How classes within this package collaborate externally.
-
-## 4. Execution Flow & Runtime Behavior
-
-The following sequence diagram outlines the execution lifecycle and message passing during core operations:
-
+### Runtime Sequence Diagram
 ```mermaid
 sequenceDiagram
     autonumber
@@ -52,8 +38,36 @@ sequenceDiagram
 ```
 
 
+## 3. Data Structures, Structs & Class Properties
+
+| Property / Field | Type | Visibility | Description | Source Reference |
+| :--- | :--- | :--- | :--- | :--- |
+| - | - | - | No properties extracted | - |
+
+
+## 4. Comprehensive Methods & Functions Breakdown
+
+### Function / Method: `main()`
+* **Source Reference:** `src/main.rs:9`
+* **Visibility / Scope:** Private (`-`)
+* **Behavioral Overview:** Extracted method logic.
+
+#### Input Parameters
+| Parameter | Type | Required / Default | Description |
+| :--- | :--- | :--- | :--- |
+| None | - | - | No parameters. |
+
+#### Output & Return Values
+| Return Type | Condition / Scenario | Description |
+| :--- | :--- | :--- |
+| `anyhow::Result<()>` | Standard Execution | Derived return type. |
+
+
+
+
 ---
 
-* **Source Citations:**
+## 5. Source Code Citations & Index
+* Module File: `src/main.rs`
 * Class `Main`: `src/main.rs:1`
 * Method `main`: `src/main.rs:9`

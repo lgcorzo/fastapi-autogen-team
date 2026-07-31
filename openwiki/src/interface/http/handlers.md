@@ -1,31 +1,22 @@
 ---
 type: "module-architecture"
 title: "Handlers"
-description: "Technical architecture and class hierarchy for Handlers"
-tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T20:32:40Z"
+description: "Technical architecture, API specification, and UML 2.0 diagrams for Handlers"
+tags: ["architecture", "uml2", "okf", "openwiki", "polyglot"]
+timestamp: "2026-07-31T12:51:19Z"
 ---
 
-# Module Name: Handlers
+# Module Architecture: Handlers
 
-* **Source Directory Reference:** `src/interface/http/`
-* **Package Dependency:**
-- `axum::{`
-- `crate::application::dtos::Input`
-- `crate::domain::agent::team::AgentEvent`
-- `crate::interface::http::routes::AppState`
-- `crate::interface::http::validation::ValidatedJson`
-- `futures::StreamExt`
-- `serde_json::json`
-- `std::convert::Infallible`
-- `std::sync::Arc`
+* **Source File Reference:** `src/interface/http/handlers.rs`
+* **Package Dependencies:** Upstream: `[[{]]` | `[[Input]]` | `[[AgentEvent]]` | `[[AppState]]` | `[[ValidatedJson]]` | `[[StreamExt]]` | `[[json]]` | `[[Infallible]]` | `[[Arc]]`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Handlers` module extracted directly from the codebase.
 
-## 2. UML 2.0 Class & Inheritance Architecture (Deterministic)
-The following class diagram models the object-oriented structure, explicit inheritance hierarchies, and polymorphic interface implementations derived from local AST analysis:
+## 2. UML 2.0 Diagrams
 
+### Class / Struct Architecture
 ```mermaid
 classDiagram
     direction BT
@@ -37,15 +28,7 @@ classDiagram
 ```
 
 
-## 3. Package & Class Relations
-
-* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides.
-* **Dependencies:** How classes within this package collaborate externally.
-
-## 4. Execution Flow & Runtime Behavior
-
-The following sequence diagram outlines the execution lifecycle and message passing during core operations:
-
+### Runtime Sequence Diagram
 ```mermaid
 sequenceDiagram
     autonumber
@@ -59,9 +42,53 @@ sequenceDiagram
 ```
 
 
+## 3. Data Structures, Structs & Class Properties
+
+| Property / Field | Type | Visibility | Description | Source Reference |
+| :--- | :--- | :--- | :--- | :--- |
+| - | - | - | No properties extracted | - |
+
+
+## 4. Comprehensive Methods & Functions Breakdown
+
+### Function / Method: `docs_redirect()`
+* **Source Reference:** `src/interface/http/handlers.rs:17`
+* **Visibility / Scope:** Public (`+`)
+* **Behavioral Overview:** Extracted method logic.
+
+#### Input Parameters
+| Parameter | Type | Required / Default | Description |
+| :--- | :--- | :--- | :--- |
+| None | - | - | No parameters. |
+
+#### Output & Return Values
+| Return Type | Condition / Scenario | Description |
+| :--- | :--- | :--- |
+| `impl IntoResponse` | Standard Execution | Derived return type. |
+
+
+### Function / Method: `get_models()`
+* **Source Reference:** `src/interface/http/handlers.rs:24`
+* **Visibility / Scope:** Public (`+`)
+* **Behavioral Overview:** Extracted method logic.
+
+#### Input Parameters
+| Parameter | Type | Required / Default | Description |
+| :--- | :--- | :--- | :--- |
+| None | - | - | No parameters. |
+
+#### Output & Return Values
+| Return Type | Condition / Scenario | Description |
+| :--- | :--- | :--- |
+| `impl IntoResponse` | Standard Execution | Derived return type. |
+
+
+
+
 ---
 
-* **Source Citations:**
+## 5. Source Code Citations & Index
+* Module File: `src/interface/http/handlers.rs`
 * Class `Handlers`: `src/interface/http/handlers.rs:1`
 * Method `docs_redirect`: `src/interface/http/handlers.rs:17`
 * Method `get_models`: `src/interface/http/handlers.rs:24`

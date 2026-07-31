@@ -1,41 +1,27 @@
 ---
 type: "module-architecture"
 title: "Team"
-description: "Technical architecture and class hierarchy for Team"
-tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T20:32:40Z"
+description: "Technical architecture, API specification, and UML 2.0 diagrams for Team"
+tags: ["architecture", "uml2", "okf", "openwiki", "polyglot"]
+timestamp: "2026-07-31T12:51:19Z"
 ---
 
-# Module Name: Team
+# Module Architecture: Team
 
-* **Source Directory Reference:** `src/domain/agent/`
-* **Package Dependency:**
-- `async_stream::stream`
-- `crate::application::dtos::Input`
-- `crate::infrastructure::tools::confluence::ConfluenceTool`
-- `crate::infrastructure::tools::jira::JiraTool`
-- `crate::infrastructure::tools::r2r::R2RTool`
-- `futures::{future::join_all, Stream, StreamExt}`
-- `rig::agent::MultiTurnStreamItem`
-- `rig::client::CompletionClient`
-- `rig::completion::Prompt`
-- `rig::providers::openai`
-- `rig::streaming::{StreamedAssistantContent, StreamingPrompt}`
-- `serde_json`
-- `std::env`
-- `std::pin::Pin`
+* **Source File Reference:** `src/domain/agent/team.rs`
+* **Package Dependencies:** Upstream: `[[stream]]` | `[[Input]]` | `[[ConfluenceTool]]` | `[[JiraTool]]` | `[[R2RTool]]` | `[[join_all, Stream, StreamExt}]]` | `[[MultiTurnStreamItem]]` | `[[CompletionClient]]` | `[[Prompt]]` | `[[openai]]` | `[[{StreamedAssistantContent, StreamingPrompt}]]` | `[[serde_json]]` | `[[env]]` | `[[Pin]]`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Team` module extracted directly from the codebase.
 
-## 2. UML 2.0 Class & Inheritance Architecture (Deterministic)
-The following class diagram models the object-oriented structure, explicit inheritance hierarchies, and polymorphic interface implementations derived from local AST analysis:
+## 2. UML 2.0 Diagrams
 
+### Class / Struct Architecture
 ```mermaid
 classDiagram
     direction BT
     class AgentTeam {
-        +openai::Client, client
+        -openai::Client, client
         +new()
         +run()
         +new_mock()
@@ -48,15 +34,7 @@ classDiagram
 ```
 
 
-## 3. Package & Class Relations
-
-* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides.
-* **Dependencies:** How classes within this package collaborate externally.
-
-## 4. Execution Flow & Runtime Behavior
-
-The following sequence diagram outlines the execution lifecycle and message passing during core operations:
-
+### Runtime Sequence Diagram
 ```mermaid
 sequenceDiagram
     autonumber
@@ -87,13 +65,106 @@ sequenceDiagram
 ```
 
 
+## 3. Data Structures, Structs & Class Properties
+
+| Property / Field | Type | Visibility | Description | Source Reference |
+| :--- | :--- | :--- | :--- | :--- |
+| `client` | `openai::Client,` | Private (`-`) | Extracted property client. | `src/domain/agent/team.rs:51` |
+
+
+## 4. Comprehensive Methods & Functions Breakdown
+
+### Function / Method: `new()`
+* **Source Reference:** `src/domain/agent/team.rs:55`
+* **Visibility / Scope:** Public (`+`)
+* **Behavioral Overview:** Extracted method logic.
+
+#### Input Parameters
+| Parameter | Type | Required / Default | Description |
+| :--- | :--- | :--- | :--- |
+| None | - | - | No parameters. |
+
+#### Output & Return Values
+| Return Type | Condition / Scenario | Description |
+| :--- | :--- | :--- |
+| `anyhow::Result<Self>` | Standard Execution | Derived return type. |
+
+
+### Function / Method: `run(&self, input: Input)`
+* **Source Reference:** `src/domain/agent/team.rs:66`
+* **Visibility / Scope:** Public (`+`)
+* **Behavioral Overview:** Extracted method logic.
+
+#### Input Parameters
+| Parameter | Type | Required / Default | Description |
+| :--- | :--- | :--- | :--- |
+| `self` | `instance reference` | Required | Context instance. |
+| `input` | `Input` | Required | Derived parameter. |
+
+#### Output & Return Values
+| Return Type | Condition / Scenario | Description |
+| :--- | :--- | :--- |
+| `anyhow::Result<String>` | Standard Execution | Derived return type. |
+
+
+### Function / Method: `new_mock()`
+* **Source Reference:** `src/domain/agent/team.rs:454`
+* **Visibility / Scope:** Public (`+`)
+* **Behavioral Overview:** Extracted method logic.
+
+#### Input Parameters
+| Parameter | Type | Required / Default | Description |
+| :--- | :--- | :--- | :--- |
+| None | - | - | No parameters. |
+
+#### Output & Return Values
+| Return Type | Condition / Scenario | Description |
+| :--- | :--- | :--- |
+| `Self` | Standard Execution | Derived return type. |
+
+
+### Function / Method: `new_test(base_url: &str)`
+* **Source Reference:** `src/domain/agent/team.rs:463`
+* **Visibility / Scope:** Public (`+`)
+* **Behavioral Overview:** Extracted method logic.
+
+#### Input Parameters
+| Parameter | Type | Required / Default | Description |
+| :--- | :--- | :--- | :--- |
+| `base_url` | `&str` | Required | Derived parameter. |
+
+#### Output & Return Values
+| Return Type | Condition / Scenario | Description |
+| :--- | :--- | :--- |
+| `Self` | Standard Execution | Derived return type. |
+
+
+### Function / Method: `is_valid_query_line(line: &str)`
+* **Source Reference:** `src/domain/agent/team.rs:32`
+* **Visibility / Scope:** Private (`-`)
+* **Behavioral Overview:** Extracted method logic.
+
+#### Input Parameters
+| Parameter | Type | Required / Default | Description |
+| :--- | :--- | :--- | :--- |
+| `line` | `&str` | Required | Derived parameter. |
+
+#### Output & Return Values
+| Return Type | Condition / Scenario | Description |
+| :--- | :--- | :--- |
+| `bool` | Standard Execution | Derived return type. |
+
+
+
+
 ---
 
-* **Source Citations:**
+## 5. Source Code Citations & Index
+* Module File: `src/domain/agent/team.rs`
 * Class `AgentTeam`: `src/domain/agent/team.rs:51`
-* Class `AgentEvent`: `src/domain/agent/team.rs:23`
-* Method `new` in `AgentTeam`: `src/domain/agent/team.rs:55`
-* Method `run` in `AgentTeam`: `src/domain/agent/team.rs:66`
-* Method `new_mock` in `AgentTeam`: `src/domain/agent/team.rs:454`
-* Method `new_test` in `AgentTeam`: `src/domain/agent/team.rs:463`
+* Enum `AgentEvent`: `src/domain/agent/team.rs:23`
+* Method `new`: `src/domain/agent/team.rs:55`
+* Method `run`: `src/domain/agent/team.rs:66`
+* Method `new_mock`: `src/domain/agent/team.rs:454`
+* Method `new_test`: `src/domain/agent/team.rs:463`
 * Method `is_valid_query_line`: `src/domain/agent/team.rs:32`

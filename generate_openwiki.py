@@ -82,30 +82,40 @@ def parse_rust_file(filepath):
         line_num = content_no_comments[:m.start()].count('\n') + 1
 
         fields = []
+        raw_fields = []
         if fields_str:
             for field_line in fields_str.split(',' if m.group(3) else '\n'):
                 field_line = field_line.strip()
                 if not field_line or field_line.startswith('#'): continue
+
+                vis = "-"
+                if field_line.startswith('pub '):
+                    vis = "+"
+                elif field_line.startswith('pub(crate) '):
+                    vis = "#"
+
                 if ':' in field_line:
                     parts = field_line.split(':', 1)
                     fname = parts[0].replace('pub ', '').replace('pub(crate) ', '').strip()
                     ftype = parts[1].strip()
                     clean_ftype = ftype.replace("<", "~").replace(">", "~").replace(" ", "_")
-                    fields.append(f"+{clean_ftype} {fname}")
+                    fields.append(f"{vis}{clean_ftype} {fname}")
+                    raw_fields.append({"name": fname, "type": ftype, "visibility": vis})
 
                     rel_type = re.sub(r'[^a-zA-Z0-9_]', '', ftype.split('<')[0])
                     if rel_type and rel_type[0].isupper() and rel_type != name:
                         relations.append(f"{name} --> {rel_type} : Association")
                 elif m.group(3):
-                    ftype = field_line.strip()
+                    ftype = field_line.replace('pub ', '').replace('pub(crate) ', '').strip()
                     clean_ftype = ftype.replace("<", "~").replace(">", "~").replace(" ", "_")
-                    fields.append(f"+{clean_ftype}")
+                    fields.append(f"{vis}{clean_ftype}")
+                    raw_fields.append({"name": f"(tuple_{len(raw_fields)})", "type": ftype, "visibility": vis})
 
                     rel_type = re.sub(r'[^a-zA-Z0-9_]', '', ftype.split('<')[0])
                     if rel_type and rel_type[0].isupper() and rel_type != name:
                         relations.append(f"{name} --> {rel_type} : Association")
 
-        classes[name] = {"type": "class", "fields": fields, "methods": [], "line": line_num}
+        classes[name] = {"type": "class", "fields": fields, "raw_fields": raw_fields, "methods": [], "line": line_num}
 
     # Extract Enums
     enum_pattern = re.compile(r'(?:pub\s+)?(?:pub\([^)]+\)\s+)?enum\s+([A-Za-z0-9_]+)\s*(?:<[^>]*>)?\s*\{([^}]*)\}', re.MULTILINE)
@@ -148,10 +158,13 @@ def parse_rust_file(filepath):
             clean_trait = trait_name.split('::')[-1]
             relations.append(f"{clean_trait} <|.. {struct_name} : Realization")
 
-        fn_pattern = re.compile(r'(pub\s+)?(?:pub\([^)]+\)\s+)?(async\s+)?fn\s+([A-Za-z0-9_]+)\s*\((.*?)\)')
+        fn_pattern = re.compile(r'(pub\s+)?(?:pub\([^)]+\)\s+)?(async\s+)?fn\s+([A-Za-z0-9_]+)\s*\((.*?)\)(?:\s*->\s*(.*?))?\s*\{', re.MULTILINE)
         for fm in fn_pattern.finditer(impl_body):
             fname = fm.group(3)
+            args = fm.group(4)
+            ret_type = fm.group(5) if fm.group(5) else ""
             is_pub = "+" if fm.group(1) else "-"
+            vis_char = "+" if fm.group(1) else "-"
             method_sig = f"{is_pub}{fname}()"
 
             # extract inner calls
@@ -169,12 +182,15 @@ def parse_rust_file(filepath):
             elif not trait_name:
                 classes[struct_name] = {"type": "class", "fields": [], "methods": [method_sig], "line": content_no_comments[:m.start()].count('\n') + 1}
 
-            methods.append({"name": fname, "struct": struct_name, "line": content_no_comments[:m.start() + fm.start()].count('\n') + 1, "calls": calls})
+            methods.append({"name": fname, "struct": struct_name, "line": content_no_comments[:m.start() + fm.start()].count('\n') + 1, "calls": calls, "args": args, "ret_type": ret_type, "visibility": vis_char})
 
     # Global functions
-    fn_pattern_global = re.compile(r'^(?:pub\s+)?(?:pub\([^)]+\)\s+)?(?:async\s+)?fn\s+([A-Za-z0-9_]+)\s*\((.*?)\)', re.MULTILINE)
+    fn_pattern_global = re.compile(r'^(?:pub\s+)?(?:pub\([^)]+\)\s+)?(?:async\s+)?fn\s+([A-Za-z0-9_]+)\s*\((.*?)\)(?:\s*->\s*(.*?))?\s*\{', re.MULTILINE)
     for m in fn_pattern_global.finditer(content_no_comments):
         fname = m.group(1)
+        args = m.group(2)
+        ret_type = m.group(3) if m.group(3) else ""
+        vis_char = "+" if m.group(0).startswith('pub ') else "-"
         fn_body = extract_body(content_no_comments, m.end() - 1)
         calls = []
         call_pattern = re.compile(r'\b([A-Za-z0-9_]+)\s*\(')
@@ -183,7 +199,7 @@ def parse_rust_file(filepath):
             if cname not in ['if', 'while', 'for', 'match', 'Some', 'Ok', 'Err', 'String', 'Vec', 'Box', 'format', 'println', 'tracing', 'info', 'debug', 'error', 'warn', 'panic']:
                 calls.append(cname)
 
-        methods.append({"name": fname, "struct": None, "line": content_no_comments[:m.start()].count('\n') + 1, "calls": calls})
+        methods.append({"name": fname, "struct": None, "line": content_no_comments[:m.start()].count('\n') + 1, "calls": calls, "args": args, "ret_type": ret_type, "visibility": vis_char})
 
     if not classes:
         mod_name = filepath.name.split('.')[0].capitalize()
@@ -249,53 +265,103 @@ def generate_okf_markdown(filepath, rel_dir, ast):
     class_diagram = generate_mermaid_class_diagram(ast)
     seq_diagram = generate_mermaid_sequence_diagram(ast)
 
-    deps_list = "\n".join([f"- `{dep}`" for dep in ast["dependencies"]]) if ast["dependencies"] else "- None"
+    deps_list = " | ".join([f"`[[{dep.split('::')[-1]}]]`" for dep in ast["dependencies"]]) if ast["dependencies"] else "None"
 
-    citations = ""
+    # 3. Data Structures
+    data_structs = "| Property / Field | Type | Visibility | Description | Source Reference |\n| :--- | :--- | :--- | :--- | :--- |\n"
+    has_fields = False
     for name, data in ast["classes"].items():
-         citations += f"* Class `{name}`: `{filepath.as_posix()}:{data['line']}`\n"
+        if "raw_fields" in data:
+            for f in data["raw_fields"]:
+                has_fields = True
+                vis_str = "Public (`+`)" if f["visibility"] == "+" else ("Private (`-`)" if f["visibility"] == "-" else f"Protected (`#`)")
+                desc = f"Extracted property {f['name']}."
+                data_structs += f"| `{f['name']}` | `{f['type']}` | {vis_str} | {desc} | `{filepath.as_posix()}:{data['line']}` |\n"
+    if not has_fields:
+        data_structs += "| - | - | - | No properties extracted | - |\n"
+
+    # 4. Methods Breakdown
+    methods_breakdown = ""
+    for m in ast["methods"]:
+        cls_str = f" in `{m['struct']}`" if m['struct'] else ""
+        vis_str = "Public (`+`)" if m.get("visibility", "+") == "+" else "Private (`-`)"
+
+        args = m.get("args", "")
+        args_table = "| Parameter | Type | Required / Default | Description |\n| :--- | :--- | :--- | :--- |\n"
+        if args:
+            for arg_part in args.split(','):
+                arg_part = arg_part.strip()
+                if not arg_part: continue
+                if ':' in arg_part:
+                    aname, atype = arg_part.split(':', 1)
+                    args_table += f"| `{aname.strip()}` | `{atype.strip()}` | Required | Derived parameter. |\n"
+                elif arg_part == 'self' or arg_part == '&self' or arg_part == '&mut self':
+                    args_table += f"| `self` | `instance reference` | Required | Context instance. |\n"
+                else:
+                    args_table += f"| `{arg_part}` | `unknown` | Required | - |\n"
+        else:
+             args_table += "| None | - | - | No parameters. |\n"
+
+        ret_type = m.get("ret_type", "")
+        ret_table = "| Return Type | Condition / Scenario | Description |\n| :--- | :--- | :--- |\n"
+        if ret_type:
+            ret_table += f"| `{ret_type}` | Standard Execution | Derived return type. |\n"
+        else:
+            ret_table += "| `void` | - | No return type extracted. |\n"
+
+        methods_breakdown += f"### Function / Method: `{m['name']}({args})`\n"
+        methods_breakdown += f"* **Source Reference:** `{filepath.as_posix()}:{m['line']}`\n"
+        methods_breakdown += f"* **Visibility / Scope:** {vis_str}\n"
+        methods_breakdown += f"* **Behavioral Overview:** Extracted method logic.\n\n"
+        methods_breakdown += f"#### Input Parameters\n{args_table}\n"
+        methods_breakdown += f"#### Output & Return Values\n{ret_table}\n\n"
+
+    if not methods_breakdown:
+        methods_breakdown = "No direct functions or methods extracted.\n"
+
+    citations = f"* Module File: `{filepath.as_posix()}`\n"
+    for name, data in ast["classes"].items():
+        type_str = "Interface" if data["type"] == "<<interface>>" else ("Enum" if data["type"] == "<<enumeration>>" else "Class")
+        citations += f"* {type_str} `{name}`: `{filepath.as_posix()}:{data['line']}`\n"
     for m in ast["methods"]:
          cls_str = f" in `{m['struct']}`" if m['struct'] else ""
-         citations += f"* Method `{m['name']}`{cls_str}: `{filepath.as_posix()}:{m['line']}`\n"
-    if not citations:
-         citations = "* No direct classes or functions extracted."
+         citations += f"* Method `{m['name']}`: `{filepath.as_posix()}:{m['line']}`\n"
 
     markdown = f"""---
 type: "module-architecture"
 title: "{title}"
-description: "Technical architecture and class hierarchy for {title}"
-tags: ["architecture", "uml", "pyreverse", "openwiki"]
+description: "Technical architecture, API specification, and UML 2.0 diagrams for {title}"
+tags: ["architecture", "uml2", "okf", "openwiki", "polyglot"]
 timestamp: "{timestamp}"
 ---
 
-# Module Name: {title}
+# Module Architecture: {title}
 
-* **Source Directory Reference:** `{rel_dir.as_posix()}/`
-* **Package Dependency:**
-{deps_list}
+* **Source File Reference:** `{filepath.as_posix()}`
+* **Package Dependencies:** Upstream: {deps_list}
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `{title}` module extracted directly from the codebase.
 
-## 2. UML 2.0 Class & Inheritance Architecture (Deterministic)
-The following class diagram models the object-oriented structure, explicit inheritance hierarchies, and polymorphic interface implementations derived from local AST analysis:
+## 2. UML 2.0 Diagrams
 
+### Class / Struct Architecture
 {class_diagram}
 
-## 3. Package & Class Relations
-
-* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides.
-* **Dependencies:** How classes within this package collaborate externally.
-
-## 4. Execution Flow & Runtime Behavior
-
-The following sequence diagram outlines the execution lifecycle and message passing during core operations:
-
+### Runtime Sequence Diagram
 {seq_diagram}
+
+## 3. Data Structures, Structs & Class Properties
+
+{data_structs}
+
+## 4. Comprehensive Methods & Functions Breakdown
+
+{methods_breakdown}
 
 ---
 
-* **Source Citations:**
+## 5. Source Code Citations & Index
 {citations}
 """
     return markdown

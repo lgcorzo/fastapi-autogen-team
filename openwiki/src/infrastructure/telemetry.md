@@ -1,26 +1,22 @@
 ---
 type: "module-architecture"
 title: "Telemetry"
-description: "Technical architecture and class hierarchy for Telemetry"
-tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T20:32:40Z"
+description: "Technical architecture, API specification, and UML 2.0 diagrams for Telemetry"
+tags: ["architecture", "uml2", "okf", "openwiki", "polyglot"]
+timestamp: "2026-07-31T12:51:19Z"
 ---
 
-# Module Name: Telemetry
+# Module Architecture: Telemetry
 
-* **Source Directory Reference:** `src/infrastructure/`
-* **Package Dependency:**
-- `opentelemetry::KeyValue`
-- `opentelemetry_otlp::WithExportConfig`
-- `opentelemetry_sdk::{runtime, trace::Config, Resource}`
-- `tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter}`
+* **Source File Reference:** `src/infrastructure/telemetry.rs`
+* **Package Dependencies:** Upstream: `[[KeyValue]]` | `[[WithExportConfig]]` | `[[Config, Resource}]]` | `[[SubscriberInitExt, EnvFilter}]]`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Telemetry` module extracted directly from the codebase.
 
-## 2. UML 2.0 Class & Inheritance Architecture (Deterministic)
-The following class diagram models the object-oriented structure, explicit inheritance hierarchies, and polymorphic interface implementations derived from local AST analysis:
+## 2. UML 2.0 Diagrams
 
+### Class / Struct Architecture
 ```mermaid
 classDiagram
     direction BT
@@ -31,15 +27,7 @@ classDiagram
 ```
 
 
-## 3. Package & Class Relations
-
-* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides.
-* **Dependencies:** How classes within this package collaborate externally.
-
-## 4. Execution Flow & Runtime Behavior
-
-The following sequence diagram outlines the execution lifecycle and message passing during core operations:
-
+### Runtime Sequence Diagram
 ```mermaid
 sequenceDiagram
     autonumber
@@ -53,8 +41,37 @@ sequenceDiagram
 ```
 
 
+## 3. Data Structures, Structs & Class Properties
+
+| Property / Field | Type | Visibility | Description | Source Reference |
+| :--- | :--- | :--- | :--- | :--- |
+| - | - | - | No properties extracted | - |
+
+
+## 4. Comprehensive Methods & Functions Breakdown
+
+### Function / Method: `init_telemetry(app_name: &str, endpoint: &str)`
+* **Source Reference:** `src/infrastructure/telemetry.rs:6`
+* **Visibility / Scope:** Public (`+`)
+* **Behavioral Overview:** Extracted method logic.
+
+#### Input Parameters
+| Parameter | Type | Required / Default | Description |
+| :--- | :--- | :--- | :--- |
+| `app_name` | `&str` | Required | Derived parameter. |
+| `endpoint` | `&str` | Required | Derived parameter. |
+
+#### Output & Return Values
+| Return Type | Condition / Scenario | Description |
+| :--- | :--- | :--- |
+| `anyhow::Result<()>` | Standard Execution | Derived return type. |
+
+
+
+
 ---
 
-* **Source Citations:**
+## 5. Source Code Citations & Index
+* Module File: `src/infrastructure/telemetry.rs`
 * Class `Telemetry`: `src/infrastructure/telemetry.rs:1`
 * Method `init_telemetry`: `src/infrastructure/telemetry.rs:6`
