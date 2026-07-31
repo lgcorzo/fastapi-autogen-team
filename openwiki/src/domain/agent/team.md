@@ -3,7 +3,7 @@ type: "module-architecture"
 title: "Team"
 description: "Technical architecture and class hierarchy for Team"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T19:23:37Z"
+timestamp: "2026-07-30T20:32:40Z"
 ---
 
 # Module Name: Team
@@ -50,8 +50,8 @@ classDiagram
 
 ## 3. Package & Class Relations
 
-* **Inheritance & Polymorphism:** Diagram depicts detected traits, realizations, and abstractions.
-* **Dependencies:** Defined by import structures across the boundary.
+* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides.
+* **Dependencies:** How classes within this package collaborate externally.
 
 ## 4. Execution Flow & Runtime Behavior
 
@@ -63,14 +63,27 @@ sequenceDiagram
     participant Caller as Client Interface
     participant Svc as AgentTeam
     Caller->>Svc: new()
-    Note over Svc: Internal execution
-    Svc-->>Caller: Returns
+    Svc->>Svc: var()
+    Svc->>Svc: expect()
+    Svc->>Svc: var()
+    Svc-->>Caller: Returns execution status
     Caller->>Svc: run()
-    Note over Svc: Internal execution
-    Svc-->>Caller: Returns
+    Svc->>Svc: clone()
+    Svc->>Svc: completions_api()
+    Svc->>Svc: last()
+    Svc-->>Caller: Returns execution status
     Caller->>Svc: new_mock()
-    Note over Svc: Internal execution
-    Svc-->>Caller: Returns
+    Svc-->>Caller: Returns execution status
+    Caller->>Svc: new_test()
+    Svc->>Svc: builder()
+    Svc->>Svc: api_key()
+    Svc->>Svc: base_url()
+    Svc-->>Caller: Returns execution status
+    Caller->>Svc: is_valid_query_line()
+    Svc->>Svc: trim()
+    Svc->>Svc: len()
+    Svc->>Svc: starts_with()
+    Svc-->>Caller: Returns execution status
 ```
 
 

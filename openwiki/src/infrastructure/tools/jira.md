@@ -3,7 +3,7 @@ type: "module-architecture"
 title: "Jira"
 description: "Technical architecture and class hierarchy for Jira"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T19:23:37Z"
+timestamp: "2026-07-30T20:32:40Z"
 ---
 
 # Module Name: Jira
@@ -32,14 +32,15 @@ classDiagram
     class JiraError {
         <<enumeration>>
     }
+    JiraArgs --> String : Association
     Tool <|.. JiraTool : Realization
 ```
 
 
 ## 3. Package & Class Relations
 
-* **Inheritance & Polymorphism:** Diagram depicts detected traits, realizations, and abstractions.
-* **Dependencies:** Defined by import structures across the boundary.
+* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides.
+* **Dependencies:** How classes within this package collaborate externally.
 
 ## 4. Execution Flow & Runtime Behavior
 
@@ -51,8 +52,10 @@ sequenceDiagram
     participant Caller as Client Interface
     participant Svc as JiraArgs
     Caller->>Svc: get_jira_results()
-    Note over Svc: Internal execution
-    Svc-->>Caller: Returns
+    Svc->>Svc: var()
+    Svc->>Svc: var()
+    Svc->>Svc: new()
+    Svc-->>Caller: Returns execution status
 ```
 
 
@@ -61,6 +64,4 @@ sequenceDiagram
 * **Source Citations:**
 * Class `JiraArgs`: `src/infrastructure/tools/jira.rs:9`
 * Class `JiraError`: `src/infrastructure/tools/jira.rs:14`
-* Method `definition` in `JiraTool`: `src/infrastructure/tools/jira.rs:29`
-* Method `call` in `JiraTool`: `src/infrastructure/tools/jira.rs:44`
 * Method `get_jira_results`: `src/infrastructure/tools/jira.rs:56`

@@ -3,7 +3,7 @@ type: "module-architecture"
 title: "Dtos"
 description: "Technical architecture and class hierarchy for Dtos"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T19:23:37Z"
+timestamp: "2026-07-30T20:32:40Z"
 ---
 
 # Module Name: Dtos
@@ -71,13 +71,27 @@ classDiagram
         List
     }
     Default <|.. Output : Realization
+    ImageUrl --> Option : Association
+    ImageUrl --> String : Association
+    Input --> Option : Association
+    Input --> String : Association
+    Input --> Vec : Association
+    Message --> ContentType : Association
+    Message --> Option : Association
+    Message --> String : Association
+    ModelInformation --> HashMap : Association
+    ModelInformation --> Option : Association
+    ModelInformation --> String : Association
+    Output --> HashMap : Association
+    Output --> String : Association
+    Output --> Vec : Association
 ```
 
 
 ## 3. Package & Class Relations
 
-* **Inheritance & Polymorphism:** Diagram depicts detected traits, realizations, and abstractions.
-* **Dependencies:** Defined by import structures across the boundary.
+* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides.
+* **Dependencies:** How classes within this package collaborate externally.
 
 ## 4. Execution Flow & Runtime Behavior
 
@@ -88,6 +102,11 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as ImageUrl
+    Caller->>Svc: default()
+    Svc->>Svc: to_string()
+    Svc->>Svc: to_string()
+    Svc->>Svc: now()
+    Svc-->>Caller: Returns execution status
 ```
 
 

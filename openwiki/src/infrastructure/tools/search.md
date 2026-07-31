@@ -3,7 +3,7 @@ type: "module-architecture"
 title: "Search"
 description: "Technical architecture and class hierarchy for Search"
 tags: ["architecture", "uml", "pyreverse", "openwiki"]
-timestamp: "2026-07-30T19:23:37Z"
+timestamp: "2026-07-30T20:32:40Z"
 ---
 
 # Module Name: Search
@@ -40,14 +40,16 @@ classDiagram
     class SearchError {
         <<enumeration>>
     }
+    SearchArgs --> String : Association
+    SearchResult --> String : Association
     Tool <|.. SearchTool : Realization
 ```
 
 
 ## 3. Package & Class Relations
 
-* **Inheritance & Polymorphism:** Diagram depicts detected traits, realizations, and abstractions.
-* **Dependencies:** Defined by import structures across the boundary.
+* **Inheritance & Polymorphism:** Detailed breakdown of abstract base classes, interfaces, and concrete overrides.
+* **Dependencies:** How classes within this package collaborate externally.
 
 ## 4. Execution Flow & Runtime Behavior
 
@@ -57,7 +59,7 @@ The following sequence diagram outlines the execution lifecycle and message pass
 sequenceDiagram
     autonumber
     participant Caller as Client Interface
-    participant Svc as SearchArgs
+    Caller->>Svc: Invoke
 ```
 
 
@@ -67,5 +69,3 @@ sequenceDiagram
 * Class `SearchArgs`: `src/infrastructure/tools/search.rs:12`
 * Class `SearchResult`: `src/infrastructure/tools/search.rs:17`
 * Class `SearchError`: `src/infrastructure/tools/search.rs:24`
-* Method `definition` in `SearchTool`: `src/infrastructure/tools/search.rs:39`
-* Method `call` in `SearchTool`: `src/infrastructure/tools/search.rs:54`
