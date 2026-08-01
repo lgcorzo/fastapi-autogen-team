@@ -49,6 +49,7 @@ jobs:
   # Job para construir y publicar la imagen Docker
   packages:
     name: Build and Push Docker Image
+    environment: production
     runs-on: ubuntu-latest
 
     steps:
