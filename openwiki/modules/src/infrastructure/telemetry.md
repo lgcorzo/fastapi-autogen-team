@@ -6,8 +6,8 @@ title: "Module: Telemetry"
 source_path: "src/infrastructure/telemetry.rs"
 description: "Detailed architecture and specifications for the Telemetry module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "3c7e8ef"
-timestamp: "2026-07-31T20:24:30Z"
+last_verified_commit: "79cb876"
+timestamp: "2026-08-01T20:12:23Z"
 ---
 
 # Module Specification: Telemetry

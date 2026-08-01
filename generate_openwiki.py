@@ -407,17 +407,17 @@ timestamp: "{timestamp}"
 ## 2. Stakeholder Perspectives & Concerns Matrix
 | Stakeholder Persona | Primary Concerns | Framing ISO Viewpoint | Governed Wiki Page |
 | :--- | :--- | :--- | :--- |
-| **System Architect** | System modularity, extensibility, dependency boundaries | Component View | [[Architecture/ComponentStructure]] |
-| **Security Officer** | Auth token validation, encryption, blast radius | Security View | [[Architecture/SecurityView]] |
-| **Lead Developer** | Execution flows, function contracts, error states | Sequence View | [[Architecture/RuntimeSequences]] |
-| **DevOps Lead** | Deployment environment, dependencies, CLI hooks | Deployment View | [[Architecture/DeploymentView]] |
+| **System Architect** | System modularity, extensibility, dependency boundaries | Component View | [Architecture/ComponentStructure](./component_structure.md) |
+| **Security Officer** | Auth token validation, encryption, blast radius | Security View | [Architecture/SecurityView](./security_view.md) |
+| **Lead Developer** | Execution flows, function contracts, error states | Sequence View | [Architecture/RuntimeSequences](./runtime_sequences.md) |
+| **DevOps Lead** | Deployment environment, dependencies, CLI hooks | Deployment View | [Architecture/DeploymentView](./deployment_view.md) |
 
 ## 3. Viewpoints Framework & Index
-- 🌐 [[Architecture/SystemContext]] — Context View & External Boundaries.
-- 📦 [[Architecture/ComponentStructure]] — Component View & UML 2.0 Class Diagrams.
-- 🔄 [[Architecture/RuntimeSequences]] — Sequence View & Interaction Diagrams.
-- 🔐 [[Architecture/SecurityView]] — Security View & Data Protection Rules.
-- 📝 [[Architecture/ADR/ADR_001_AST_Engine]] — Architecture Decision Records.
+- 🌐 [Architecture/SystemContext](./system_context.md) — Context View & External Boundaries.
+- 📦 [Architecture/ComponentStructure](./component_structure.md) — Component View & UML 2.0 Class Diagrams.
+- 🔄 [Architecture/RuntimeSequences](./runtime_sequences.md) — Sequence View & Interaction Diagrams.
+- 🔐 [Architecture/SecurityView](./security_view.md) — Security View & Data Protection Rules.
+- 📝 [Architecture/ADR/ADR_001_AST_Engine](./adr/adr_001_ast_engine.md) — Architecture Decision Records.
 """)
 
     # Other basic architecture files
@@ -536,9 +536,9 @@ timestamp: "{timestamp}"
 
 ## ISO Documentation
 
-- [[Architecture Overview|./architecture/iso_42010_overview.md]]
-- [[Quality Assessment|./quality/iso_25010_quality.md]]
-- [[Developer Guide|./user_guides/developer_guide.md]]
+- [Architecture Overview](./architecture/iso_42010_overview.md)
+- [Quality Assessment](./quality/iso_25010_quality.md)
+- [Developer Guide](./user_guides/developer_guide.md)
 
 ## Modules
 

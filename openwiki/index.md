@@ -5,16 +5,16 @@ type: "index"
 title: "Master Knowledge Hub & Navigation Map"
 description: "Root index for openwiki documentation"
 tags: ["iso15289", "index", "okf"]
-timestamp: "2026-07-31T20:24:30Z"
+timestamp: "2026-08-01T20:12:23Z"
 ---
 
 # OpenWiki Technical Index
 
 ## ISO Documentation
 
-- [[Architecture Overview|./architecture/iso_42010_overview.md]]
-- [[Quality Assessment|./quality/iso_25010_quality.md]]
-- [[Developer Guide|./user_guides/developer_guide.md]]
+- [Architecture Overview](./architecture/iso_42010_overview.md)
+- [Quality Assessment](./quality/iso_25010_quality.md)
+- [Developer Guide](./user_guides/developer_guide.md)
 
 ## Modules
 
