@@ -2,9 +2,9 @@
 
 # Rust-Agent-team Service
 
-[![check.yml](https://github.com/lgcorzo/fastapi-agent-team/actions/workflows/check.yml/badge.svg)](https://github.com/lgcorzo/fastapi-agent-team/actions/workflows/check.yml)
-[![License](https://img.shields.io/github/license/lgcorzo/fastapi-agent-team)](https://github.com/lgcorzo/fastapi-agent-team/blob/main/LICENCE.txt)
-[![Release](https://img.shields.io/github/v/release/lgcorzo/fastapi-agent-team)](https://github.com/lgcorzo/fastapi-agent-team/releases)
+[![check.yml](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/check.yml/badge.svg)](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/check.yml)
+[![License](https://img.shields.io/github/license/lgcorzo/fastapi-autogen-team)](https://github.com/lgcorzo/fastapi-autogen-team/blob/main/LICENSE)
+[![Release](https://img.shields.io/github/v/release/lgcorzo/fastapi-autogen-team)](https://github.com/lgcorzo/fastapi-autogen-team/releases)
 
 **This repository contains a high-performance Rust service designed as an MLOps template application following Domain-Driven Design (DDD) principles.** Originally a Python/FastAPI project using Microsoft's AutoGen, it has been fully refactored into a native Rust implementation using the [Axum](https://github.com/tokio-rs/axum) web framework and the [Rig](https://github.com/0xPlayground/rig) LLM orchestration library.
 
@@ -138,8 +138,8 @@ tests/                   # DDD Testing Suite
 
 1.  **Clone the repository**:
     ```bash
-    git clone https://github.com/lgcorzo/fastapi-agent-team.git
-    cd fastapi-agent-team
+    git clone https://github.com/lgcorzo/fastapi-autogen-team.git
+    cd fastapi-autogen-team
     ```
 
 2.  **Install dependencies**:
