@@ -42,39 +42,39 @@ The system is built on **Domain-Driven Design (DDD)** principles to ensure a cle
 ### DDD Layered Structure
 
 ```mermaid
-graph TD
-    Client[OpenAI-Compatible Client] --> Interface[Interface Layer]
+flowchart TD
+    Client["OpenAI-Compatible Client"] --> Interface["Interface Layer"]
     
-    subgraph Layers
-        Interface --> Application[Application Layer]
-        Application --> Domain[Domain Layer]
-        Domain --> Infrastructure[Infrastructure Layer]
+    subgraph layers ["Layers"]
+        Interface --> Application["Application Layer"]
+        Application --> Domain["Domain Layer"]
+        Domain --> Infrastructure["Infrastructure Layer"]
     end
 
-    subgraph Interface Details
-        Interface --> Handlers[Axum Handlers]
-        Interface --> Middleware[Security & CORS]
-        Interface --> Routes[Router Setup]
+    subgraph interface_details ["Interface Details"]
+        Interface --> Handlers["Axum Handlers"]
+        Interface --> Middleware["Security & CORS"]
+        Interface --> Routes["Router Setup"]
     end
 
-    subgraph Application Details
-        Application --> DTOs[Input / Output Schema]
-        Application --> Validation[Request Validation]
+    subgraph application_details ["Application Details"]
+        Application --> DTOs["Input / Output Schema"]
+        Application --> Validation["Request Validation"]
     end
 
-    subgraph Domain Layer
-        AgentTeam[Agent Team Orchestrator]
-        AgentTeam --> Planner[Planner Agent]
-        AgentTeam --> Searcher[Searcher Agent]
-        AgentTeam --> QA[QA / Expert Agent]
+    subgraph domain_layer ["Domain Layer"]
+        AgentTeam["Agent Team Orchestrator"]
+        AgentTeam --> Planner["Planner Agent"]
+        AgentTeam --> Searcher["Searcher Agent"]
+        AgentTeam --> QA["QA / Expert Agent"]
     end
 
-    subgraph Infrastructure Layer
-        Infrastructure --> LiteLLM[LiteLLM Gateway]
-        Infrastructure --> R2R[R2R RAG Tool]
-        Infrastructure --> Jira[Jira Tool]
-        Infrastructure --> Confluence[Confluence Tool]
-        Infrastructure --> Telemetry[OpenTelemetry]
+    subgraph infrastructure_layer ["Infrastructure Layer"]
+        Infrastructure --> LiteLLM["LiteLLM Gateway"]
+        Infrastructure --> R2R["R2R RAG Tool"]
+        Infrastructure --> Jira["Jira Tool"]
+        Infrastructure --> Confluence["Confluence Tool"]
+        Infrastructure --> Telemetry["OpenTelemetry"]
     end
 
     %% Dependencies
@@ -90,9 +90,9 @@ graph TD
 ```mermaid
 sequenceDiagram
     participant C as Client
-    participant I as Interface (Axum)
-    participant D as Domain (AgentTeam)
-    participant Inf as Infrastructure (Tools)
+    participant I as "Interface (Axum)"
+    participant D as "Domain (AgentTeam)"
+    participant Inf as "Infrastructure (Tools)"
 
     C->>I: POST /chat/completions
     I->>D: Orchestrate Workflow
