@@ -17,25 +17,25 @@ The primary objective of this repository is to orchestrate a team of specialized
 The system follows a tiered DDD structure to decouple the web boundary, the core domain logic, and the external infrastructure tools.
 
 ### 🧩 Core Layers
-1. **[Interface Layer](v2_architecture#interface-layer)**: Handles HTTP requests, streaming responses, and middleware (Security/CORS).
-2. **[Application Layer](v2_architecture#application-layer)**: Defines DTOs and shared models for data transport.
-3. **[Domain Layer](v2_architecture#domain-layer)**: The orchestration heart, containing the `AgentTeam` (Planner, Searcher, QA).
-4. **[Infrastructure Layer](v2_architecture#infrastructure-layer)**: Implements concrete tools (Jira, Confluence, R2R) and telemetry observers.
+1. **[[v2_architecture#interface-layer|Interface Layer]]**: Handles HTTP requests, streaming responses, and middleware (Security/CORS).
+2. **[[v2_architecture#application-layer|Application Layer]]**: Defines DTOs and shared models for data transport.
+3. **[[v2_architecture#domain-layer|Domain Layer]]**: The orchestration heart, containing the `AgentTeam` (Planner, Searcher, QA).
+4. **[[v2_architecture#infrastructure-layer|Infrastructure Layer]]**: Implements concrete tools (Jira, Confluence, R2R) and telemetry observers.
 
 ---
 
 ## 🗺️ Documentation Map
-- **[System Architecture](v2_architecture)**: Detailed design decisions and workflow descriptions.
-- **[Data Models](data_models)**: Struct definitions for API inputs and agent outputs.
-- **[Module Structure](architecture_modules)**: Visual map of the Rust DDD package hierarchy including Confluence.
+- **[[v2_architecture|System Architecture]]**: Detailed design decisions and workflow descriptions.
+- **[[data_models|Data Models]]**: Struct definitions for API inputs and agent outputs.
+- **[[architecture_modules|Module Structure]]**: Visual map of the Rust DDD package hierarchy including Confluence.
 - **[Deployment](https://github.com/lgcorzo/fastapi-autogen-team/blob/main/README.md#usage)**: How to build, test, and deploy the service.
 
 ---
 
 ## 📊 Interaction Diagrams
-- **[Package Hierarchy](architecture_modules)**: Visual map of the Rust module structure.
-- **[Data Relationships](data_models)**: Relationship between the primary API and Agent structs.
-- **[Sequence Flow](completion_sequence)**: Step-by-step lifecycle of a chat request through DDD layers.
+- **[[architecture_modules|Package Hierarchy]]**: Visual map of the Rust module structure.
+- **[[data_models|Data Relationships]]**: Relationship between the primary API and Agent structs.
+- **[[completion_sequence|Sequence Flow]]**: Step-by-step lifecycle of a chat request through DDD layers.
 
 ---
 
