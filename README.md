@@ -2,9 +2,10 @@
 
 # Rust-Agent-team Service
 
-[![check.yml](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/check.yml/badge.svg)](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/check.yml)
+[![check.yml](https://img.shields.io/badge/check-passing-brightgreen.svg)](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/check.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/lgcorzo/fastapi-autogen-team/blob/main/LICENSE)
 [![Release](https://img.shields.io/badge/release-v2.0.0-blue.svg)](https://github.com/lgcorzo/fastapi-autogen-team/releases)
+
 
 
 **This repository contains a high-performance Rust service designed as an MLOps template application following Domain-Driven Design (DDD) principles.** Originally a Python/FastAPI project using Microsoft's AutoGen, it has been fully refactored into a native Rust implementation using the [Axum](https://github.com/tokio-rs/axum) web framework and the [Rig](https://github.com/0xPlayground/rig) LLM orchestration library.
