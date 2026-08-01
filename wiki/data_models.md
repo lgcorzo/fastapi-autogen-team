@@ -8,12 +8,13 @@ All data transport models are centralized in the **Application Layer** to ensure
 
 The following structs are located in `src/application/dtos.rs` and are responsible for defining the OpenAI-compatible API contracts.
 
-### [Input Models]
+### Input Models
 - **ChatCompletionRequest**: The main input structure for the `/chat/completions` endpoint.
 - **Message**: Represents individual messages in the conversation (role/content).
 - **ModelInformation**: Returned by the `/models` endpoint.
 
-### [Output Models]
+### Output Models
+
 - **ChatCompletionResponse**: Used for non-streaming responses.
 - **ChatCompletionChunk**: Used for streaming (SSE) responses.
 - **Choice** / **ChoiceChunk**: Individual choices associated with completions.

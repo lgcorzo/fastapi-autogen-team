@@ -9,10 +9,11 @@ The following diagram illustrates the request lifecycle as it traverses the Doma
 ```mermaid
 sequenceDiagram
     participant C as Client
-    participant I as Interface (Axum)
-    participant A as Application (DTOs)
-    participant D as Domain (AgentTeam)
-    participant Inf as Infrastructure (Tools)
+    participant I as "Interface (Axum)"
+    participant A as "Application (DTOs)"
+    participant D as "Domain (AgentTeam)"
+    participant Inf as "Infrastructure (Tools)"
+
 
     Note over C,Inf: 1. Request Entry
     C->>I: POST /chat/completions

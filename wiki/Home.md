@@ -17,25 +17,25 @@ The primary objective of this repository is to orchestrate a team of specialized
 The system follows a tiered DDD structure to decouple the web boundary, the core domain logic, and the external infrastructure tools.
 
 ### 🧩 Core Layers
-1. **[Interface Layer](v2_architecture.md#interface-layer)**: Handles HTTP requests, streaming responses, and middleware (Security/CORS).
-2. **[Application Layer](v2_architecture.md#application-layer)**: Defines DTOs and shared models for data transport.
-3. **[Domain Layer](v2_architecture.md#domain-layer)**: The orchestration heart, containing the `AgentTeam` (Planner, Searcher, QA).
-4. **[Infrastructure Layer](v2_architecture.md#infrastructure-layer)**: Implements concrete tools (Jira, Confluence, R2R) and telemetry observers.
+1. **[Interface Layer](v2_architecture#interface-layer)**: Handles HTTP requests, streaming responses, and middleware (Security/CORS).
+2. **[Application Layer](v2_architecture#application-layer)**: Defines DTOs and shared models for data transport.
+3. **[Domain Layer](v2_architecture#domain-layer)**: The orchestration heart, containing the `AgentTeam` (Planner, Searcher, QA).
+4. **[Infrastructure Layer](v2_architecture#infrastructure-layer)**: Implements concrete tools (Jira, Confluence, R2R) and telemetry observers.
 
 ---
 
 ## 🗺️ Documentation Map
-- **[System Architecture](v2_architecture.md)**: Detailed design decisions and workflow descriptions.
-- **[Data Models](data_models.md)**: Struct definitions for API inputs and agent outputs.
-- **[Module Structure](architecture_modules.md)**: Visual map of the Rust DDD package hierarchy including Confluence.
-- **[Deployment](../README.md#🚀-quick-start)**: How to build, test, and deploy the service.
+- **[System Architecture](v2_architecture)**: Detailed design decisions and workflow descriptions.
+- **[Data Models](data_models)**: Struct definitions for API inputs and agent outputs.
+- **[Module Structure](architecture_modules)**: Visual map of the Rust DDD package hierarchy including Confluence.
+- **[Deployment](https://github.com/lgcorzo/fastapi-autogen-team/blob/main/README.md#usage)**: How to build, test, and deploy the service.
 
 ---
 
 ## 📊 Interaction Diagrams
-- **[Package Hierarchy](architecture_modules.md)**: Visual map of the Rust module structure.
-- **[Data Relationships](data_models.md)**: Relationship between the primary API and Agent structs.
-- **[Sequence Flow](completion_sequence.md)**: Step-by-step lifecycle of a chat request through DDD layers.
+- **[Package Hierarchy](architecture_modules)**: Visual map of the Rust module structure.
+- **[Data Relationships](data_models)**: Relationship between the primary API and Agent structs.
+- **[Sequence Flow](completion_sequence)**: Step-by-step lifecycle of a chat request through DDD layers.
 
 ---
 

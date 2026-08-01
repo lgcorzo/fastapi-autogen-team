@@ -5,7 +5,7 @@ The system has been architected using **Domain-Driven Design (DDD)** principles.
 
 ---
 
-### [Interface Layer]
+### Interface Layer
 The entry point of the service is a REST API built with **Axum**, located in `src/interface/http/`.
 - **routes.rs**: Centralized router configuration and shared `AppState`.
 - **handlers.rs**: OpenAI-compatible route handlers implementing **Tokio streaming** for real-time SSE token delivery.
@@ -13,13 +13,13 @@ The entry point of the service is a REST API built with **Axum**, located in `sr
 
 ---
 
-### [Application Layer]
+### Application Layer
 The transport and orchestration layer, located in `src/application/`.
 - **dtos.rs**: Serde-ready Data Transfer Objects that define the contract for all internal and external communication.
 
 ---
 
-### [Domain Layer]
+### Domain Layer
 The core business logic and agent orchestration, located in `src/domain/agent/`.
 - **team.rs**: Implements the `AgentTeam` using the **Rig** framework.
 - **Orchestration Triad**:
@@ -29,7 +29,8 @@ The core business logic and agent orchestration, located in `src/domain/agent/`.
 
 ---
 
-### [Infrastructure Layer]
+### Infrastructure Layer
+
 Concrete implementations of external dependencies, located in `src/infrastructure/`.
 - **tools/jira.rs**: Jira JQL client for issue tracking.
 - **tools/confluence.rs**: Confluence CQL client for documentation search.
