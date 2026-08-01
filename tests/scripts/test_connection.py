@@ -3,7 +3,7 @@ import json
 import os
 import sys
 
-def test_agent_team(prompt, model="internal-gpt4_v0.1"):
+def send_agent_team_request(prompt="que es el mlops y como se defien un proyecto por pasos", model="internal-gpt4_v0.1"):
     url = "http://10.152.183.237/v1/chat/completions"
     headers = {
         "Content-Type": "application/json",
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         prompt = sys.argv[1]
     
-    result = test_agent_team(prompt)
+    result = send_agent_team_request(prompt)
     if result:
         print("\n--- Response ---\n")
         print(result['choices'][0]['message']['content'])
