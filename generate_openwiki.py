@@ -3,6 +3,14 @@ import re
 import subprocess
 from pathlib import Path
 from datetime import datetime, timezone
+import shutil
+import argparse
+import tree_sitter
+import tree_sitter_rust
+
+language = tree_sitter.Language(tree_sitter_rust.language())
+parser = tree_sitter.Parser(language)
+
 
 def get_git_commit():
     try:
@@ -28,197 +36,241 @@ def mirror_directory(src_dir, target_dir):
                 files_to_process.append((source_file, target_file, current_root))
     return files_to_process
 
-def extract_body(content, start_idx):
-    brace_count = 0
-    in_string = False
-    in_char = False
-    escape = False
-    i = start_idx
-    body_start = -1
-
-    while i < len(content):
-        c = content[i]
-        if escape:
-            escape = False
-            i += 1
-            continue
-        if c == '\\':
-            escape = True
-        elif c == '"' and not in_char:
-            in_string = not in_string
-        elif c == "'" and not in_string:
-            in_char = not in_char
-        elif not in_string and not in_char:
-            if c == '{':
-                if brace_count == 0:
-                    body_start = i + 1
-                brace_count += 1
-            elif c == '}':
-                brace_count -= 1
-                if brace_count == 0 and body_start != -1:
-                    return content[body_start:i]
-        i += 1
-    return ""
 
 def parse_rust_file(filepath):
-    with open(filepath, 'r', encoding='utf-8') as f:
-        content = f.read()
+    with open(filepath, "rb") as f:
+        source_code = f.read()
+
+    tree = parser.parse(source_code)
 
     classes = {}
     methods = []
     dependencies = []
     relations = []
 
-    content_no_comments = re.sub(r'//.*', '', content)
-    content_no_comments = re.sub(r'/\*.*?\*/', '', content_no_comments, flags=re.DOTALL)
+    def get_text(node):
+        return source_code[node.start_byte:node.end_byte].decode("utf-8")
 
-    for line in content_no_comments.split('\n'):
-        line = line.strip()
-        if line.startswith('use '):
-            dep = line.replace('use ', '').rstrip(';')
-            dependencies.append(dep)
-        elif line.startswith('mod '):
-            dep = line.replace('mod ', '').rstrip(';')
-            dependencies.append(f"mod {dep}")
+    def walk_file(node):
+        if node.type == "use_declaration":
+            dependencies.append(get_text(node))
+        elif node.type == "struct_item":
+            struct_name_node = node.child_by_field_name("name")
+            if struct_name_node:
+                struct_name = get_text(struct_name_node)
+                fields = []
+                raw_fields = []
+                body = node.child_by_field_name("body")
+                if body and body.type == "field_declaration_list":
+                    for field in body.children:
+                        if field.type == "field_declaration":
+                            fname = get_text(field.child_by_field_name("name"))
+                            ftype = get_text(field.child_by_field_name("type"))
+                            clean_ftype = ftype.replace("<", "~").replace(">", "~").replace(" ", "_")
+                            visibility = "+" if field.child_by_field_name("visibility") else "-"
+                            fields.append(f"{visibility}{clean_ftype} {fname}")
+                            raw_fields.append((fname, ftype))
 
-    # Extract Structs
-    struct_pattern = re.compile(r'(?:pub\s+)?(?:pub\([^)]+\)\s+)?struct\s+([A-Za-z0-9_]+)\s*(?:<[^>]*>)?\s*(?:\{([^}]*)\}|\(([^)]*)\);)', re.MULTILINE)
-    for m in struct_pattern.finditer(content_no_comments):
-        name = m.group(1)
-        fields_str = m.group(2) if m.group(2) else (m.group(3) if m.group(3) else "")
-        line_num = content_no_comments[:m.start()].count('\n') + 1
+                            rel_type = re.sub(r'[^a-zA-Z0-9_]', '', ftype.split('<')[0])
+                            if rel_type and rel_type[0].isupper() and rel_type != struct_name:
+                                relations.append(f"{struct_name} --> {rel_type} : Association")
+                elif body and body.type == "ordered_field_declaration_list":
+                     for field in body.children:
+                         if field.type == "field_declaration":
+                             ftype = get_text(field.child_by_field_name("type"))
+                             clean_ftype = ftype.replace("<", "~").replace(">", "~").replace(" ", "_")
+                             visibility = "+" if field.child_by_field_name("visibility") else "-"
+                             fields.append(f"{visibility}{clean_ftype}")
+                             raw_fields.append(("", ftype))
 
-        fields = []
-        raw_fields = []
-        if fields_str:
-            for field_line in fields_str.split(',' if m.group(3) else '\n'):
-                field_line = field_line.strip()
-                if not field_line or field_line.startswith('#'): continue
-                if ':' in field_line:
-                    parts = field_line.split(':', 1)
-                    fname = parts[0].replace('pub ', '').replace('pub(crate) ', '').strip()
-                    ftype = parts[1].strip()
-                    clean_ftype = ftype.replace("<", "~").replace(">", "~").replace(" ", "_")
-                    fields.append(f"+{clean_ftype} {fname}")
-                    raw_fields.append((fname, ftype))
+                             rel_type = re.sub(r'[^a-zA-Z0-9_]', '', ftype.split('<')[0])
+                             if rel_type and rel_type[0].isupper() and rel_type != struct_name:
+                                 relations.append(f"{struct_name} --> {rel_type} : Association")
 
-                    rel_type = re.sub(r'[^a-zA-Z0-9_]', '', ftype.split('<')[0])
-                    if rel_type and rel_type[0].isupper() and rel_type != name:
-                        relations.append(f"{name} --> {rel_type} : Association")
-                elif m.group(3):
-                    ftype = field_line.strip()
-                    clean_ftype = ftype.replace("<", "~").replace(">", "~").replace(" ", "_")
-                    fields.append(f"+{clean_ftype}")
-                    raw_fields.append(("", ftype))
+                classes[struct_name] = {
+                    "type": "class",
+                    "fields": fields,
+                    "raw_fields": raw_fields,
+                    "methods": [],
+                    "line": node.start_point[0] + 1
+                }
+        elif node.type == "enum_item":
+            enum_name_node = node.child_by_field_name("name")
+            if enum_name_node:
+                enum_name = get_text(enum_name_node)
+                fields = []
+                raw_fields = []
+                body = node.child_by_field_name("body")
+                if body and body.type == "enum_variant_list":
+                    for variant in body.children:
+                        if variant.type == "enum_variant":
+                            vname = get_text(variant.child_by_field_name("name"))
+                            fields.append(vname)
+                            raw_fields.append((vname, "variant"))
+                classes[enum_name] = {
+                    "type": "<<enumeration>>",
+                    "fields": fields,
+                    "raw_fields": raw_fields,
+                    "methods": [],
+                    "line": node.start_point[0] + 1
+                }
+        elif node.type == "trait_item":
+            trait_name_node = node.child_by_field_name("name")
+            if trait_name_node:
+                trait_name = get_text(trait_name_node)
+                trait_methods = []
+                body = node.child_by_field_name("body")
+                if body and body.type == "declaration_list":
+                    for child in body.children:
+                        if child.type == "function_item":
+                            fname = get_text(child.child_by_field_name("name"))
+                            trait_methods.append(f"+{fname}()")
 
-                    rel_type = re.sub(r'[^a-zA-Z0-9_]', '', ftype.split('<')[0])
-                    if rel_type and rel_type[0].isupper() and rel_type != name:
-                        relations.append(f"{name} --> {rel_type} : Association")
+                            params_str = ""
+                            params_node = child.child_by_field_name("parameters")
+                            if params_node:
+                                params_str = get_text(params_node)[1:-1]
 
-        classes[name] = {"type": "class", "fields": fields, "raw_fields": raw_fields, "methods": [], "line": line_num}
+                            ret_type_str = "()"
+                            ret_type_node = child.child_by_field_name("return_type")
+                            if ret_type_node:
+                                ret_type_str = get_text(ret_type_node)
 
-    # Extract Enums
-    enum_pattern = re.compile(r'(?:pub\s+)?(?:pub\([^)]+\)\s+)?enum\s+([A-Za-z0-9_]+)\s*(?:<[^>]*>)?\s*\{([^}]*)\}', re.MULTILINE)
-    for m in enum_pattern.finditer(content_no_comments):
-        name = m.group(1)
-        fields_str = m.group(2)
-        line_num = content_no_comments[:m.start()].count('\n') + 1
+                            methods.append({
+                                "name": fname,
+                                "struct": trait_name,
+                                "line": child.start_point[0] + 1,
+                                "calls": [],
+                                "params": params_str,
+                                "ret_type": ret_type_str,
+                                "is_pub": "+"
+                            })
+                classes[trait_name] = {
+                    "type": "<<interface>>",
+                    "fields": [],
+                    "raw_fields": [],
+                    "methods": trait_methods,
+                    "line": node.start_point[0] + 1
+                }
+        elif node.type == "impl_item":
+            type_node = node.child_by_field_name("type")
+            trait_node = node.child_by_field_name("trait")
 
-        fields = []
-        raw_fields = []
-        for line in fields_str.split('\n'):
-            line = line.strip()
-            if line and not line.startswith('#'):
-                v = line.split(',')[0].strip().split('(')[0].split('{')[0].strip()
-                if v:
-                    fields.append(v)
-                    raw_fields.append((v, "variant"))
-        classes[name] = {"type": "<<enumeration>>", "fields": fields, "raw_fields": raw_fields, "methods": [], "line": line_num}
+            if type_node:
+                struct_name = get_text(type_node)
+                if trait_node:
+                    trait_name = get_text(trait_node)
+                    clean_trait = trait_name.split('::')[-1]
+                    relations.append(f"{clean_trait} <|.. {struct_name} : Realization")
 
-    # Extract Traits
-    trait_pattern = re.compile(r'(?:pub\s+)?(?:pub\([^)]+\)\s+)?trait\s+([A-Za-z0-9_]+)\s*(?:<[^>]*>)?\s*\{([^}]*)\}', re.MULTILINE)
-    for m in trait_pattern.finditer(content_no_comments):
-        name = m.group(1)
-        methods_str = m.group(2)
-        line_num = content_no_comments[:m.start()].count('\n') + 1
+                body = node.child_by_field_name("body")
+                if body:
+                    for child in body.children:
+                        if child.type == "function_item":
+                            fname = get_text(child.child_by_field_name("name"))
+                            visibility = "+" if child.child_by_field_name("visibility") else "-"
+                            method_sig = f"{visibility}{fname}()"
 
-        trait_methods = []
-        fn_pattern_trait = re.compile(r'(?:async\s+)?fn\s+([A-Za-z0-9_]+)\s*\((.*?)\)(?:\s*->\s*([^;{]+))?')
-        for fm in fn_pattern_trait.finditer(methods_str):
-            fname = fm.group(1)
-            params = fm.group(2)
-            ret_type = fm.group(3).strip() if fm.group(3) else "()"
-            trait_methods.append(f"+{fname}()")
+                            params_str = ""
+                            params_node = child.child_by_field_name("parameters")
+                            if params_node:
+                                params_str = get_text(params_node)[1:-1]
+
+                            ret_type_str = "()"
+                            ret_type_node = child.child_by_field_name("return_type")
+                            if ret_type_node:
+                                ret_type_str = get_text(ret_type_node)
+
+                            calls = []
+                            def extract_calls(n):
+                                if n.type == "call_expression":
+                                    func_node = n.child_by_field_name("function")
+                                    if func_node:
+                                        if func_node.type == "field_expression":
+                                            cname = get_text(func_node.child_by_field_name("field"))
+                                        elif func_node.type == "identifier":
+                                            cname = get_text(func_node)
+                                        else:
+                                            cname = get_text(func_node)
+                                        if cname not in ['if', 'while', 'for', 'match', 'Some', 'Ok', 'Err', 'String', 'Vec', 'Box', 'format!', 'println!', 'tracing::info!', 'tracing::debug!', 'tracing::error!', 'tracing::warn!', 'panic!']:
+                                            calls.append(cname)
+                                for c in n.children:
+                                    extract_calls(c)
+                            extract_calls(child)
+
+                            methods.append({
+                                "name": fname,
+                                "struct": struct_name,
+                                "line": child.start_point[0] + 1,
+                                "calls": calls,
+                                "params": params_str,
+                                "ret_type": ret_type_str,
+                                "is_pub": visibility
+                            })
+
+                            if struct_name in classes:
+                                classes[struct_name]["methods"].append(method_sig)
+                            else:
+                                classes[struct_name] = {
+                                    "type": "class",
+                                    "fields": [],
+                                    "raw_fields": [],
+                                    "methods": [method_sig],
+                                    "line": node.start_point[0] + 1
+                                }
+        elif node.type == "function_item" and node.parent.type == "source_file":
+            fname = get_text(node.child_by_field_name("name"))
+            visibility = "+" if node.child_by_field_name("visibility") else "-"
+
+            params_str = ""
+            params_node = node.child_by_field_name("parameters")
+            if params_node:
+                params_str = get_text(params_node)[1:-1]
+
+            ret_type_str = "()"
+            ret_type_node = node.child_by_field_name("return_type")
+            if ret_type_node:
+                ret_type_str = get_text(ret_type_node)
+
+            calls = []
+            def extract_calls(n):
+                if n.type == "call_expression":
+                    func_node = n.child_by_field_name("function")
+                    if func_node:
+                        if func_node.type == "field_expression":
+                            cname = get_text(func_node.child_by_field_name("field"))
+                        elif func_node.type == "identifier":
+                            cname = get_text(func_node)
+                        else:
+                            cname = get_text(func_node)
+                        if cname not in ['if', 'while', 'for', 'match', 'Some', 'Ok', 'Err', 'String', 'Vec', 'Box', 'format!', 'println!', 'tracing::info!', 'tracing::debug!', 'tracing::error!', 'tracing::warn!', 'panic!']:
+                            calls.append(cname)
+                for c in n.children:
+                    extract_calls(c)
+            extract_calls(node)
+
             methods.append({
                 "name": fname,
-                "struct": name,
-                "line": line_num,
-                "calls": [],
-                "params": params,
-                "ret_type": ret_type,
-                "is_pub": "+"
+                "struct": None,
+                "line": node.start_point[0] + 1,
+                "calls": calls,
+                "params": params_str,
+                "ret_type": ret_type_str,
+                "is_pub": visibility
             })
 
-        classes[name] = {"type": "<<interface>>", "fields": [], "raw_fields": [], "methods": trait_methods, "line": line_num}
+        for child in node.children:
+            if node.type not in ["impl_item", "struct_item", "enum_item", "trait_item", "use_declaration"]:
+                walk_file(child)
 
-    # Extract Impls and Methods
-    impl_pattern = re.compile(r'impl\s+(?:<[^>]*>\s+)?([A-Za-z0-9_:]+)(?:\s+for\s+([A-Za-z0-9_<>]+))?\s*\{', re.MULTILINE)
-    for m in impl_pattern.finditer(content_no_comments):
-        trait_name = m.group(1) if m.group(2) else None
-        struct_name = m.group(2).split('<')[0] if m.group(2) else m.group(1)
-
-        impl_body = extract_body(content_no_comments, m.end() - 1)
-
-        if trait_name and trait_name != struct_name:
-            clean_trait = trait_name.split('::')[-1]
-            relations.append(f"{clean_trait} <|.. {struct_name} : Realization")
-
-        fn_pattern = re.compile(r'(pub\s+)?(?:pub\([^)]+\)\s+)?(?:async\s+)?fn\s+([A-Za-z0-9_]+)\s*\((.*?)\)(?:\s*->\s*([^{]+))?\s*\{')
-        for fm in fn_pattern.finditer(impl_body):
-            fname = fm.group(2)
-            is_pub = "+" if fm.group(1) else "-"
-            method_sig = f"{is_pub}{fname}()"
-            params = fm.group(3)
-            ret_type = fm.group(4).strip() if fm.group(4) else "()"
-
-            # extract inner calls
-            fn_body = extract_body(impl_body, fm.end() - 1)
-            calls = []
-            # Find obj.method() or function()
-            call_pattern = re.compile(r'\b([A-Za-z0-9_]+)\s*\(')
-            for cm in call_pattern.finditer(fn_body):
-                cname = cm.group(1)
-                if cname not in ['if', 'while', 'for', 'match', 'Some', 'Ok', 'Err', 'String', 'Vec', 'Box', 'format', 'println', 'tracing', 'info', 'debug', 'error', 'warn', 'panic']:
-                    calls.append(cname)
-
-            if struct_name in classes:
-                classes[struct_name]["methods"].append(method_sig)
-            elif not trait_name:
-                classes[struct_name] = {"type": "class", "fields": [], "raw_fields": [], "methods": [method_sig], "line": content_no_comments[:m.start()].count('\n') + 1}
-
-            methods.append({"name": fname, "struct": struct_name, "line": content_no_comments[:m.start() + fm.start()].count('\n') + 1, "calls": calls, "params": params, "ret_type": ret_type, "is_pub": is_pub})
-
-    # Global functions
-    fn_pattern_global = re.compile(r'^(?:pub\s+)?(?:pub\([^)]+\)\s+)?(?:async\s+)?fn\s+([A-Za-z0-9_]+)\s*\((.*?)\)(?:\s*->\s*([^{]+))?\s*\{', re.MULTILINE)
-    for m in fn_pattern_global.finditer(content_no_comments):
-        fname = m.group(1)
-        params = m.group(2)
-        ret_type = m.group(3).strip() if m.group(3) else "()"
-
-        fn_body = extract_body(content_no_comments, m.end() - 1)
-        calls = []
-        call_pattern = re.compile(r'\b([A-Za-z0-9_]+)\s*\(')
-        for cm in call_pattern.finditer(fn_body):
-            cname = cm.group(1)
-            if cname not in ['if', 'while', 'for', 'match', 'Some', 'Ok', 'Err', 'String', 'Vec', 'Box', 'format', 'println', 'tracing', 'info', 'debug', 'error', 'warn', 'panic']:
-                calls.append(cname)
-
-        methods.append({"name": fname, "struct": None, "line": content_no_comments[:m.start()].count('\n') + 1, "calls": calls, "params": params, "ret_type": ret_type, "is_pub": "+"})
+    walk_file(tree.root_node)
 
     if not classes:
-        mod_name = filepath.name.split('.')[0].capitalize()
+        import pathlib
+        p = pathlib.Path(filepath)
+        mod_name = p.name.split('.')[0].capitalize()
         if mod_name == "Mod":
-            mod_name = filepath.parent.name.capitalize() + "Module"
+            mod_name = p.parent.name.capitalize() + "Module"
 
         mod_methods = []
         for m in methods:
@@ -577,22 +629,53 @@ timestamp: "{timestamp}"
             f.write("# OpenWiki Changelog\n\n" + log_entry)
 
 def main():
+    parser = argparse.ArgumentParser(description="AST Documentation Generator")
+    parser.add_argument("--mode", choices=["full", "diff"], default="full", help="Execution mode: full or diff")
+    args = parser.parse_args()
+
     target_dir = "openwiki"
-    Path(target_dir).mkdir(exist_ok=True)
+
+    if args.mode == "full":
+        shutil.rmtree(target_dir, ignore_errors=True)
+
+    Path(target_dir).mkdir(parents=True, exist_ok=True)
     commit_hash = get_git_commit()
 
     generate_base_structure(target_dir)
 
-    files = mirror_directory("src", target_dir)
-    print(f"Discovered {len(files)} files to process.")
+    all_files = mirror_directory("src", target_dir)
 
-    for src, dst, rel_root in files:
+    files_to_process = []
+    if args.mode == "diff":
+        try:
+            changed_files_raw = subprocess.check_output(["git", "diff", "--name-only", "origin/main...HEAD"]).decode("utf-8").splitlines()
+        except Exception:
+            try:
+                changed_files_raw = subprocess.check_output(["git", "show", "--name-only", "--format="]).decode("utf-8").splitlines()
+            except Exception:
+                changed_files_raw = []
+
+        changed_rs = {f for f in changed_files_raw if f.endswith(".rs")}
+
+        for src, dst, rel_root in all_files:
+            if src.as_posix() in changed_rs:
+                files_to_process.append((src, dst, rel_root))
+    else:
+        files_to_process = all_files
+
+    print(f"Discovered {len(files_to_process)} files to process in {args.mode} mode.")
+
+    for src, dst, rel_root in files_to_process:
         ast = parse_rust_file(src)
         md = generate_okf_markdown(src, rel_root, ast, commit_hash)
         with open(dst, 'w', encoding='utf-8') as f:
             f.write(md)
 
-    generate_index_and_logs(target_dir, files, commit_hash)
+    if args.mode == "full":
+        generate_index_and_logs(target_dir, files_to_process, commit_hash)
+    else:
+        generate_index_and_logs(target_dir, all_files, commit_hash)
+
     print(f"Generated index and changelog in {target_dir}")
 
 if __name__ == "__main__":
