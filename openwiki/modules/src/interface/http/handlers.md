@@ -6,23 +6,28 @@ title: "Module: Handlers"
 source_path: "src/interface/http/handlers.rs"
 description: "Detailed architecture and specifications for the Handlers module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "3c7e8ef"
-timestamp: "2026-07-31T20:24:30Z"
+last_verified_commit: "06ba4b7"
+timestamp: "2026-08-04T20:55:22Z"
 ---
 
 # Module Specification: Handlers
 
 * **Source Reference:** `src/interface/http/handlers.rs`
 * **Package Dependency:**
-- `axum::{`
-- `crate::application::dtos::Input`
-- `crate::domain::agent::team::AgentEvent`
-- `crate::interface::http::routes::AppState`
-- `crate::interface::http::validation::ValidatedJson`
-- `futures::StreamExt`
-- `serde_json::json`
-- `std::convert::Infallible`
-- `std::sync::Arc`
+- `use axum::{
+    extract::State,
+    http::{HeaderMap, StatusCode},
+    response::{sse::Event, IntoResponse, Sse},
+    Json,
+};`
+- `use crate::application::dtos::Input;`
+- `use crate::domain::agent::team::AgentEvent;`
+- `use crate::interface::http::routes::AppState;`
+- `use crate::interface::http::validation::ValidatedJson;`
+- `use futures::StreamExt;`
+- `use serde_json::json;`
+- `use std::convert::Infallible;`
+- `use std::sync::Arc;`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Handlers` module extracted directly from the codebase.
@@ -36,6 +41,7 @@ classDiagram
         <<module>>
         +docs_redirect()
         +get_models()
+        +route_query()
     }
 ```
 
@@ -51,6 +57,11 @@ sequenceDiagram
     Caller->>Svc: get_models()
     Svc->>Svc: Json()
     Svc-->>Caller: Returns execution status
+    Caller->>Svc: route_query()
+    Svc->>Svc: get()
+    Svc->>Svc: is_empty()
+    Svc->>Svc: into_response()
+    Svc-->>Caller: Returns execution status
 ```
 
 
@@ -63,7 +74,7 @@ No notable data structures or fields in this module.
 ## 4. Comprehensive Methods & Functions Breakdown
 
 ### `docs_redirect`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/interface/http/handlers.rs:L17`
 
 #### Input Parameters
@@ -77,7 +88,7 @@ No notable data structures or fields in this module.
 | `impl IntoResponse` | Success | Result of the operation |
 
 ### `get_models`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/interface/http/handlers.rs:L24`
 
 #### Input Parameters
@@ -90,9 +101,26 @@ No notable data structures or fields in this module.
 | :--- | :--- | :--- |
 | `impl IntoResponse` | Success | Result of the operation |
 
+### `route_query`
+* **Visibility:** -
+* **Source Line Citation:** `src/interface/http/handlers.rs:L42`
+
+#### Input Parameters
+| Parameter | Data Type | Required / Default | Semantic Description |
+| :--- | :--- | :--- | :--- |
+| `State(state)` | `State<Arc<AppState>>` | Required | Parameter |
+| `headers` | `HeaderMap` | Required | Parameter |
+| `ValidatedJson(request)` | `ValidatedJson<Input>` | Required | Parameter |
+
+#### Return Value & Output Shape
+| Return Type | Scenario | Description |
+| :--- | :--- | :--- |
+| `impl IntoResponse` | Success | Result of the operation |
+
 
 
 ## 5. Source Code Citations & Index
 * Class `Handlers`: `src/interface/http/handlers.rs:L1`
 * Method `docs_redirect`: `src/interface/http/handlers.rs:L17`
 * Method `get_models`: `src/interface/http/handlers.rs:L24`
+* Method `route_query`: `src/interface/http/handlers.rs:L42`

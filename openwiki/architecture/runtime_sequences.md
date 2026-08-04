@@ -5,7 +5,7 @@ type: "architecture"
 title: "Runtime Sequences"
 description: "Architecture view for runtime_sequences"
 tags: ["iso42010", "architecture", "okf"]
-timestamp: "2026-07-31T20:24:30Z"
+timestamp: "2026-08-04T20:55:22Z"
 ---
 
 # Runtime Sequences

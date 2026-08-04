@@ -6,20 +6,20 @@ title: "Module: R2r"
 source_path: "src/infrastructure/tools/r2r.rs"
 description: "Detailed architecture and specifications for the R2r module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "3c7e8ef"
-timestamp: "2026-07-31T20:24:30Z"
+last_verified_commit: "06ba4b7"
+timestamp: "2026-08-04T20:55:22Z"
 ---
 
 # Module Specification: R2r
 
 * **Source Reference:** `src/infrastructure/tools/r2r.rs`
 * **Package Dependency:**
-- `rig::completion::ToolDefinition`
-- `rig::tool::Tool`
-- `serde::Deserialize`
-- `serde_json::json`
-- `std::env`
-- `thiserror::Error`
+- `use rig::completion::ToolDefinition;`
+- `use rig::tool::Tool;`
+- `use serde::Deserialize;`
+- `use serde_json::json;`
+- `use std::env;`
+- `use thiserror::Error;`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `R2r` module extracted directly from the codebase.
@@ -30,10 +30,17 @@ Deterministic technical architecture for the `R2r` module extracted directly fro
 classDiagram
     direction BT
     class R2RArgs {
-        +String, query
+        -String query
     }
     class R2RError {
         <<enumeration>>
+        EnvVarMissing
+        RequestError
+        Other
+    }
+    class R2RTool {
+        -definition()
+        -call()
     }
     R2RArgs --> String : Association
     Tool <|.. R2RTool : Realization
@@ -46,10 +53,19 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as R2RArgs
+    Caller->>Svc: definition()
+    Svc->>Svc: to_string()
+    Svc->>Svc: to_string()
+    Svc-->>Caller: Returns execution status
+    Caller->>Svc: call()
+    Svc->>Svc: unwrap_or_else()
+    Svc->>Svc: env::var()
+    Svc->>Svc: to_string()
+    Svc-->>Caller: Returns execution status
     Caller->>Svc: get_r2r_results()
-    Svc->>Svc: var()
-    Svc->>Svc: var()
-    Svc->>Svc: new()
+    Svc->>Svc: env::var()
+    Svc->>Svc: env::var()
+    Svc->>Svc: reqwest::Client::new()
     Svc-->>Caller: Returns execution status
 ```
 
@@ -59,14 +75,51 @@ sequenceDiagram
 ### R2RArgs
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `query` | `String,` | Field of R2RArgs |
+| `query` | `String` | Field of R2RArgs |
+
+### R2RError
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `EnvVarMissing` | `variant` | Field of R2RError |
+| `RequestError` | `variant` | Field of R2RError |
+| `Other` | `variant` | Field of R2RError |
 
 
 
 ## 4. Comprehensive Methods & Functions Breakdown
 
+### `R2RTool::definition`
+* **Visibility:** -
+* **Source Line Citation:** `src/infrastructure/tools/r2r.rs:L31`
+
+#### Input Parameters
+| Parameter | Data Type | Required / Default | Semantic Description |
+| :--- | :--- | :--- | :--- |
+| `&self` | `self` | Required | Instance reference |
+| `_prompt` | `String` | Required | Parameter |
+
+#### Return Value & Output Shape
+| Return Type | Scenario | Description |
+| :--- | :--- | :--- |
+| `ToolDefinition` | Success | Result of the operation |
+
+### `R2RTool::call`
+* **Visibility:** -
+* **Source Line Citation:** `src/infrastructure/tools/r2r.rs:L49`
+
+#### Input Parameters
+| Parameter | Data Type | Required / Default | Semantic Description |
+| :--- | :--- | :--- | :--- |
+| `&self` | `self` | Required | Instance reference |
+| `args: Self::Args` | `self` | Required | Instance reference |
+
+#### Return Value & Output Shape
+| Return Type | Scenario | Description |
+| :--- | :--- | :--- |
+| `Result<Self::Output, Self::Error>` | Success | Result of the operation |
+
 ### `get_r2r_results`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/r2r.rs:L57`
 
 #### Input Parameters
@@ -85,4 +138,7 @@ sequenceDiagram
 ## 5. Source Code Citations & Index
 * Class `R2RArgs`: `src/infrastructure/tools/r2r.rs:L9`
 * Class `R2RError`: `src/infrastructure/tools/r2r.rs:L14`
+* Class `R2RTool`: `src/infrastructure/tools/r2r.rs:L23`
+* Method `definition` in `R2RTool`: `src/infrastructure/tools/r2r.rs:L31`
+* Method `call` in `R2RTool`: `src/infrastructure/tools/r2r.rs:L49`
 * Method `get_r2r_results`: `src/infrastructure/tools/r2r.rs:L57`

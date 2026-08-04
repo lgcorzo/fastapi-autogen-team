@@ -6,20 +6,20 @@ title: "Module: Main"
 source_path: "src/main.rs"
 description: "Detailed architecture and specifications for the Main module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "3c7e8ef"
-timestamp: "2026-07-31T20:24:30Z"
+last_verified_commit: "06ba4b7"
+timestamp: "2026-08-04T20:55:22Z"
 ---
 
 # Module Specification: Main
 
 * **Source Reference:** `src/main.rs`
 * **Package Dependency:**
-- `dotenvy::dotenv`
-- `rust_agent_team::domain::agent::team::AgentTeam`
-- `rust_agent_team::infrastructure::telemetry`
-- `rust_agent_team::{create_app, AppState}`
-- `std::env`
-- `std::sync::Arc`
+- `use dotenvy::dotenv;`
+- `use rust_agent_team::domain::agent::team::AgentTeam;`
+- `use rust_agent_team::infrastructure::telemetry;`
+- `use rust_agent_team::{create_app, AppState};`
+- `use std::env;`
+- `use std::sync::Arc;`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Main` module extracted directly from the codebase.
@@ -43,6 +43,9 @@ sequenceDiagram
     participant Caller as Client Interface
     participant Svc as Main
     Caller->>Svc: main()
+    Svc->>Svc: ok()
+    Svc->>Svc: dotenv()
+    Svc->>Svc: unwrap_or_else()
     Svc-->>Caller: Returns execution status
 ```
 
@@ -56,7 +59,7 @@ No notable data structures or fields in this module.
 ## 4. Comprehensive Methods & Functions Breakdown
 
 ### `main`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/main.rs:L9`
 
 #### Input Parameters

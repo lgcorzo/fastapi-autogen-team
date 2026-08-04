@@ -6,18 +6,18 @@ title: "Module: Telemetry"
 source_path: "src/infrastructure/telemetry.rs"
 description: "Detailed architecture and specifications for the Telemetry module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "3c7e8ef"
-timestamp: "2026-07-31T20:24:30Z"
+last_verified_commit: "06ba4b7"
+timestamp: "2026-08-04T20:55:22Z"
 ---
 
 # Module Specification: Telemetry
 
 * **Source Reference:** `src/infrastructure/telemetry.rs`
 * **Package Dependency:**
-- `opentelemetry::KeyValue`
-- `opentelemetry_otlp::WithExportConfig`
-- `opentelemetry_sdk::{runtime, trace::Config, Resource}`
-- `tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter}`
+- `use opentelemetry::KeyValue;`
+- `use opentelemetry_otlp::WithExportConfig;`
+- `use opentelemetry_sdk::{runtime, trace::Config, Resource};`
+- `use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Telemetry` module extracted directly from the codebase.
@@ -41,9 +41,9 @@ sequenceDiagram
     participant Caller as Client Interface
     participant Svc as Telemetry
     Caller->>Svc: init_telemetry()
-    Svc->>Svc: new()
-    Svc->>Svc: new()
-    Svc->>Svc: to_string()
+    Svc->>Svc: Resource::new()
+    Svc->>Svc: install_batch()
+    Svc->>Svc: with_trace_config()
     Svc-->>Caller: Returns execution status
 ```
 
@@ -57,7 +57,7 @@ No notable data structures or fields in this module.
 ## 4. Comprehensive Methods & Functions Breakdown
 
 ### `init_telemetry`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/telemetry.rs:L6`
 
 #### Input Parameters

@@ -6,15 +6,15 @@ title: "Module: Lib"
 source_path: "src/lib.rs"
 description: "Detailed architecture and specifications for the Lib module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "3c7e8ef"
-timestamp: "2026-07-31T20:24:30Z"
+last_verified_commit: "06ba4b7"
+timestamp: "2026-08-04T20:55:22Z"
 ---
 
 # Module Specification: Lib
 
 * **Source Reference:** `src/lib.rs`
 * **Package Dependency:**
-- None
+- `pub use interface::http::routes::{create_app, AppState};`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Lib` module extracted directly from the codebase.

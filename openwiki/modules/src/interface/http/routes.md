@@ -6,20 +6,23 @@ title: "Module: Routes"
 source_path: "src/interface/http/routes.rs"
 description: "Detailed architecture and specifications for the Routes module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "3c7e8ef"
-timestamp: "2026-07-31T20:24:30Z"
+last_verified_commit: "06ba4b7"
+timestamp: "2026-08-04T20:55:22Z"
 ---
 
 # Module Specification: Routes
 
 * **Source Reference:** `src/interface/http/routes.rs`
 * **Package Dependency:**
-- `axum::{`
-- `crate::domain::agent::team::AgentTeam`
-- `crate::interface::http::handlers::{docs_redirect, get_models, route_query}`
-- `crate::interface::http::middleware::{cors_layer, security_headers}`
-- `std::sync::Arc`
-- `tower_http::trace::TraceLayer`
+- `use axum::{
+    routing::{get, post},
+    Router,
+};`
+- `use crate::domain::agent::team::AgentTeam;`
+- `use crate::interface::http::handlers::{docs_redirect, get_models, route_query};`
+- `use crate::interface::http::middleware::{cors_layer, security_headers};`
+- `use std::sync::Arc;`
+- `use tower_http::trace::TraceLayer;`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Routes` module extracted directly from the codebase.
@@ -30,7 +33,7 @@ Deterministic technical architecture for the `Routes` module extracted directly 
 classDiagram
     direction BT
     class AppState {
-        +AgentTeam, team
+        -AgentTeam team
     }
     AppState --> AgentTeam : Association
 ```
@@ -43,9 +46,9 @@ sequenceDiagram
     participant Caller as Client Interface
     participant Svc as AppState
     Caller->>Svc: create_app()
-    Svc->>Svc: new()
+    Svc->>Svc: with_state()
+    Svc->>Svc: nest()
     Svc->>Svc: route()
-    Svc->>Svc: get()
     Svc-->>Caller: Returns execution status
 ```
 
@@ -55,14 +58,14 @@ sequenceDiagram
 ### AppState
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `team` | `AgentTeam,` | Field of AppState |
+| `team` | `AgentTeam` | Field of AppState |
 
 
 
 ## 4. Comprehensive Methods & Functions Breakdown
 
 ### `create_app`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/interface/http/routes.rs:L15`
 
 #### Input Parameters
