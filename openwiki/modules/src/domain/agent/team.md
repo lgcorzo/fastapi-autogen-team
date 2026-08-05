@@ -6,8 +6,8 @@ title: "Module: Team"
 source_path: "src/domain/agent/team.rs"
 description: "Detailed architecture and specifications for the Team module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "06ba4b7"
-timestamp: "2026-08-04T20:55:22Z"
+last_verified_commit: "e78baf4"
+timestamp: "2026-08-05T20:29:51Z"
 ---
 
 # Module Specification: Team
@@ -34,9 +34,8 @@ Deterministic technical architecture for the `Team` module extracted directly fr
 
 ## 2. UML 2.0 Diagrams
 ### Class & Inheritance Architecture
-```mermaid
-classDiagram
-    direction BT
+```plantuml
+@startuml
     class AgentEvent {
         <<enumeration>>
         Progress
@@ -51,40 +50,42 @@ classDiagram
         -new_mock()
         -new_test()
     }
+@enduml
 ```
 
 
 ### Execution Flow & Runtime Behavior
-```mermaid
-sequenceDiagram
+```plantuml
+@startuml
     autonumber
-    participant Caller as Client Interface
-    participant Svc as AgentEvent
-    Caller->>Svc: is_valid_query_line()
-    Svc->>Svc: trim()
-    Svc->>Svc: len()
-    Svc->>Svc: starts_with()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: new()
-    Svc->>Svc: expect()
-    Svc->>Svc: env::var()
-    Svc->>Svc: unwrap_or_else()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: run()
-    Svc->>Svc: completions_api()
-    Svc->>Svc: clone()
-    Svc->>Svc: unwrap_or_default()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: run_stream()
-    Svc->>Svc: clone()
-    Svc->>Svc: completions_api()
-    Svc->>Svc: Box::pin()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: new_mock()
-    Svc->>Svc: unwrap()
-    Svc->>Svc: build()
-    Svc->>Svc: base_url()
-    Svc-->>Caller: Returns execution status
+    participant "Client Interface" as Caller
+    participant AgentEvent as Svc
+    Caller->Svc: is_valid_query_line()
+    Svc->Svc: trim()
+    Svc->Svc: len()
+    Svc->Svc: starts_with()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: new()
+    Svc->Svc: expect()
+    Svc->Svc: env::var()
+    Svc->Svc: unwrap_or_else()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: run()
+    Svc->Svc: completions_api()
+    Svc->Svc: clone()
+    Svc->Svc: unwrap_or_default()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: run_stream()
+    Svc->Svc: clone()
+    Svc->Svc: completions_api()
+    Svc->Svc: Box::pin()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: new_mock()
+    Svc->Svc: unwrap()
+    Svc->Svc: build()
+    Svc->Svc: base_url()
+    Svc-->Caller: Returns execution status
+@enduml
 ```
 
 

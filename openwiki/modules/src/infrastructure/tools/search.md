@@ -6,8 +6,8 @@ title: "Module: Search"
 source_path: "src/infrastructure/tools/search.rs"
 description: "Detailed architecture and specifications for the Search module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "06ba4b7"
-timestamp: "2026-08-04T20:55:22Z"
+last_verified_commit: "e78baf4"
+timestamp: "2026-08-05T20:29:51Z"
 ---
 
 # Module Specification: Search
@@ -29,9 +29,8 @@ Deterministic technical architecture for the `Search` module extracted directly 
 
 ## 2. UML 2.0 Diagrams
 ### Class & Inheritance Architecture
-```mermaid
-classDiagram
-    direction BT
+```plantuml
+@startuml
     class SearchArgs {
         -String query
     }
@@ -53,24 +52,26 @@ classDiagram
     SearchArgs --> String : Association
     SearchResult --> String : Association
     Tool <|.. SearchTool : Realization
+@enduml
 ```
 
 
 ### Execution Flow & Runtime Behavior
-```mermaid
-sequenceDiagram
+```plantuml
+@startuml
     autonumber
-    participant Caller as Client Interface
-    participant Svc as SearchArgs
-    Caller->>Svc: definition()
-    Svc->>Svc: to_string()
-    Svc->>Svc: to_string()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: call()
-    Svc->>Svc: unwrap_or_else()
-    Svc->>Svc: env::var()
-    Svc->>Svc: to_string()
-    Svc-->>Caller: Returns execution status
+    participant "Client Interface" as Caller
+    participant SearchArgs as Svc
+    Caller->Svc: definition()
+    Svc->Svc: to_string()
+    Svc->Svc: to_string()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: call()
+    Svc->Svc: unwrap_or_else()
+    Svc->Svc: env::var()
+    Svc->Svc: to_string()
+    Svc-->Caller: Returns execution status
+@enduml
 ```
 
 

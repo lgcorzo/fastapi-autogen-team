@@ -6,8 +6,8 @@ title: "Module: Main"
 source_path: "src/main.rs"
 description: "Detailed architecture and specifications for the Main module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "06ba4b7"
-timestamp: "2026-08-04T20:55:22Z"
+last_verified_commit: "e78baf4"
+timestamp: "2026-08-05T20:29:51Z"
 ---
 
 # Module Specification: Main
@@ -26,27 +26,28 @@ Deterministic technical architecture for the `Main` module extracted directly fr
 
 ## 2. UML 2.0 Diagrams
 ### Class & Inheritance Architecture
-```mermaid
-classDiagram
-    direction BT
+```plantuml
+@startuml
     class Main {
         <<module>>
         +main()
     }
+@enduml
 ```
 
 
 ### Execution Flow & Runtime Behavior
-```mermaid
-sequenceDiagram
+```plantuml
+@startuml
     autonumber
-    participant Caller as Client Interface
-    participant Svc as Main
-    Caller->>Svc: main()
-    Svc->>Svc: ok()
-    Svc->>Svc: dotenv()
-    Svc->>Svc: unwrap_or_else()
-    Svc-->>Caller: Returns execution status
+    participant "Client Interface" as Caller
+    participant Main as Svc
+    Caller->Svc: main()
+    Svc->Svc: ok()
+    Svc->Svc: dotenv()
+    Svc->Svc: unwrap_or_else()
+    Svc-->Caller: Returns execution status
+@enduml
 ```
 
 

@@ -6,8 +6,8 @@ title: "Module: Dtos"
 source_path: "src/application/dtos.rs"
 description: "Detailed architecture and specifications for the Dtos module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "06ba4b7"
-timestamp: "2026-08-04T20:55:22Z"
+last_verified_commit: "e78baf4"
+timestamp: "2026-08-05T20:29:51Z"
 ---
 
 # Module Specification: Dtos
@@ -23,12 +23,11 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
 
 ## 2. UML 2.0 Diagrams
 ### Class & Inheritance Architecture
-```mermaid
-classDiagram
-    direction BT
+```plantuml
+@startuml
     class ImageUrl {
         -String url
-        -Option~String~ detail
+        -Option<String> detail
     }
     class Content {
         <<enumeration>>
@@ -39,16 +38,16 @@ classDiagram
         -String id
         -String name
         -String description
-        -HashMap~String,_Value~ pricing
+        -HashMap<String,_Value> pricing
         -u32 context_length
-        -HashMap~String,_Value~ architecture
-        -HashMap~String,_Value~ top_provider
-        -Option~HashMap~String,_Value~~ per_request_limits
+        -HashMap<String,_Value> architecture
+        -HashMap<String,_Value> top_provider
+        -Option<HashMap<String,_Value>> per_request_limits
     }
     class Message {
         -String role
         -ContentType content
-        -Option~String~ name
+        -Option<String> name
     }
     class ContentType {
         <<enumeration>>
@@ -57,21 +56,21 @@ classDiagram
     }
     class Input {
         -String model
-        -Option~String~ user
-        -Vec~Message~ messages
-        -Option~f32~ temperature
-        -Option~f32~ top_p
-        -Option~f32~ presence_penalty
-        -Option~f32~ frequency_penalty
-        -Option~bool~ stream
+        -Option<String> user
+        -Vec<Message> messages
+        -Option<f32> temperature
+        -Option<f32> top_p
+        -Option<f32> presence_penalty
+        -Option<f32> frequency_penalty
+        -Option<bool> stream
     }
     class Output {
         -String id
         -String object
         -i64 created
         -String model
-        -Vec~HashMap~String,_Value~~ choices
-        -HashMap~String,_Value~ usage
+        -Vec<HashMap<String,_Value>> choices
+        -HashMap<String,_Value> usage
         -default()
     }
     Default <|.. Output : Realization
@@ -89,20 +88,22 @@ classDiagram
     Output --> HashMap : Association
     Output --> String : Association
     Output --> Vec : Association
+@enduml
 ```
 
 
 ### Execution Flow & Runtime Behavior
-```mermaid
-sequenceDiagram
+```plantuml
+@startuml
     autonumber
-    participant Caller as Client Interface
-    participant Svc as ImageUrl
-    Caller->>Svc: default()
-    Svc->>Svc: to_string()
-    Svc->>Svc: to_string()
-    Svc->>Svc: timestamp()
-    Svc-->>Caller: Returns execution status
+    participant "Client Interface" as Caller
+    participant ImageUrl as Svc
+    Caller->Svc: default()
+    Svc->Svc: to_string()
+    Svc->Svc: to_string()
+    Svc->Svc: timestamp()
+    Svc-->Caller: Returns execution status
+@enduml
 ```
 
 

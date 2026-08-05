@@ -6,8 +6,8 @@ title: "Module: Handlers"
 source_path: "src/interface/http/handlers.rs"
 description: "Detailed architecture and specifications for the Handlers module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "06ba4b7"
-timestamp: "2026-08-04T20:55:22Z"
+last_verified_commit: "e78baf4"
+timestamp: "2026-08-05T20:29:51Z"
 ---
 
 # Module Specification: Handlers
@@ -34,34 +34,35 @@ Deterministic technical architecture for the `Handlers` module extracted directl
 
 ## 2. UML 2.0 Diagrams
 ### Class & Inheritance Architecture
-```mermaid
-classDiagram
-    direction BT
+```plantuml
+@startuml
     class Handlers {
         <<module>>
         +docs_redirect()
         +get_models()
         +route_query()
     }
+@enduml
 ```
 
 
 ### Execution Flow & Runtime Behavior
-```mermaid
-sequenceDiagram
+```plantuml
+@startuml
     autonumber
-    participant Caller as Client Interface
-    participant Svc as Handlers
-    Caller->>Svc: docs_redirect()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: get_models()
-    Svc->>Svc: Json()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: route_query()
-    Svc->>Svc: get()
-    Svc->>Svc: is_empty()
-    Svc->>Svc: into_response()
-    Svc-->>Caller: Returns execution status
+    participant "Client Interface" as Caller
+    participant Handlers as Svc
+    Caller->Svc: docs_redirect()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: get_models()
+    Svc->Svc: Json()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: route_query()
+    Svc->Svc: get()
+    Svc->Svc: is_empty()
+    Svc->Svc: into_response()
+    Svc-->Caller: Returns execution status
+@enduml
 ```
 
 

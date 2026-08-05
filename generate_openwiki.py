@@ -66,7 +66,7 @@ def parse_rust_file(filepath):
                         if field.type == "field_declaration":
                             fname = get_text(field.child_by_field_name("name"))
                             ftype = get_text(field.child_by_field_name("type"))
-                            clean_ftype = ftype.replace("<", "~").replace(">", "~").replace(" ", "_")
+                            clean_ftype = ftype.replace(" ", "_")
                             visibility = "+" if field.child_by_field_name("visibility") else "-"
                             fields.append(f"{visibility}{clean_ftype} {fname}")
                             raw_fields.append((fname, ftype))
@@ -78,7 +78,7 @@ def parse_rust_file(filepath):
                      for field in body.children:
                          if field.type == "field_declaration":
                              ftype = get_text(field.child_by_field_name("type"))
-                             clean_ftype = ftype.replace("<", "~").replace(">", "~").replace(" ", "_")
+                             clean_ftype = ftype.replace(" ", "_")
                              visibility = "+" if field.child_by_field_name("visibility") else "-"
                              fields.append(f"{visibility}{clean_ftype}")
                              raw_fields.append(("", ftype))
@@ -285,41 +285,41 @@ def parse_rust_file(filepath):
         "relations": sorted(list(set(relations)))
     }
 
-def generate_mermaid_class_diagram(ast):
-    mermaid = "```mermaid\nclassDiagram\n    direction BT\n"
+def generate_plantuml_class_diagram(ast):
+    plantuml = "```plantuml\n@startuml\n"
     for name, data in ast["classes"].items():
-        mermaid += f"    class {name} {{\n"
+        plantuml += f"    class {name} {{\n"
         if data["type"] != "class":
-            mermaid += f"        {data['type']}\n"
+            plantuml += f"        {data['type']}\n"
         for f in data["fields"]:
-            mermaid += f"        {f}\n"
+            plantuml += f"        {f}\n"
         for m in data["methods"]:
-            mermaid += f"        {m}\n"
-        mermaid += "    }\n"
+            plantuml += f"        {m}\n"
+        plantuml += "    }\n"
     for rel in ast["relations"]:
-        mermaid += f"    {rel}\n"
+        plantuml += f"    {rel}\n"
     if not ast["classes"]:
-        mermaid += "    class Module {\n        <<module>>\n    }\n"
-    mermaid += "```\n"
-    return mermaid
+        plantuml += "    class Module {\n        <<module>>\n    }\n"
+    plantuml += "@enduml\n```\n"
+    return plantuml
 
-def generate_mermaid_sequence_diagram(ast):
-    mermaid = "```mermaid\nsequenceDiagram\n    autonumber\n    participant Caller as Client Interface\n"
+def generate_plantuml_sequence_diagram(ast):
+    plantuml = "```plantuml\n@startuml\n    autonumber\n    participant \"Client Interface\" as Caller\n"
     if not ast["methods"]:
-        return mermaid + "    Caller->>Svc: Invoke\n```\n"
+        return plantuml + "    Caller->Svc: Invoke\n@enduml\n```\n"
 
     main_actor = list(ast["classes"].keys())[0] if ast["classes"] else "Svc"
-    mermaid += f"    participant Svc as {main_actor}\n"
+    plantuml += f"    participant {main_actor} as Svc\n"
 
     for m in ast["methods"][:5]:  # limit to top 5 methods for clarity
         actor = m["struct"] if m["struct"] else main_actor
-        mermaid += f"    Caller->>Svc: {m['name']}()\n"
+        plantuml += f"    Caller->Svc: {m['name']}()\n"
         for call in m.get("calls", [])[:3]: # limit inner calls
-             mermaid += f"    Svc->>Svc: {call}()\n"
-        mermaid += f"    Svc-->>Caller: Returns execution status\n"
+             plantuml += f"    Svc->Svc: {call}()\n"
+        plantuml += f"    Svc-->Caller: Returns execution status\n"
 
-    mermaid += "```\n"
-    return mermaid
+    plantuml += "@enduml\n```\n"
+    return plantuml
 
 def generate_okf_markdown(filepath, rel_dir, ast, commit_hash):
     title = filepath.name.split('.')[0].capitalize()
@@ -327,8 +327,8 @@ def generate_okf_markdown(filepath, rel_dir, ast, commit_hash):
          title = filepath.parent.name.capitalize() + "Module"
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    class_diagram = generate_mermaid_class_diagram(ast)
-    seq_diagram = generate_mermaid_sequence_diagram(ast)
+    class_diagram = generate_plantuml_class_diagram(ast)
+    seq_diagram = generate_plantuml_sequence_diagram(ast)
 
     deps_list = "\n".join([f"- `{dep}`" for dep in ast["dependencies"]]) if ast["dependencies"] else "- None"
 
@@ -459,17 +459,17 @@ timestamp: "{timestamp}"
 ## 2. Stakeholder Perspectives & Concerns Matrix
 | Stakeholder Persona | Primary Concerns | Framing ISO Viewpoint | Governed Wiki Page |
 | :--- | :--- | :--- | :--- |
-| **System Architect** | System modularity, extensibility, dependency boundaries | Component View | [[Architecture/ComponentStructure]] |
-| **Security Officer** | Auth token validation, encryption, blast radius | Security View | [[Architecture/SecurityView]] |
-| **Lead Developer** | Execution flows, function contracts, error states | Sequence View | [[Architecture/RuntimeSequences]] |
-| **DevOps Lead** | Deployment environment, dependencies, CLI hooks | Deployment View | [[Architecture/DeploymentView]] |
+| **System Architect** | System modularity, extensibility, dependency boundaries | Component View | [Architecture/ComponentStructure](./component_structure.md) |
+| **Security Officer** | Auth token validation, encryption, blast radius | Security View | [Architecture/SecurityView](./security_view.md) |
+| **Lead Developer** | Execution flows, function contracts, error states | Sequence View | [Architecture/RuntimeSequences](./runtime_sequences.md) |
+| **DevOps Lead** | Deployment environment, dependencies, CLI hooks | Deployment View | [Architecture/DeploymentView](./deployment_view.md) |
 
 ## 3. Viewpoints Framework & Index
-- 🌐 [[Architecture/SystemContext]] — Context View & External Boundaries.
-- 📦 [[Architecture/ComponentStructure]] — Component View & UML 2.0 Class Diagrams.
-- 🔄 [[Architecture/RuntimeSequences]] — Sequence View & Interaction Diagrams.
-- 🔐 [[Architecture/SecurityView]] — Security View & Data Protection Rules.
-- 📝 [[Architecture/ADR/ADR_001_AST_Engine]] — Architecture Decision Records.
+- 🌐 [Architecture/SystemContext](./system_context.md) — Context View & External Boundaries.
+- 📦 [Architecture/ComponentStructure](./component_structure.md) — Component View & UML 2.0 Class Diagrams.
+- 🔄 [Architecture/RuntimeSequences](./runtime_sequences.md) — Sequence View & Interaction Diagrams.
+- 🔐 [Architecture/SecurityView](./security_view.md) — Security View & Data Protection Rules.
+- 📝 [Architecture/ADR/ADR_001_AST_Engine](./adr/adr_001_ast_engine.md) — Architecture Decision Records.
 """)
 
     # Other basic architecture files
@@ -588,9 +588,9 @@ timestamp: "{timestamp}"
 
 ## ISO Documentation
 
-- [[Architecture Overview|./architecture/iso_42010_overview.md]]
-- [[Quality Assessment|./quality/iso_25010_quality.md]]
-- [[Developer Guide|./user_guides/developer_guide.md]]
+- [Architecture Overview](./architecture/iso_42010_overview.md)
+- [Quality Assessment](./quality/iso_25010_quality.md)
+- [Developer Guide](./user_guides/developer_guide.md)
 
 ## Modules
 

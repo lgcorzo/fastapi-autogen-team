@@ -6,8 +6,8 @@ title: "Module: Telemetry"
 source_path: "src/infrastructure/telemetry.rs"
 description: "Detailed architecture and specifications for the Telemetry module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "06ba4b7"
-timestamp: "2026-08-04T20:55:22Z"
+last_verified_commit: "e78baf4"
+timestamp: "2026-08-05T20:29:51Z"
 ---
 
 # Module Specification: Telemetry
@@ -24,27 +24,28 @@ Deterministic technical architecture for the `Telemetry` module extracted direct
 
 ## 2. UML 2.0 Diagrams
 ### Class & Inheritance Architecture
-```mermaid
-classDiagram
-    direction BT
+```plantuml
+@startuml
     class Telemetry {
         <<module>>
         +init_telemetry()
     }
+@enduml
 ```
 
 
 ### Execution Flow & Runtime Behavior
-```mermaid
-sequenceDiagram
+```plantuml
+@startuml
     autonumber
-    participant Caller as Client Interface
-    participant Svc as Telemetry
-    Caller->>Svc: init_telemetry()
-    Svc->>Svc: Resource::new()
-    Svc->>Svc: install_batch()
-    Svc->>Svc: with_trace_config()
-    Svc-->>Caller: Returns execution status
+    participant "Client Interface" as Caller
+    participant Telemetry as Svc
+    Caller->Svc: init_telemetry()
+    Svc->Svc: Resource::new()
+    Svc->Svc: install_batch()
+    Svc->Svc: with_trace_config()
+    Svc-->Caller: Returns execution status
+@enduml
 ```
 
 

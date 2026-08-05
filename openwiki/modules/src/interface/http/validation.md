@@ -6,8 +6,8 @@ title: "Module: Validation"
 source_path: "src/interface/http/validation.rs"
 description: "Detailed architecture and specifications for the Validation module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "06ba4b7"
-timestamp: "2026-08-04T20:55:22Z"
+last_verified_commit: "e78baf4"
+timestamp: "2026-08-05T20:29:51Z"
 ---
 
 # Module Specification: Validation
@@ -28,29 +28,30 @@ Deterministic technical architecture for the `Validation` module extracted direc
 
 ## 2. UML 2.0 Diagrams
 ### Class & Inheritance Architecture
-```mermaid
-classDiagram
-    direction BT
+```plantuml
+@startuml
     class ValidatedJson {
     }
     class ValidatedJson<T> {
         -from_request()
     }
     FromRequest<S> <|.. ValidatedJson<T> : Realization
+@enduml
 ```
 
 
 ### Execution Flow & Runtime Behavior
-```mermaid
-sequenceDiagram
+```plantuml
+@startuml
     autonumber
-    participant Caller as Client Interface
-    participant Svc as ValidatedJson
-    Caller->>Svc: from_request()
-    Svc->>Svc: Json::<T>::from_request()
-    Svc->>Svc: ValidatedJson()
-    Svc->>Svc: status()
-    Svc-->>Caller: Returns execution status
+    participant "Client Interface" as Caller
+    participant ValidatedJson as Svc
+    Caller->Svc: from_request()
+    Svc->Svc: Json::<T>::from_request()
+    Svc->Svc: ValidatedJson()
+    Svc->Svc: status()
+    Svc-->Caller: Returns execution status
+@enduml
 ```
 
 
