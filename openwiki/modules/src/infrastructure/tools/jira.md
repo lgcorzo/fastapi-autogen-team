@@ -6,20 +6,20 @@ title: "Module: Jira"
 source_path: "src/infrastructure/tools/jira.rs"
 description: "Detailed architecture and specifications for the Jira module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "3c7e8ef"
-timestamp: "2026-07-31T20:24:30Z"
+last_verified_commit: "06ba4b7"
+timestamp: "2026-08-04T20:55:22Z"
 ---
 
 # Module Specification: Jira
 
 * **Source Reference:** `src/infrastructure/tools/jira.rs`
 * **Package Dependency:**
-- `rig::completion::ToolDefinition`
-- `rig::tool::Tool`
-- `serde::Deserialize`
-- `serde_json::json`
-- `std::env`
-- `thiserror::Error`
+- `use rig::completion::ToolDefinition;`
+- `use rig::tool::Tool;`
+- `use serde::Deserialize;`
+- `use serde_json::json;`
+- `use std::env;`
+- `use thiserror::Error;`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Jira` module extracted directly from the codebase.
@@ -30,10 +30,17 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
 classDiagram
     direction BT
     class JiraArgs {
-        +String, query
+        -String query
     }
     class JiraError {
         <<enumeration>>
+        EnvVarMissing
+        RequestError
+        Other
+    }
+    class JiraTool {
+        -definition()
+        -call()
     }
     JiraArgs --> String : Association
     Tool <|.. JiraTool : Realization
@@ -46,10 +53,19 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as JiraArgs
+    Caller->>Svc: definition()
+    Svc->>Svc: to_string()
+    Svc->>Svc: to_string()
+    Svc-->>Caller: Returns execution status
+    Caller->>Svc: call()
+    Svc->>Svc: map_err()
+    Svc->>Svc: env::var()
+    Svc->>Svc: map_err()
+    Svc-->>Caller: Returns execution status
     Caller->>Svc: get_jira_results()
-    Svc->>Svc: var()
-    Svc->>Svc: var()
-    Svc->>Svc: new()
+    Svc->>Svc: env::var()
+    Svc->>Svc: env::var()
+    Svc->>Svc: reqwest::Client::new()
     Svc-->>Caller: Returns execution status
 ```
 
@@ -59,14 +75,51 @@ sequenceDiagram
 ### JiraArgs
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `query` | `String,` | Field of JiraArgs |
+| `query` | `String` | Field of JiraArgs |
+
+### JiraError
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `EnvVarMissing` | `variant` | Field of JiraError |
+| `RequestError` | `variant` | Field of JiraError |
+| `Other` | `variant` | Field of JiraError |
 
 
 
 ## 4. Comprehensive Methods & Functions Breakdown
 
+### `JiraTool::definition`
+* **Visibility:** -
+* **Source Line Citation:** `src/infrastructure/tools/jira.rs:L31`
+
+#### Input Parameters
+| Parameter | Data Type | Required / Default | Semantic Description |
+| :--- | :--- | :--- | :--- |
+| `&self` | `self` | Required | Instance reference |
+| `_prompt` | `String` | Required | Parameter |
+
+#### Return Value & Output Shape
+| Return Type | Scenario | Description |
+| :--- | :--- | :--- |
+| `ToolDefinition` | Success | Result of the operation |
+
+### `JiraTool::call`
+* **Visibility:** -
+* **Source Line Citation:** `src/infrastructure/tools/jira.rs:L48`
+
+#### Input Parameters
+| Parameter | Data Type | Required / Default | Semantic Description |
+| :--- | :--- | :--- | :--- |
+| `&self` | `self` | Required | Instance reference |
+| `args: Self::Args` | `self` | Required | Instance reference |
+
+#### Return Value & Output Shape
+| Return Type | Scenario | Description |
+| :--- | :--- | :--- |
+| `Result<Self::Output, Self::Error>` | Success | Result of the operation |
+
 ### `get_jira_results`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/jira.rs:L56`
 
 #### Input Parameters
@@ -85,4 +138,7 @@ sequenceDiagram
 ## 5. Source Code Citations & Index
 * Class `JiraArgs`: `src/infrastructure/tools/jira.rs:L9`
 * Class `JiraError`: `src/infrastructure/tools/jira.rs:L14`
+* Class `JiraTool`: `src/infrastructure/tools/jira.rs:L23`
+* Method `definition` in `JiraTool`: `src/infrastructure/tools/jira.rs:L31`
+* Method `call` in `JiraTool`: `src/infrastructure/tools/jira.rs:L48`
 * Method `get_jira_results`: `src/infrastructure/tools/jira.rs:L56`

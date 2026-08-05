@@ -6,23 +6,23 @@ title: "Module: Search"
 source_path: "src/infrastructure/tools/search.rs"
 description: "Detailed architecture and specifications for the Search module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "3c7e8ef"
-timestamp: "2026-07-31T20:24:30Z"
+last_verified_commit: "06ba4b7"
+timestamp: "2026-08-04T20:55:22Z"
 ---
 
 # Module Specification: Search
 
 * **Source Reference:** `src/infrastructure/tools/search.rs`
 * **Package Dependency:**
-- `crate::infrastructure::tools::confluence::get_confluence_results`
-- `crate::infrastructure::tools::jira::get_jira_results`
-- `crate::infrastructure::tools::r2r::get_r2r_results`
-- `rig::completion::ToolDefinition`
-- `rig::tool::Tool`
-- `serde::{Deserialize, Serialize}`
-- `serde_json::json`
-- `std::env`
-- `thiserror::Error`
+- `use crate::infrastructure::tools::confluence::get_confluence_results;`
+- `use crate::infrastructure::tools::jira::get_jira_results;`
+- `use crate::infrastructure::tools::r2r::get_r2r_results;`
+- `use rig::completion::ToolDefinition;`
+- `use rig::tool::Tool;`
+- `use serde::{Deserialize, Serialize};`
+- `use serde_json::json;`
+- `use std::env;`
+- `use thiserror::Error;`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Search` module extracted directly from the codebase.
@@ -33,15 +33,22 @@ Deterministic technical architecture for the `Search` module extracted directly 
 classDiagram
     direction BT
     class SearchArgs {
-        +String, query
+        -String query
     }
     class SearchResult {
-        +String, r2r
-        +String, jira
-        +String, confluence
+        -String r2r
+        -String jira
+        -String confluence
     }
     class SearchError {
         <<enumeration>>
+        EnvVarMissing
+        RequestError
+        Other
+    }
+    class SearchTool {
+        -definition()
+        -call()
     }
     SearchArgs --> String : Association
     SearchResult --> String : Association
@@ -54,7 +61,16 @@ classDiagram
 sequenceDiagram
     autonumber
     participant Caller as Client Interface
-    Caller->>Svc: Invoke
+    participant Svc as SearchArgs
+    Caller->>Svc: definition()
+    Svc->>Svc: to_string()
+    Svc->>Svc: to_string()
+    Svc-->>Caller: Returns execution status
+    Caller->>Svc: call()
+    Svc->>Svc: unwrap_or_else()
+    Svc->>Svc: env::var()
+    Svc->>Svc: to_string()
+    Svc-->>Caller: Returns execution status
 ```
 
 
@@ -63,20 +79,55 @@ sequenceDiagram
 ### SearchArgs
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `query` | `String,` | Field of SearchArgs |
+| `query` | `String` | Field of SearchArgs |
 
 ### SearchResult
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `r2r` | `String,` | Field of SearchResult |
-| `jira` | `String,` | Field of SearchResult |
-| `confluence` | `String,` | Field of SearchResult |
+| `r2r` | `String` | Field of SearchResult |
+| `jira` | `String` | Field of SearchResult |
+| `confluence` | `String` | Field of SearchResult |
+
+### SearchError
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `EnvVarMissing` | `variant` | Field of SearchError |
+| `RequestError` | `variant` | Field of SearchError |
+| `Other` | `variant` | Field of SearchError |
 
 
 
 ## 4. Comprehensive Methods & Functions Breakdown
 
-No methods or functions defined in this module.
+### `SearchTool::definition`
+* **Visibility:** -
+* **Source Line Citation:** `src/infrastructure/tools/search.rs:L41`
+
+#### Input Parameters
+| Parameter | Data Type | Required / Default | Semantic Description |
+| :--- | :--- | :--- | :--- |
+| `&self` | `self` | Required | Instance reference |
+| `_prompt` | `String` | Required | Parameter |
+
+#### Return Value & Output Shape
+| Return Type | Scenario | Description |
+| :--- | :--- | :--- |
+| `ToolDefinition` | Success | Result of the operation |
+
+### `SearchTool::call`
+* **Visibility:** -
+* **Source Line Citation:** `src/infrastructure/tools/search.rs:L58`
+
+#### Input Parameters
+| Parameter | Data Type | Required / Default | Semantic Description |
+| :--- | :--- | :--- | :--- |
+| `&self` | `self` | Required | Instance reference |
+| `args: Self::Args` | `self` | Required | Instance reference |
+
+#### Return Value & Output Shape
+| Return Type | Scenario | Description |
+| :--- | :--- | :--- |
+| `Result<Self::Output, Self::Error>` | Success | Result of the operation |
 
 
 
@@ -84,3 +135,6 @@ No methods or functions defined in this module.
 * Class `SearchArgs`: `src/infrastructure/tools/search.rs:L12`
 * Class `SearchResult`: `src/infrastructure/tools/search.rs:L17`
 * Class `SearchError`: `src/infrastructure/tools/search.rs:L24`
+* Class `SearchTool`: `src/infrastructure/tools/search.rs:L33`
+* Method `definition` in `SearchTool`: `src/infrastructure/tools/search.rs:L41`
+* Method `call` in `SearchTool`: `src/infrastructure/tools/search.rs:L58`

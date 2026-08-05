@@ -6,17 +6,17 @@ title: "Module: Dtos"
 source_path: "src/application/dtos.rs"
 description: "Detailed architecture and specifications for the Dtos module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "3c7e8ef"
-timestamp: "2026-07-31T20:24:30Z"
+last_verified_commit: "06ba4b7"
+timestamp: "2026-08-04T20:55:22Z"
 ---
 
 # Module Specification: Dtos
 
 * **Source Reference:** `src/application/dtos.rs`
 * **Package Dependency:**
-- `serde::{Deserialize, Serialize}`
-- `serde_json::Value`
-- `std::collections::HashMap`
+- `use serde::{Deserialize, Serialize};`
+- `use serde_json::Value;`
+- `use std::collections::HashMap;`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Dtos` module extracted directly from the codebase.
@@ -27,51 +27,52 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
 classDiagram
     direction BT
     class ImageUrl {
-        +String, url
-        +Option~String~, detail
-    }
-    class ModelInformation {
-        +String, id
-        +String, name
-        +String, description
-        +HashMap~String,_Value~, pricing
-        +u32, context_length
-        +HashMap~String,_Value~, architecture
-        +HashMap~String,_Value~, top_provider
-        +Option~HashMap~String,_Value~~, per_request_limits
-    }
-    class Message {
-        +String, role
-        +ContentType, content
-        +Option~String~, name
-    }
-    class Input {
-        +String, model
-        +Option~String~, user
-        +Vec~Message~, messages
-        +Option~f32~, temperature
-        +Option~f32~, top_p
-        +Option~f32~, presence_penalty
-        +Option~f32~, frequency_penalty
-        +Option~bool~, stream
-    }
-    class Output {
-        +String, id
-        +String, object
-        +i64, created
-        +String, model
-        +Vec~HashMap~String,_Value~~, choices
-        +HashMap~String,_Value~, usage
-        -default()
+        -String url
+        -Option~String~ detail
     }
     class Content {
         <<enumeration>>
         Image
+        Text
+    }
+    class ModelInformation {
+        -String id
+        -String name
+        -String description
+        -HashMap~String,_Value~ pricing
+        -u32 context_length
+        -HashMap~String,_Value~ architecture
+        -HashMap~String,_Value~ top_provider
+        -Option~HashMap~String,_Value~~ per_request_limits
+    }
+    class Message {
+        -String role
+        -ContentType content
+        -Option~String~ name
     }
     class ContentType {
         <<enumeration>>
         String
         List
+    }
+    class Input {
+        -String model
+        -Option~String~ user
+        -Vec~Message~ messages
+        -Option~f32~ temperature
+        -Option~f32~ top_p
+        -Option~f32~ presence_penalty
+        -Option~f32~ frequency_penalty
+        -Option~bool~ stream
+    }
+    class Output {
+        -String id
+        -String object
+        -i64 created
+        -String model
+        -Vec~HashMap~String,_Value~~ choices
+        -HashMap~String,_Value~ usage
+        -default()
     }
     Default <|.. Output : Realization
     ImageUrl --> Option : Association
@@ -100,7 +101,7 @@ sequenceDiagram
     Caller->>Svc: default()
     Svc->>Svc: to_string()
     Svc->>Svc: to_string()
-    Svc->>Svc: now()
+    Svc->>Svc: timestamp()
     Svc-->>Caller: Returns execution status
 ```
 
@@ -110,54 +111,33 @@ sequenceDiagram
 ### ImageUrl
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `url` | `String,` | Field of ImageUrl |
-| `detail` | `Option<String>,` | Field of ImageUrl |
-
-### ModelInformation
-| Property | Type | Description |
-| :--- | :--- | :--- |
-| `id` | `String,` | Field of ModelInformation |
-| `name` | `String,` | Field of ModelInformation |
-| `description` | `String,` | Field of ModelInformation |
-| `pricing` | `HashMap<String, Value>,` | Field of ModelInformation |
-| `context_length` | `u32,` | Field of ModelInformation |
-| `architecture` | `HashMap<String, Value>,` | Field of ModelInformation |
-| `top_provider` | `HashMap<String, Value>,` | Field of ModelInformation |
-| `per_request_limits` | `Option<HashMap<String, Value>>,` | Field of ModelInformation |
-
-### Message
-| Property | Type | Description |
-| :--- | :--- | :--- |
-| `role` | `String,` | Field of Message |
-| `content` | `ContentType,` | Field of Message |
-| `name` | `Option<String>,` | Field of Message |
-
-### Input
-| Property | Type | Description |
-| :--- | :--- | :--- |
-| `model` | `String,` | Field of Input |
-| `user` | `Option<String>,` | Field of Input |
-| `messages` | `Vec<Message>,` | Field of Input |
-| `temperature` | `Option<f32>,` | Field of Input |
-| `top_p` | `Option<f32>,` | Field of Input |
-| `presence_penalty` | `Option<f32>,` | Field of Input |
-| `frequency_penalty` | `Option<f32>,` | Field of Input |
-| `stream` | `Option<bool>,` | Field of Input |
-
-### Output
-| Property | Type | Description |
-| :--- | :--- | :--- |
-| `id` | `String,` | Field of Output |
-| `object` | `String,` | Field of Output |
-| `created` | `i64,` | Field of Output |
-| `model` | `String,` | Field of Output |
-| `choices` | `Vec<HashMap<String, Value>>,` | Field of Output |
-| `usage` | `HashMap<String, Value>,` | Field of Output |
+| `url` | `String` | Field of ImageUrl |
+| `detail` | `Option<String>` | Field of ImageUrl |
 
 ### Content
 | Property | Type | Description |
 | :--- | :--- | :--- |
 | `Image` | `variant` | Field of Content |
+| `Text` | `variant` | Field of Content |
+
+### ModelInformation
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `id` | `String` | Field of ModelInformation |
+| `name` | `String` | Field of ModelInformation |
+| `description` | `String` | Field of ModelInformation |
+| `pricing` | `HashMap<String, Value>` | Field of ModelInformation |
+| `context_length` | `u32` | Field of ModelInformation |
+| `architecture` | `HashMap<String, Value>` | Field of ModelInformation |
+| `top_provider` | `HashMap<String, Value>` | Field of ModelInformation |
+| `per_request_limits` | `Option<HashMap<String, Value>>` | Field of ModelInformation |
+
+### Message
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `role` | `String` | Field of Message |
+| `content` | `ContentType` | Field of Message |
+| `name` | `Option<String>` | Field of Message |
 
 ### ContentType
 | Property | Type | Description |
@@ -165,13 +145,35 @@ sequenceDiagram
 | `String` | `variant` | Field of ContentType |
 | `List` | `variant` | Field of ContentType |
 
+### Input
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `model` | `String` | Field of Input |
+| `user` | `Option<String>` | Field of Input |
+| `messages` | `Vec<Message>` | Field of Input |
+| `temperature` | `Option<f32>` | Field of Input |
+| `top_p` | `Option<f32>` | Field of Input |
+| `presence_penalty` | `Option<f32>` | Field of Input |
+| `frequency_penalty` | `Option<f32>` | Field of Input |
+| `stream` | `Option<bool>` | Field of Input |
+
+### Output
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `id` | `String` | Field of Output |
+| `object` | `String` | Field of Output |
+| `created` | `i64` | Field of Output |
+| `model` | `String` | Field of Output |
+| `choices` | `Vec<HashMap<String, Value>>` | Field of Output |
+| `usage` | `HashMap<String, Value>` | Field of Output |
+
 
 
 ## 4. Comprehensive Methods & Functions Breakdown
 
 ### `Output::default`
 * **Visibility:** -
-* **Source Line Citation:** `src/application/dtos.rs:L70`
+* **Source Line Citation:** `src/application/dtos.rs:L71`
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -187,10 +189,10 @@ sequenceDiagram
 
 ## 5. Source Code Citations & Index
 * Class `ImageUrl`: `src/application/dtos.rs:L6`
+* Class `Content`: `src/application/dtos.rs:L13`
 * Class `ModelInformation`: `src/application/dtos.rs:L22`
 * Class `Message`: `src/application/dtos.rs:L34`
+* Class `ContentType`: `src/application/dtos.rs:L42`
 * Class `Input`: `src/application/dtos.rs:L48`
 * Class `Output`: `src/application/dtos.rs:L61`
-* Class `Content`: `src/application/dtos.rs:L13`
-* Class `ContentType`: `src/application/dtos.rs:L42`
-* Method `default` in `Output`: `src/application/dtos.rs:L70`
+* Method `default` in `Output`: `src/application/dtos.rs:L71`

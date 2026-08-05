@@ -6,20 +6,20 @@ title: "Module: Confluence"
 source_path: "src/infrastructure/tools/confluence.rs"
 description: "Detailed architecture and specifications for the Confluence module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "3c7e8ef"
-timestamp: "2026-07-31T20:24:30Z"
+last_verified_commit: "06ba4b7"
+timestamp: "2026-08-04T20:55:22Z"
 ---
 
 # Module Specification: Confluence
 
 * **Source Reference:** `src/infrastructure/tools/confluence.rs`
 * **Package Dependency:**
-- `rig::completion::ToolDefinition`
-- `rig::tool::Tool`
-- `serde::Deserialize`
-- `serde_json::json`
-- `std::env`
-- `thiserror::Error`
+- `use rig::completion::ToolDefinition;`
+- `use rig::tool::Tool;`
+- `use serde::Deserialize;`
+- `use serde_json::json;`
+- `use std::env;`
+- `use thiserror::Error;`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Confluence` module extracted directly from the codebase.
@@ -30,10 +30,17 @@ Deterministic technical architecture for the `Confluence` module extracted direc
 classDiagram
     direction BT
     class ConfluenceArgs {
-        +String, query
+        -String query
     }
     class ConfluenceError {
         <<enumeration>>
+        EnvVarMissing
+        RequestError
+        Other
+    }
+    class ConfluenceTool {
+        -definition()
+        -call()
     }
     ConfluenceArgs --> String : Association
     Tool <|.. ConfluenceTool : Realization
@@ -46,10 +53,19 @@ sequenceDiagram
     autonumber
     participant Caller as Client Interface
     participant Svc as ConfluenceArgs
+    Caller->>Svc: definition()
+    Svc->>Svc: to_string()
+    Svc->>Svc: to_string()
+    Svc-->>Caller: Returns execution status
+    Caller->>Svc: call()
+    Svc->>Svc: map_err()
+    Svc->>Svc: env::var()
+    Svc->>Svc: map_err()
+    Svc-->>Caller: Returns execution status
     Caller->>Svc: get_confluence_results()
-    Svc->>Svc: var()
-    Svc->>Svc: var()
-    Svc->>Svc: new()
+    Svc->>Svc: env::var()
+    Svc->>Svc: env::var()
+    Svc->>Svc: reqwest::Client::new()
     Svc-->>Caller: Returns execution status
 ```
 
@@ -59,14 +75,51 @@ sequenceDiagram
 ### ConfluenceArgs
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `query` | `String,` | Field of ConfluenceArgs |
+| `query` | `String` | Field of ConfluenceArgs |
+
+### ConfluenceError
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `EnvVarMissing` | `variant` | Field of ConfluenceError |
+| `RequestError` | `variant` | Field of ConfluenceError |
+| `Other` | `variant` | Field of ConfluenceError |
 
 
 
 ## 4. Comprehensive Methods & Functions Breakdown
 
+### `ConfluenceTool::definition`
+* **Visibility:** -
+* **Source Line Citation:** `src/infrastructure/tools/confluence.rs:L31`
+
+#### Input Parameters
+| Parameter | Data Type | Required / Default | Semantic Description |
+| :--- | :--- | :--- | :--- |
+| `&self` | `self` | Required | Instance reference |
+| `_prompt` | `String` | Required | Parameter |
+
+#### Return Value & Output Shape
+| Return Type | Scenario | Description |
+| :--- | :--- | :--- |
+| `ToolDefinition` | Success | Result of the operation |
+
+### `ConfluenceTool::call`
+* **Visibility:** -
+* **Source Line Citation:** `src/infrastructure/tools/confluence.rs:L48`
+
+#### Input Parameters
+| Parameter | Data Type | Required / Default | Semantic Description |
+| :--- | :--- | :--- | :--- |
+| `&self` | `self` | Required | Instance reference |
+| `args: Self::Args` | `self` | Required | Instance reference |
+
+#### Return Value & Output Shape
+| Return Type | Scenario | Description |
+| :--- | :--- | :--- |
+| `Result<Self::Output, Self::Error>` | Success | Result of the operation |
+
 ### `get_confluence_results`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/confluence.rs:L56`
 
 #### Input Parameters
@@ -85,4 +138,7 @@ sequenceDiagram
 ## 5. Source Code Citations & Index
 * Class `ConfluenceArgs`: `src/infrastructure/tools/confluence.rs:L9`
 * Class `ConfluenceError`: `src/infrastructure/tools/confluence.rs:L14`
+* Class `ConfluenceTool`: `src/infrastructure/tools/confluence.rs:L23`
+* Method `definition` in `ConfluenceTool`: `src/infrastructure/tools/confluence.rs:L31`
+* Method `call` in `ConfluenceTool`: `src/infrastructure/tools/confluence.rs:L48`
 * Method `get_confluence_results`: `src/infrastructure/tools/confluence.rs:L56`

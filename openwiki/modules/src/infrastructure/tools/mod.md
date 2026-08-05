@@ -6,8 +6,8 @@ title: "Module: ToolsModule"
 source_path: "src/infrastructure/tools/mod.rs"
 description: "Detailed architecture and specifications for the ToolsModule module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "3c7e8ef"
-timestamp: "2026-07-31T20:24:30Z"
+last_verified_commit: "06ba4b7"
+timestamp: "2026-08-04T20:55:22Z"
 ---
 
 # Module Specification: ToolsModule

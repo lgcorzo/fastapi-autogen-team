@@ -6,20 +6,24 @@ title: "Module: Mock_services"
 source_path: "src/bin/mock_services.rs"
 description: "Detailed architecture and specifications for the Mock_services module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "3c7e8ef"
-timestamp: "2026-07-31T20:24:30Z"
+last_verified_commit: "06ba4b7"
+timestamp: "2026-08-04T20:55:22Z"
 ---
 
 # Module Specification: Mock_services
 
 * **Source Reference:** `src/bin/mock_services.rs`
 * **Package Dependency:**
-- `axum::{`
-- `serde::Deserialize`
-- `serde_json::{json, Value}`
-- `std::net::SocketAddr`
-- `std::sync::Arc`
-- `tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt}`
+- `use axum::{
+    extract::Query,
+    routing::{get, post},
+    Json, Router,
+};`
+- `use serde::Deserialize;`
+- `use serde_json::{json, Value};`
+- `use std::net::SocketAddr;`
+- `use std::sync::Arc;`
+- `use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Mock_services` module extracted directly from the codebase.
@@ -32,7 +36,7 @@ classDiagram
     class AppState {
     }
     class JiraQueryParams {
-        +Option~String~, jql
+        -Option~String~ jql
     }
     JiraQueryParams --> Option : Association
 ```
@@ -45,9 +49,9 @@ sequenceDiagram
     participant Caller as Client Interface
     participant Svc as AppState
     Caller->>Svc: main()
-    Svc->>Svc: registry()
+    Svc->>Svc: init()
     Svc->>Svc: with()
-    Svc->>Svc: layer()
+    Svc->>Svc: with()
     Svc-->>Caller: Returns execution status
     Caller->>Svc: r2r_login()
     Svc->>Svc: Json()
@@ -69,14 +73,14 @@ sequenceDiagram
 ### JiraQueryParams
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `jql` | `Option<String>,` | Field of JiraQueryParams |
+| `jql` | `Option<String>` | Field of JiraQueryParams |
 
 
 
 ## 4. Comprehensive Methods & Functions Breakdown
 
 ### `main`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/bin/mock_services.rs:L16`
 
 #### Input Parameters
@@ -90,7 +94,7 @@ sequenceDiagram
 | `()` | Success | Result of the operation |
 
 ### `r2r_login`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/bin/mock_services.rs:L40`
 
 #### Input Parameters
@@ -104,7 +108,7 @@ sequenceDiagram
 | `Json<Value>` | Success | Result of the operation |
 
 ### `r2r_rag`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/bin/mock_services.rs:L51`
 
 #### Input Parameters
@@ -118,7 +122,7 @@ sequenceDiagram
 | `Json<Value>` | Success | Result of the operation |
 
 ### `r2r_search`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/bin/mock_services.rs:L60`
 
 #### Input Parameters
@@ -132,7 +136,7 @@ sequenceDiagram
 | `Json<Value>` | Success | Result of the operation |
 
 ### `jira_search`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/bin/mock_services.rs:L81`
 
 #### Input Parameters

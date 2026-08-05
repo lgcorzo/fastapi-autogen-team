@@ -6,18 +6,18 @@ title: "Module: Middleware"
 source_path: "src/interface/http/middleware.rs"
 description: "Detailed architecture and specifications for the Middleware module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "3c7e8ef"
-timestamp: "2026-07-31T20:24:30Z"
+last_verified_commit: "06ba4b7"
+timestamp: "2026-08-04T20:55:22Z"
 ---
 
 # Module Specification: Middleware
 
 * **Source Reference:** `src/interface/http/middleware.rs`
 * **Package Dependency:**
-- `axum::http::{HeaderName, HeaderValue}`
-- `std::env`
-- `tower_http::cors::{AllowOrigin, CorsLayer}`
-- `tower_http::set_header::SetResponseHeaderLayer`
+- `use axum::http::{HeaderName, HeaderValue};`
+- `use std::env;`
+- `use tower_http::cors::{AllowOrigin, CorsLayer};`
+- `use tower_http::set_header::SetResponseHeaderLayer;`
 
 ## 1. Executive Summary & Purpose
 Deterministic technical architecture for the `Middleware` module extracted directly from the codebase.
@@ -42,14 +42,11 @@ sequenceDiagram
     participant Caller as Client Interface
     participant Svc as Middleware
     Caller->>Svc: security_headers()
-    Svc->>Svc: if_not_present()
-    Svc->>Svc: from_static()
-    Svc->>Svc: from_static()
     Svc-->>Caller: Returns execution status
     Caller->>Svc: cors_layer()
-    Svc->>Svc: var()
-    Svc->>Svc: trim()
+    Svc->>Svc: env::var()
     Svc->>Svc: is_empty()
+    Svc->>Svc: trim()
     Svc-->>Caller: Returns execution status
 ```
 
@@ -63,7 +60,7 @@ No notable data structures or fields in this module.
 ## 4. Comprehensive Methods & Functions Breakdown
 
 ### `security_headers`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/interface/http/middleware.rs:L6`
 
 #### Input Parameters
@@ -77,7 +74,7 @@ No notable data structures or fields in this module.
 | `Vec<SetResponseHeaderLayer<HeaderValue>>` | Success | Result of the operation |
 
 ### `cors_layer`
-* **Visibility:** +
+* **Visibility:** -
 * **Source Line Citation:** `src/interface/http/middleware.rs:L33`
 
 #### Input Parameters
