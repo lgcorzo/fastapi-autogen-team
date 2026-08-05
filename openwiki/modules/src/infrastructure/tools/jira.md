@@ -6,8 +6,8 @@ title: "Module: Jira"
 source_path: "src/infrastructure/tools/jira.rs"
 description: "Detailed architecture and specifications for the Jira module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "06ba4b7"
-timestamp: "2026-08-04T20:55:22Z"
+last_verified_commit: "e78baf4"
+timestamp: "2026-08-05T20:29:51Z"
 ---
 
 # Module Specification: Jira
@@ -26,9 +26,8 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
 
 ## 2. UML 2.0 Diagrams
 ### Class & Inheritance Architecture
-```mermaid
-classDiagram
-    direction BT
+```plantuml
+@startuml
     class JiraArgs {
         -String query
     }
@@ -44,29 +43,31 @@ classDiagram
     }
     JiraArgs --> String : Association
     Tool <|.. JiraTool : Realization
+@enduml
 ```
 
 
 ### Execution Flow & Runtime Behavior
-```mermaid
-sequenceDiagram
+```plantuml
+@startuml
     autonumber
-    participant Caller as Client Interface
-    participant Svc as JiraArgs
-    Caller->>Svc: definition()
-    Svc->>Svc: to_string()
-    Svc->>Svc: to_string()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: call()
-    Svc->>Svc: map_err()
-    Svc->>Svc: env::var()
-    Svc->>Svc: map_err()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: get_jira_results()
-    Svc->>Svc: env::var()
-    Svc->>Svc: env::var()
-    Svc->>Svc: reqwest::Client::new()
-    Svc-->>Caller: Returns execution status
+    participant "Client Interface" as Caller
+    participant JiraArgs as Svc
+    Caller->Svc: definition()
+    Svc->Svc: to_string()
+    Svc->Svc: to_string()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: call()
+    Svc->Svc: map_err()
+    Svc->Svc: env::var()
+    Svc->Svc: map_err()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: get_jira_results()
+    Svc->Svc: env::var()
+    Svc->Svc: env::var()
+    Svc->Svc: reqwest::Client::new()
+    Svc-->Caller: Returns execution status
+@enduml
 ```
 
 

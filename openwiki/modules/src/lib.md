@@ -6,8 +6,8 @@ title: "Module: Lib"
 source_path: "src/lib.rs"
 description: "Detailed architecture and specifications for the Lib module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "06ba4b7"
-timestamp: "2026-08-04T20:55:22Z"
+last_verified_commit: "e78baf4"
+timestamp: "2026-08-05T20:29:51Z"
 ---
 
 # Module Specification: Lib
@@ -21,21 +21,22 @@ Deterministic technical architecture for the `Lib` module extracted directly fro
 
 ## 2. UML 2.0 Diagrams
 ### Class & Inheritance Architecture
-```mermaid
-classDiagram
-    direction BT
+```plantuml
+@startuml
     class Lib {
         <<module>>
     }
+@enduml
 ```
 
 
 ### Execution Flow & Runtime Behavior
-```mermaid
-sequenceDiagram
+```plantuml
+@startuml
     autonumber
-    participant Caller as Client Interface
-    Caller->>Svc: Invoke
+    participant "Client Interface" as Caller
+    Caller->Svc: Invoke
+@enduml
 ```
 
 

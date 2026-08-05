@@ -6,8 +6,8 @@ title: "Module: R2r"
 source_path: "src/infrastructure/tools/r2r.rs"
 description: "Detailed architecture and specifications for the R2r module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "06ba4b7"
-timestamp: "2026-08-04T20:55:22Z"
+last_verified_commit: "e78baf4"
+timestamp: "2026-08-05T20:29:51Z"
 ---
 
 # Module Specification: R2r
@@ -26,9 +26,8 @@ Deterministic technical architecture for the `R2r` module extracted directly fro
 
 ## 2. UML 2.0 Diagrams
 ### Class & Inheritance Architecture
-```mermaid
-classDiagram
-    direction BT
+```plantuml
+@startuml
     class R2RArgs {
         -String query
     }
@@ -44,29 +43,31 @@ classDiagram
     }
     R2RArgs --> String : Association
     Tool <|.. R2RTool : Realization
+@enduml
 ```
 
 
 ### Execution Flow & Runtime Behavior
-```mermaid
-sequenceDiagram
+```plantuml
+@startuml
     autonumber
-    participant Caller as Client Interface
-    participant Svc as R2RArgs
-    Caller->>Svc: definition()
-    Svc->>Svc: to_string()
-    Svc->>Svc: to_string()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: call()
-    Svc->>Svc: unwrap_or_else()
-    Svc->>Svc: env::var()
-    Svc->>Svc: to_string()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: get_r2r_results()
-    Svc->>Svc: env::var()
-    Svc->>Svc: env::var()
-    Svc->>Svc: reqwest::Client::new()
-    Svc-->>Caller: Returns execution status
+    participant "Client Interface" as Caller
+    participant R2RArgs as Svc
+    Caller->Svc: definition()
+    Svc->Svc: to_string()
+    Svc->Svc: to_string()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: call()
+    Svc->Svc: unwrap_or_else()
+    Svc->Svc: env::var()
+    Svc->Svc: to_string()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: get_r2r_results()
+    Svc->Svc: env::var()
+    Svc->Svc: env::var()
+    Svc->Svc: reqwest::Client::new()
+    Svc-->Caller: Returns execution status
+@enduml
 ```
 
 

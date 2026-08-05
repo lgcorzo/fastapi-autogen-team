@@ -6,8 +6,8 @@ title: "Module: ApplicationModule"
 source_path: "src/application/mod.rs"
 description: "Detailed architecture and specifications for the ApplicationModule module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "06ba4b7"
-timestamp: "2026-08-04T20:55:22Z"
+last_verified_commit: "e78baf4"
+timestamp: "2026-08-05T20:29:51Z"
 ---
 
 # Module Specification: ApplicationModule
@@ -21,21 +21,22 @@ Deterministic technical architecture for the `ApplicationModule` module extracte
 
 ## 2. UML 2.0 Diagrams
 ### Class & Inheritance Architecture
-```mermaid
-classDiagram
-    direction BT
+```plantuml
+@startuml
     class ApplicationModule {
         <<module>>
     }
+@enduml
 ```
 
 
 ### Execution Flow & Runtime Behavior
-```mermaid
-sequenceDiagram
+```plantuml
+@startuml
     autonumber
-    participant Caller as Client Interface
-    Caller->>Svc: Invoke
+    participant "Client Interface" as Caller
+    Caller->Svc: Invoke
+@enduml
 ```
 
 

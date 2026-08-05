@@ -6,8 +6,8 @@ title: "Module: Mock_services"
 source_path: "src/bin/mock_services.rs"
 description: "Detailed architecture and specifications for the Mock_services module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "06ba4b7"
-timestamp: "2026-08-04T20:55:22Z"
+last_verified_commit: "e78baf4"
+timestamp: "2026-08-05T20:29:51Z"
 ---
 
 # Module Specification: Mock_services
@@ -30,41 +30,42 @@ Deterministic technical architecture for the `Mock_services` module extracted di
 
 ## 2. UML 2.0 Diagrams
 ### Class & Inheritance Architecture
-```mermaid
-classDiagram
-    direction BT
+```plantuml
+@startuml
     class AppState {
     }
     class JiraQueryParams {
-        -Option~String~ jql
+        -Option<String> jql
     }
     JiraQueryParams --> Option : Association
+@enduml
 ```
 
 
 ### Execution Flow & Runtime Behavior
-```mermaid
-sequenceDiagram
+```plantuml
+@startuml
     autonumber
-    participant Caller as Client Interface
-    participant Svc as AppState
-    Caller->>Svc: main()
-    Svc->>Svc: init()
-    Svc->>Svc: with()
-    Svc->>Svc: with()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: r2r_login()
-    Svc->>Svc: Json()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: r2r_rag()
-    Svc->>Svc: Json()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: r2r_search()
-    Svc->>Svc: Json()
-    Svc-->>Caller: Returns execution status
-    Caller->>Svc: jira_search()
-    Svc->>Svc: Json()
-    Svc-->>Caller: Returns execution status
+    participant "Client Interface" as Caller
+    participant AppState as Svc
+    Caller->Svc: main()
+    Svc->Svc: init()
+    Svc->Svc: with()
+    Svc->Svc: with()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: r2r_login()
+    Svc->Svc: Json()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: r2r_rag()
+    Svc->Svc: Json()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: r2r_search()
+    Svc->Svc: Json()
+    Svc-->Caller: Returns execution status
+    Caller->Svc: jira_search()
+    Svc->Svc: Json()
+    Svc-->Caller: Returns execution status
+@enduml
 ```
 
 
