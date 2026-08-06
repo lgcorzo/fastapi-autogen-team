@@ -6,8 +6,8 @@ title: "Module: Dtos"
 source_path: "src/application/dtos.rs"
 description: "Detailed architecture and specifications for the Dtos module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "e78baf4"
-timestamp: "2026-08-05T20:29:51Z"
+last_verified_commit: "077ffb4"
+timestamp: "2026-08-06T20:30:10Z"
 ---
 
 # Module Specification: Dtos
@@ -38,11 +38,11 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
         -String id
         -String name
         -String description
-        -HashMap<String,_Value> pricing
+        -HashMap<String, Value> pricing
         -u32 context_length
-        -HashMap<String,_Value> architecture
-        -HashMap<String,_Value> top_provider
-        -Option<HashMap<String,_Value>> per_request_limits
+        -HashMap<String, Value> architecture
+        -HashMap<String, Value> top_provider
+        -Option<HashMap<String, Value>> per_request_limits
     }
     class Message {
         -String role
@@ -69,8 +69,8 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
         -String object
         -i64 created
         -String model
-        -Vec<HashMap<String,_Value>> choices
-        -HashMap<String,_Value> usage
+        -Vec<HashMap<String, Value>> choices
+        -HashMap<String, Value> usage
         -default()
     }
     Default <|.. Output : Realization

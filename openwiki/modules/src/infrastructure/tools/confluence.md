@@ -6,8 +6,8 @@ title: "Module: Confluence"
 source_path: "src/infrastructure/tools/confluence.rs"
 description: "Detailed architecture and specifications for the Confluence module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "e78baf4"
-timestamp: "2026-08-05T20:29:51Z"
+last_verified_commit: "077ffb4"
+timestamp: "2026-08-06T20:30:10Z"
 ---
 
 # Module Specification: Confluence
