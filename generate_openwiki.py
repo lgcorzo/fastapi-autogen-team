@@ -66,9 +66,8 @@ def parse_rust_file(filepath):
                         if field.type == "field_declaration":
                             fname = get_text(field.child_by_field_name("name"))
                             ftype = get_text(field.child_by_field_name("type"))
-                            clean_ftype = ftype.replace(" ", "_")
                             visibility = "+" if field.child_by_field_name("visibility") else "-"
-                            fields.append(f"{visibility}{clean_ftype} {fname}")
+                            fields.append(f"{visibility}{ftype} {fname}")
                             raw_fields.append((fname, ftype))
 
                             rel_type = re.sub(r'[^a-zA-Z0-9_]', '', ftype.split('<')[0])
@@ -78,9 +77,8 @@ def parse_rust_file(filepath):
                      for field in body.children:
                          if field.type == "field_declaration":
                              ftype = get_text(field.child_by_field_name("type"))
-                             clean_ftype = ftype.replace(" ", "_")
                              visibility = "+" if field.child_by_field_name("visibility") else "-"
-                             fields.append(f"{visibility}{clean_ftype}")
+                             fields.append(f"{visibility}{ftype}")
                              raw_fields.append(("", ftype))
 
                              rel_type = re.sub(r'[^a-zA-Z0-9_]', '', ftype.split('<')[0])
