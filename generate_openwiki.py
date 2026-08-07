@@ -1,5 +1,4 @@
 import os
-import re
 import subprocess
 from pathlib import Path
 from datetime import datetime, timezone
@@ -70,7 +69,7 @@ def parse_rust_file(filepath):
                             fields.append(f"{visibility}{ftype} {fname}")
                             raw_fields.append((fname, ftype))
 
-                            rel_type = re.sub(r'[^a-zA-Z0-9_]', '', ftype.split('<')[0])
+                            rel_type = ''.join(c for c in ftype.split('<')[0] if c.isalnum() or c == '_')
                             if rel_type and rel_type[0].isupper() and rel_type != struct_name:
                                 relations.append(f"{struct_name} --> {rel_type} : Association")
                 elif body and body.type == "ordered_field_declaration_list":
@@ -81,7 +80,7 @@ def parse_rust_file(filepath):
                              fields.append(f"{visibility}{ftype}")
                              raw_fields.append(("", ftype))
 
-                             rel_type = re.sub(r'[^a-zA-Z0-9_]', '', ftype.split('<')[0])
+                             rel_type = ''.join(c for c in ftype.split('<')[0] if c.isalnum() or c == '_')
                              if rel_type and rel_type[0].isupper() and rel_type != struct_name:
                                  relations.append(f"{struct_name} --> {rel_type} : Association")
 
