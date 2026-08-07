@@ -2,6 +2,7 @@ use axum::{
     body::Body,
     http::{Request, StatusCode},
 };
+use http_body_util::BodyExt;
 use rust_agent_team::domain::agent::team::AgentTeam;
 use rust_agent_team::{create_app, AppState};
 use serde_json::json;
@@ -35,10 +36,13 @@ async fn test_large_payload_rejection() {
         .unwrap();
 
     // Standard Axum/Tower-HTTP limit is usually around 2MB or similar by default if configured
-    // If not configured, it might be OK, but for security, we should check for reasonable limits.
-    // Here we check if the service handles it (either OK if under limit or PayloadTooLarge)
-    assert!(
-        response.status() == StatusCode::OK || response.status() == StatusCode::PAYLOAD_TOO_LARGE
+    assert_eq!(response.status(), StatusCode::PAYLOAD_TOO_LARGE);
+
+    let body_bytes = response.into_body().collect().await.unwrap().to_bytes();
+    let body_json: serde_json::Value = serde_json::from_slice(&body_bytes).unwrap();
+    assert_eq!(
+        body_json["details"].as_str().unwrap(),
+        "The request payload exceeds the maximum allowed size."
     );
 }
 
@@ -62,6 +66,13 @@ async fn test_invalid_json_rejection() {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY); // Axum default for bad JSON
+
+    let body_bytes = response.into_body().collect().await.unwrap().to_bytes();
+    let body_json: serde_json::Value = serde_json::from_slice(&body_bytes).unwrap();
+    assert_eq!(
+        body_json["details"].as_str().unwrap(),
+        "Failed to parse request body as JSON or invalid payload structure."
+    );
 }
 
 #[tokio::test]

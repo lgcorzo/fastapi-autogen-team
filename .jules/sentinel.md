@@ -117,3 +117,9 @@
 **Vulnerability:** The application would panic and fail to start if the `ALLOWED_ORIGINS` environment variable contained malformed origins, due to an unsafe `.unwrap()` in `src/interface/http/middleware.rs`.
 **Learning:** Trusting environment variables to always be correctly formatted is a risk. Configuration parsing must be defensive to avoid Denial of Service (DoS) at the application level.
 **Prevention:** Use safe parsing (e.g., `.parse().ok()`) and `filter_map` when processing comma-separated configuration values. Return `None` or a safe default if no valid values are found.
+
+## 2026-08-07 - Information Leakage via JSON Validation Rejection
+
+**Vulnerability:** The `ValidatedJson` extractor in `src/interface/http/validation.rs` was returning raw deserialization error messages `rejection.to_string()` directly to the client under the `"details"` key. This could leak internal application architecture, precise struct names, expected types, and fragments of untrusted input.
+**Learning:** Returning raw parser error messages is a common vector for information disclosure. Clients only need to know that their request was malformed, while detailed error logs should be kept secure on the server.
+**Prevention:** Intercept JSON deserialization rejections, log the detailed validation message internally via `tracing::error!`, and return generic, sanitized messages to the client (e.g., indicating the payload size limit exceeded or general JSON schema invalidity).

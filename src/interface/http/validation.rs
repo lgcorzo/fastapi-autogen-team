@@ -25,9 +25,18 @@ where
                     StatusCode::PAYLOAD_TOO_LARGE => StatusCode::PAYLOAD_TOO_LARGE,
                     _ => StatusCode::UNPROCESSABLE_ENTITY,
                 };
+
+                // Log the detailed error internally to prevent information leakage
+                tracing::error!("JSON validation rejection: {}", rejection);
+
+                let details = match status {
+                    StatusCode::PAYLOAD_TOO_LARGE => "The request payload exceeds the maximum allowed size.",
+                    _ => "Failed to parse request body as JSON or invalid payload structure.",
+                };
+
                 let body = Json(serde_json::json!({
                     "error": status.canonical_reason().unwrap_or("Error"),
-                    "details": rejection.to_string()
+                    "details": details
                 }));
                 Err((status, body).into_response())
             }
