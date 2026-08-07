@@ -30,7 +30,9 @@ where
                 tracing::error!("JSON validation rejection: {}", rejection);
 
                 let details = match status {
-                    StatusCode::PAYLOAD_TOO_LARGE => "The request payload exceeds the maximum allowed size.",
+                    StatusCode::PAYLOAD_TOO_LARGE => {
+                        "The request payload exceeds the maximum allowed size."
+                    }
                     _ => "Failed to parse request body as JSON or invalid payload structure.",
                 };
 
