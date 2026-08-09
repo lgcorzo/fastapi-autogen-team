@@ -72,3 +72,19 @@
 - [ValidatedJson<T> (struct)](./modules/src/interface/http/validation.md)
 
 ## Public API index
+
+- [cors_layer](./modules/src/interface/http/middleware.md)
+- [create_app](./modules/src/interface/http/routes.md)
+- [docs_redirect](./modules/src/interface/http/handlers.md)
+- [get_confluence_results](./modules/src/infrastructure/tools/confluence.md)
+- [get_jira_results](./modules/src/infrastructure/tools/jira.md)
+- [get_models](./modules/src/interface/http/handlers.md)
+- [get_r2r_results](./modules/src/infrastructure/tools/r2r.md)
+- [init_telemetry](./modules/src/infrastructure/telemetry.md)
+- [AgentTeam::new](./modules/src/domain/agent/team.md)
+- [AgentTeam::new_mock](./modules/src/domain/agent/team.md)
+- [AgentTeam::new_test](./modules/src/domain/agent/team.md)
+- [route_query](./modules/src/interface/http/handlers.md)
+- [AgentTeam::run](./modules/src/domain/agent/team.md)
+- [AgentTeam::run_stream](./modules/src/domain/agent/team.md)
+- [security_headers](./modules/src/interface/http/middleware.md)

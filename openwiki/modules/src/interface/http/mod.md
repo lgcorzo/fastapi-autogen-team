@@ -6,8 +6,8 @@ title: "Module: HttpModule"
 source_path: "src/interface/http/mod.rs"
 description: "Detailed architecture and specifications for the HttpModule module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "bc0cc29"
-timestamp: "2026-08-08T20:26:38Z"
+last_verified_commit: "b782e47"
+timestamp: "2026-08-09T20:16:29Z"
 ---
 
 # Module Specification: HttpModule

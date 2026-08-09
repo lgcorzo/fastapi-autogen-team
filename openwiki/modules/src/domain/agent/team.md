@@ -6,8 +6,8 @@ title: "Module: Team"
 source_path: "src/domain/agent/team.rs"
 description: "Detailed architecture and specifications for the Team module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "bc0cc29"
-timestamp: "2026-08-08T20:26:38Z"
+last_verified_commit: "b782e47"
+timestamp: "2026-08-09T20:16:29Z"
 ---
 
 # Module Specification: Team
@@ -44,11 +44,11 @@ Deterministic technical architecture for the `Team` module extracted directly fr
     }
     class AgentTeam {
         -openai::Client client
-        -new()
-        -run()
-        -run_stream()
-        -new_mock()
-        -new_test()
+        +new()
+        +run()
+        +run_stream()
+        +new_mock()
+        +new_test()
     }
 @enduml
 ```
@@ -122,7 +122,7 @@ Deterministic technical architecture for the `Team` module extracted directly fr
 | `bool` | Success | Result of the operation |
 
 ### `AgentTeam::new`
-* **Visibility:** -
+* **Visibility:** +
 * **Source Line Citation:** `src/domain/agent/team.rs:L56`
 
 #### Input Parameters
@@ -136,7 +136,7 @@ Deterministic technical architecture for the `Team` module extracted directly fr
 | `anyhow::Result<Self>` | Success | Result of the operation |
 
 ### `AgentTeam::run`
-* **Visibility:** -
+* **Visibility:** +
 * **Source Line Citation:** `src/domain/agent/team.rs:L69`
 
 #### Input Parameters
@@ -151,7 +151,7 @@ Deterministic technical architecture for the `Team` module extracted directly fr
 | `anyhow::Result<String>` | Success | Result of the operation |
 
 ### `AgentTeam::run_stream`
-* **Visibility:** -
+* **Visibility:** +
 * **Source Line Citation:** `src/domain/agent/team.rs:L245`
 
 #### Input Parameters
@@ -166,7 +166,7 @@ Deterministic technical architecture for the `Team` module extracted directly fr
 | `anyhow::Result<Pin<Box<dyn Stream<Item = anyhow::Result<AgentEvent>> + Send>>>` | Success | Result of the operation |
 
 ### `AgentTeam::new_mock`
-* **Visibility:** -
+* **Visibility:** +
 * **Source Line Citation:** `src/domain/agent/team.rs:L457`
 
 #### Input Parameters
@@ -180,7 +180,7 @@ Deterministic technical architecture for the `Team` module extracted directly fr
 | `Self` | Success | Result of the operation |
 
 ### `AgentTeam::new_test`
-* **Visibility:** -
+* **Visibility:** +
 * **Source Line Citation:** `src/domain/agent/team.rs:L466`
 
 #### Input Parameters

@@ -65,7 +65,11 @@ def parse_rust_file(filepath):
                         if field.type == "field_declaration":
                             fname = get_text(field.child_by_field_name("name"))
                             ftype = get_text(field.child_by_field_name("type"))
-                            visibility = "+" if field.child_by_field_name("visibility") else "-"
+                            visibility = "-"
+                            for c in field.children:
+                                if c.type == "visibility_modifier":
+                                    visibility = "+"
+                                    break
                             fields.append(f"{visibility}{ftype} {fname}")
                             raw_fields.append((fname, ftype))
 
@@ -76,7 +80,11 @@ def parse_rust_file(filepath):
                      for field in body.children:
                          if field.type == "field_declaration":
                              ftype = get_text(field.child_by_field_name("type"))
-                             visibility = "+" if field.child_by_field_name("visibility") else "-"
+                             visibility = "-"
+                             for c in field.children:
+                                 if c.type == "visibility_modifier":
+                                     visibility = "+"
+                                     break
                              fields.append(f"{visibility}{ftype}")
                              raw_fields.append(("", ftype))
 
@@ -165,7 +173,11 @@ def parse_rust_file(filepath):
                     for child in body.children:
                         if child.type == "function_item":
                             fname = get_text(child.child_by_field_name("name"))
-                            visibility = "+" if child.child_by_field_name("visibility") else "-"
+                            visibility = "-"
+                            for c in child.children:
+                                if c.type == "visibility_modifier":
+                                    visibility = "+"
+                                    break
                             method_sig = f"{visibility}{fname}()"
 
                             params_str = ""
@@ -217,7 +229,11 @@ def parse_rust_file(filepath):
                                 }
         elif node.type == "function_item" and node.parent.type == "source_file":
             fname = get_text(node.child_by_field_name("name"))
-            visibility = "+" if node.child_by_field_name("visibility") else "-"
+            visibility = "-"
+            for c in node.children:
+                if c.type == "visibility_modifier":
+                    visibility = "+"
+                    break
 
             params_str = ""
             params_node = node.child_by_field_name("parameters")
