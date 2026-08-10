@@ -6,8 +6,8 @@ title: "Module: Jira"
 source_path: "src/infrastructure/tools/jira.rs"
 description: "Detailed architecture and specifications for the Jira module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "bc0cc29"
-timestamp: "2026-08-08T20:26:38Z"
+last_verified_commit: "b782e47"
+timestamp: "2026-08-09T20:16:29Z"
 ---
 
 # Module Specification: Jira
@@ -29,7 +29,7 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
 ```plantuml
 @startuml
     class JiraArgs {
-        -String query
+        +String query
     }
     class JiraError {
         <<enumeration>>
@@ -120,7 +120,7 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
 | `Result<Self::Output, Self::Error>` | Success | Result of the operation |
 
 ### `get_jira_results`
-* **Visibility:** -
+* **Visibility:** +
 * **Source Line Citation:** `src/infrastructure/tools/jira.rs:L56`
 
 #### Input Parameters

@@ -6,8 +6,8 @@ title: "Module: Handlers"
 source_path: "src/interface/http/handlers.rs"
 description: "Detailed architecture and specifications for the Handlers module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "bc0cc29"
-timestamp: "2026-08-08T20:26:38Z"
+last_verified_commit: "b782e47"
+timestamp: "2026-08-09T20:16:29Z"
 ---
 
 # Module Specification: Handlers
@@ -75,7 +75,7 @@ No notable data structures or fields in this module.
 ## 4. Comprehensive Methods & Functions Breakdown
 
 ### `docs_redirect`
-* **Visibility:** -
+* **Visibility:** +
 * **Source Line Citation:** `src/interface/http/handlers.rs:L17`
 
 #### Input Parameters
@@ -89,7 +89,7 @@ No notable data structures or fields in this module.
 | `impl IntoResponse` | Success | Result of the operation |
 
 ### `get_models`
-* **Visibility:** -
+* **Visibility:** +
 * **Source Line Citation:** `src/interface/http/handlers.rs:L24`
 
 #### Input Parameters
@@ -103,7 +103,7 @@ No notable data structures or fields in this module.
 | `impl IntoResponse` | Success | Result of the operation |
 
 ### `route_query`
-* **Visibility:** -
+* **Visibility:** +
 * **Source Line Citation:** `src/interface/http/handlers.rs:L42`
 
 #### Input Parameters

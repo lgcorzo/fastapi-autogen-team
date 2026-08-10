@@ -6,8 +6,8 @@ title: "Module: Search"
 source_path: "src/infrastructure/tools/search.rs"
 description: "Detailed architecture and specifications for the Search module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "bc0cc29"
-timestamp: "2026-08-08T20:26:38Z"
+last_verified_commit: "b782e47"
+timestamp: "2026-08-09T20:16:29Z"
 ---
 
 # Module Specification: Search
@@ -32,12 +32,12 @@ Deterministic technical architecture for the `Search` module extracted directly 
 ```plantuml
 @startuml
     class SearchArgs {
-        -String query
+        +String query
     }
     class SearchResult {
-        -String r2r
-        -String jira
-        -String confluence
+        +String r2r
+        +String jira
+        +String confluence
     }
     class SearchError {
         <<enumeration>>

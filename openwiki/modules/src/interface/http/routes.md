@@ -6,8 +6,8 @@ title: "Module: Routes"
 source_path: "src/interface/http/routes.rs"
 description: "Detailed architecture and specifications for the Routes module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "bc0cc29"
-timestamp: "2026-08-08T20:26:38Z"
+last_verified_commit: "b782e47"
+timestamp: "2026-08-09T20:16:29Z"
 ---
 
 # Module Specification: Routes
@@ -32,7 +32,7 @@ Deterministic technical architecture for the `Routes` module extracted directly 
 ```plantuml
 @startuml
     class AppState {
-        -AgentTeam team
+        +AgentTeam team
     }
     AppState --> AgentTeam : Association
 @enduml
@@ -66,7 +66,7 @@ Deterministic technical architecture for the `Routes` module extracted directly 
 ## 4. Comprehensive Methods & Functions Breakdown
 
 ### `create_app`
-* **Visibility:** -
+* **Visibility:** +
 * **Source Line Citation:** `src/interface/http/routes.rs:L15`
 
 #### Input Parameters

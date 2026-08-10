@@ -6,8 +6,8 @@ title: "Module: Telemetry"
 source_path: "src/infrastructure/telemetry.rs"
 description: "Detailed architecture and specifications for the Telemetry module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "bc0cc29"
-timestamp: "2026-08-08T20:26:38Z"
+last_verified_commit: "b782e47"
+timestamp: "2026-08-09T20:16:29Z"
 ---
 
 # Module Specification: Telemetry
@@ -58,7 +58,7 @@ No notable data structures or fields in this module.
 ## 4. Comprehensive Methods & Functions Breakdown
 
 ### `init_telemetry`
-* **Visibility:** -
+* **Visibility:** +
 * **Source Line Citation:** `src/infrastructure/telemetry.rs:L6`
 
 #### Input Parameters

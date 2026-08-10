@@ -6,8 +6,8 @@ title: "Module: Confluence"
 source_path: "src/infrastructure/tools/confluence.rs"
 description: "Detailed architecture and specifications for the Confluence module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "bc0cc29"
-timestamp: "2026-08-08T20:26:38Z"
+last_verified_commit: "b782e47"
+timestamp: "2026-08-09T20:16:29Z"
 ---
 
 # Module Specification: Confluence
@@ -29,7 +29,7 @@ Deterministic technical architecture for the `Confluence` module extracted direc
 ```plantuml
 @startuml
     class ConfluenceArgs {
-        -String query
+        +String query
     }
     class ConfluenceError {
         <<enumeration>>
@@ -120,7 +120,7 @@ Deterministic technical architecture for the `Confluence` module extracted direc
 | `Result<Self::Output, Self::Error>` | Success | Result of the operation |
 
 ### `get_confluence_results`
-* **Visibility:** -
+* **Visibility:** +
 * **Source Line Citation:** `src/infrastructure/tools/confluence.rs:L56`
 
 #### Input Parameters
