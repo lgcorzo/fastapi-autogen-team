@@ -5,7 +5,7 @@ type: "architecture"
 title: "Deployment View"
 description: "Architecture view for deployment_view"
 tags: ["iso42010", "architecture", "okf"]
-timestamp: "2026-08-09T20:16:29Z"
+timestamp: "2026-08-11T20:44:36Z"
 ---
 
 # Deployment View

@@ -5,7 +5,7 @@ type: "specification"
 title: "Api Contracts"
 description: "Specification doc"
 tags: ["iso15289", "specification", "okf"]
-timestamp: "2026-08-09T20:16:29Z"
+timestamp: "2026-08-11T20:44:36Z"
 ---
 
 # Api Contracts
