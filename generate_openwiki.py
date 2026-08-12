@@ -110,8 +110,32 @@ def parse_rust_file(filepath):
                     for variant in body.children:
                         if variant.type == "enum_variant":
                             vname = get_text(variant.child_by_field_name("name"))
-                            fields.append(vname)
-                            raw_fields.append((vname, "variant"))
+                            variant_body = variant.child_by_field_name("body")
+                            if variant_body:
+                                if variant_body.type == "ordered_field_declaration_list":
+                                    types = []
+                                    for child in variant_body.children:
+                                        if child.type not in ["(", ")", ",", "visibility_modifier", "attribute_item"]:
+                                            types.append(get_text(child))
+                                    types_str = ", ".join(types)
+                                    fields.append(f"{vname}({types_str})")
+                                    raw_fields.append((vname, f"tuple({types_str})"))
+                                elif variant_body.type == "field_declaration_list":
+                                    struct_fields = []
+                                    for child in variant_body.children:
+                                        if child.type == "field_declaration":
+                                            f_name = get_text(child.child_by_field_name("name"))
+                                            f_type = get_text(child.child_by_field_name("type"))
+                                            struct_fields.append(f"{f_name}: {f_type}")
+                                    struct_fields_str = ", ".join(struct_fields)
+                                    fields.append(f"{vname} {{ {struct_fields_str} }}")
+                                    raw_fields.append((vname, f"struct {{ {struct_fields_str} }}"))
+                                else:
+                                    fields.append(vname)
+                                    raw_fields.append((vname, "variant"))
+                            else:
+                                fields.append(vname)
+                                raw_fields.append((vname, "variant"))
                 classes[enum_name] = {
                     "type": "<<enumeration>>",
                     "fields": fields,
