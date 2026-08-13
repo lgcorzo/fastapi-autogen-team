@@ -110,8 +110,41 @@ def parse_rust_file(filepath):
                     for variant in body.children:
                         if variant.type == "enum_variant":
                             vname = get_text(variant.child_by_field_name("name"))
-                            fields.append(vname)
-                            raw_fields.append((vname, "variant"))
+                            vbody = variant.child_by_field_name("body")
+                            if vbody:
+                                if vbody.type == "field_declaration_list":
+                                    inner_types = []
+                                    for c in vbody.children:
+                                        if c.type == "field_declaration":
+                                            inner_ftype = get_text(c.child_by_field_name("type"))
+                                            inner_fname = get_text(c.child_by_field_name("name"))
+                                            inner_types.append(f"{inner_fname}: {inner_ftype}")
+
+                                            rel_type = ''.join(ch for ch in inner_ftype.split('<')[0] if ch.isalnum() or ch == '_')
+                                            if rel_type and rel_type[0].isupper() and rel_type != enum_name:
+                                                relations.append(f"{enum_name} --> {rel_type} : Association")
+                                    vtype_str = f"{{{', '.join(inner_types)}}}"
+                                    fields.append(f"{vname}{vtype_str}")
+                                    raw_fields.append((vname, vtype_str))
+                                elif vbody.type == "ordered_field_declaration_list":
+                                    inner_types = []
+                                    for c in vbody.children:
+                                        if c.type not in [',', '(', ')']:
+                                            inner_ftype = get_text(c)
+                                            inner_types.append(inner_ftype)
+
+                                            rel_type = ''.join(ch for ch in inner_ftype.split('<')[0] if ch.isalnum() or ch == '_')
+                                            if rel_type and rel_type[0].isupper() and rel_type != enum_name:
+                                                relations.append(f"{enum_name} --> {rel_type} : Association")
+                                    vtype_str = f"({', '.join(inner_types)})"
+                                    fields.append(f"{vname}{vtype_str}")
+                                    raw_fields.append((vname, vtype_str))
+                                else:
+                                    fields.append(vname)
+                                    raw_fields.append((vname, "variant"))
+                            else:
+                                fields.append(vname)
+                                raw_fields.append((vname, "variant"))
                 classes[enum_name] = {
                     "type": "<<enumeration>>",
                     "fields": fields,

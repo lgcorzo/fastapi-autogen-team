@@ -6,8 +6,8 @@ title: "Module: Dtos"
 source_path: "src/application/dtos.rs"
 description: "Detailed architecture and specifications for the Dtos module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "b782e47"
-timestamp: "2026-08-09T20:16:29Z"
+last_verified_commit: "55dbf3f"
+timestamp: "2026-08-13T20:42:44Z"
 ---
 
 # Module Specification: Dtos
@@ -31,8 +31,8 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
     }
     class Content {
         <<enumeration>>
-        Image
-        Text
+        Image{image_url: ImageUrl}
+        Text{text: String}
     }
     class ModelInformation {
         +String id
@@ -51,8 +51,8 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
     }
     class ContentType {
         <<enumeration>>
-        String
-        List
+        String(String)
+        List(Vec<Content>)
     }
     class Input {
         +String model
@@ -73,6 +73,10 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
         +HashMap<String, Value> usage
         -default()
     }
+    Content --> ImageUrl : Association
+    Content --> String : Association
+    ContentType --> String : Association
+    ContentType --> Vec : Association
     Default <|.. Output : Realization
     ImageUrl --> Option : Association
     ImageUrl --> String : Association
@@ -118,8 +122,8 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
 ### Content
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `Image` | `variant` | Field of Content |
-| `Text` | `variant` | Field of Content |
+| `Image` | `{image_url: ImageUrl}` | Field of Content |
+| `Text` | `{text: String}` | Field of Content |
 
 ### ModelInformation
 | Property | Type | Description |
@@ -143,8 +147,8 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
 ### ContentType
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `String` | `variant` | Field of ContentType |
-| `List` | `variant` | Field of ContentType |
+| `String` | `(String)` | Field of ContentType |
+| `List` | `(Vec<Content>)` | Field of ContentType |
 
 ### Input
 | Property | Type | Description |

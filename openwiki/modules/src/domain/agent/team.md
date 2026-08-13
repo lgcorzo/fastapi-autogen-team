@@ -6,8 +6,8 @@ title: "Module: Team"
 source_path: "src/domain/agent/team.rs"
 description: "Detailed architecture and specifications for the Team module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "b782e47"
-timestamp: "2026-08-09T20:16:29Z"
+last_verified_commit: "55dbf3f"
+timestamp: "2026-08-13T20:42:44Z"
 ---
 
 # Module Specification: Team
@@ -38,8 +38,8 @@ Deterministic technical architecture for the `Team` module extracted directly fr
 @startuml
     class AgentEvent {
         <<enumeration>>
-        Progress
-        Delta
+        Progress{stage: String, message: String}
+        Delta(String)
         Done
     }
     class AgentTeam {
@@ -50,6 +50,7 @@ Deterministic technical architecture for the `Team` module extracted directly fr
         +new_mock()
         +new_test()
     }
+    AgentEvent --> String : Association
 @enduml
 ```
 
@@ -94,8 +95,8 @@ Deterministic technical architecture for the `Team` module extracted directly fr
 ### AgentEvent
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `Progress` | `variant` | Field of AgentEvent |
-| `Delta` | `variant` | Field of AgentEvent |
+| `Progress` | `{stage: String, message: String}` | Field of AgentEvent |
+| `Delta` | `(String)` | Field of AgentEvent |
 | `Done` | `variant` | Field of AgentEvent |
 
 ### AgentTeam
