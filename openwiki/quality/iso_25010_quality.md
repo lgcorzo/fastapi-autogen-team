@@ -5,7 +5,7 @@ type: "quality"
 title: "ISO/IEC 25010 Software Quality Assessment"
 description: "Evaluation of system quality characteristics against international SQuaRE standards."
 tags: ["iso25010", "quality", "square"]
-timestamp: "2026-08-09T20:16:29Z"
+timestamp: "2026-08-14T20:34:30Z"
 ---
 
 # ISO/IEC 25010 Software Quality Assessment

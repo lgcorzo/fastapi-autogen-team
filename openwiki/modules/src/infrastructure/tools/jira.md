@@ -6,8 +6,8 @@ title: "Module: Jira"
 source_path: "src/infrastructure/tools/jira.rs"
 description: "Detailed architecture and specifications for the Jira module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "b782e47"
-timestamp: "2026-08-09T20:16:29Z"
+last_verified_commit: "55dbf3f"
+timestamp: "2026-08-14T20:34:30Z"
 ---
 
 # Module Specification: Jira
@@ -33,9 +33,9 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
     }
     class JiraError {
         <<enumeration>>
-        EnvVarMissing
-        RequestError
-        Other
+        EnvVarMissing(#[from], env::VarError)
+        RequestError(#[from], reqwest::Error)
+        Other(String)
     }
     class JiraTool {
         -definition()
@@ -81,9 +81,9 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
 ### JiraError
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `EnvVarMissing` | `variant` | Field of JiraError |
-| `RequestError` | `variant` | Field of JiraError |
-| `Other` | `variant` | Field of JiraError |
+| `EnvVarMissing(#[from], env::VarError)` | `variant` | Field of JiraError |
+| `RequestError(#[from], reqwest::Error)` | `variant` | Field of JiraError |
+| `Other(String)` | `variant` | Field of JiraError |
 
 
 

@@ -6,8 +6,8 @@ title: "Module: Search"
 source_path: "src/infrastructure/tools/search.rs"
 description: "Detailed architecture and specifications for the Search module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "b782e47"
-timestamp: "2026-08-09T20:16:29Z"
+last_verified_commit: "55dbf3f"
+timestamp: "2026-08-14T20:34:30Z"
 ---
 
 # Module Specification: Search
@@ -41,9 +41,9 @@ Deterministic technical architecture for the `Search` module extracted directly 
     }
     class SearchError {
         <<enumeration>>
-        EnvVarMissing
-        RequestError
-        Other
+        EnvVarMissing(#[from], env::VarError)
+        RequestError(#[from], reqwest::Error)
+        Other(String)
     }
     class SearchTool {
         -definition()
@@ -92,9 +92,9 @@ Deterministic technical architecture for the `Search` module extracted directly 
 ### SearchError
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `EnvVarMissing` | `variant` | Field of SearchError |
-| `RequestError` | `variant` | Field of SearchError |
-| `Other` | `variant` | Field of SearchError |
+| `EnvVarMissing(#[from], env::VarError)` | `variant` | Field of SearchError |
+| `RequestError(#[from], reqwest::Error)` | `variant` | Field of SearchError |
+| `Other(String)` | `variant` | Field of SearchError |
 
 
 

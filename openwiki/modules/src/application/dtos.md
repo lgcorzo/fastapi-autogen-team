@@ -6,8 +6,8 @@ title: "Module: Dtos"
 source_path: "src/application/dtos.rs"
 description: "Detailed architecture and specifications for the Dtos module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "b782e47"
-timestamp: "2026-08-09T20:16:29Z"
+last_verified_commit: "55dbf3f"
+timestamp: "2026-08-14T20:34:30Z"
 ---
 
 # Module Specification: Dtos
@@ -31,8 +31,8 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
     }
     class Content {
         <<enumeration>>
-        Image
-        Text
+        Image(ImageUrl)
+        Text(String)
     }
     class ModelInformation {
         +String id
@@ -51,8 +51,8 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
     }
     class ContentType {
         <<enumeration>>
-        String
-        List
+        String(String)
+        List(Vec<Content>)
     }
     class Input {
         +String model
@@ -118,8 +118,8 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
 ### Content
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `Image` | `variant` | Field of Content |
-| `Text` | `variant` | Field of Content |
+| `Image(ImageUrl)` | `variant` | Field of Content |
+| `Text(String)` | `variant` | Field of Content |
 
 ### ModelInformation
 | Property | Type | Description |
@@ -143,8 +143,8 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
 ### ContentType
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `String` | `variant` | Field of ContentType |
-| `List` | `variant` | Field of ContentType |
+| `String(String)` | `variant` | Field of ContentType |
+| `List(Vec<Content>)` | `variant` | Field of ContentType |
 
 ### Input
 | Property | Type | Description |

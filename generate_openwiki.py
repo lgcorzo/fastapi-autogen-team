@@ -110,8 +110,24 @@ def parse_rust_file(filepath):
                     for variant in body.children:
                         if variant.type == "enum_variant":
                             vname = get_text(variant.child_by_field_name("name"))
-                            fields.append(vname)
-                            raw_fields.append((vname, "variant"))
+                            types = []
+                            for c in variant.children:
+                                if c.type == "ordered_field_declaration_list":
+                                    for type_node in c.children:
+                                        if type_node.type not in ["(", ")", ","]:
+                                            types.append(get_text(type_node))
+                                elif c.type == "field_declaration_list":
+                                    for field_node in c.children:
+                                        if field_node.type == "field_declaration":
+                                            types.append(get_text(field_node.child_by_field_name("type")))
+
+                            if types:
+                                vname_with_types = f"{vname}({', '.join(types)})"
+                            else:
+                                vname_with_types = vname
+
+                            fields.append(vname_with_types)
+                            raw_fields.append((vname_with_types, "variant"))
                 classes[enum_name] = {
                     "type": "<<enumeration>>",
                     "fields": fields,
@@ -127,7 +143,7 @@ def parse_rust_file(filepath):
                 body = node.child_by_field_name("body")
                 if body and body.type == "declaration_list":
                     for child in body.children:
-                        if child.type == "function_item":
+                        if child.type in ["function_item", "function_signature_item"]:
                             fname = get_text(child.child_by_field_name("name"))
                             trait_methods.append(f"+{fname}()")
 
@@ -644,7 +660,9 @@ timestamp: "{timestamp}"
 
     all_classes.sort(key=lambda x: x[0].lower())
     for class_name, type_str, link in all_classes:
-        clean_type = type_str.replace("<<", "").replace(">>", "")
+        clean_type = type_str
+        if clean_type in ["<<enumeration>>", "<<interface>>", "<<module>>"]:
+            clean_type = clean_type.replace("<<", "").replace(">>", "")
         if clean_type == "class":
             clean_type = "struct"
         summary_content += f"- [{class_name} ({clean_type})]({link})\n"

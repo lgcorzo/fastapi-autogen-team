@@ -6,8 +6,8 @@ title: "Module: Confluence"
 source_path: "src/infrastructure/tools/confluence.rs"
 description: "Detailed architecture and specifications for the Confluence module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "b782e47"
-timestamp: "2026-08-09T20:16:29Z"
+last_verified_commit: "55dbf3f"
+timestamp: "2026-08-14T20:34:30Z"
 ---
 
 # Module Specification: Confluence
@@ -33,9 +33,9 @@ Deterministic technical architecture for the `Confluence` module extracted direc
     }
     class ConfluenceError {
         <<enumeration>>
-        EnvVarMissing
-        RequestError
-        Other
+        EnvVarMissing(#[from], env::VarError)
+        RequestError(#[from], reqwest::Error)
+        Other(String)
     }
     class ConfluenceTool {
         -definition()
@@ -81,9 +81,9 @@ Deterministic technical architecture for the `Confluence` module extracted direc
 ### ConfluenceError
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `EnvVarMissing` | `variant` | Field of ConfluenceError |
-| `RequestError` | `variant` | Field of ConfluenceError |
-| `Other` | `variant` | Field of ConfluenceError |
+| `EnvVarMissing(#[from], env::VarError)` | `variant` | Field of ConfluenceError |
+| `RequestError(#[from], reqwest::Error)` | `variant` | Field of ConfluenceError |
+| `Other(String)` | `variant` | Field of ConfluenceError |
 
 
 

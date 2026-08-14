@@ -6,8 +6,8 @@ title: "Module: R2r"
 source_path: "src/infrastructure/tools/r2r.rs"
 description: "Detailed architecture and specifications for the R2r module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "b782e47"
-timestamp: "2026-08-09T20:16:29Z"
+last_verified_commit: "55dbf3f"
+timestamp: "2026-08-14T20:34:30Z"
 ---
 
 # Module Specification: R2r
@@ -33,9 +33,9 @@ Deterministic technical architecture for the `R2r` module extracted directly fro
     }
     class R2RError {
         <<enumeration>>
-        EnvVarMissing
-        RequestError
-        Other
+        EnvVarMissing(#[from], env::VarError)
+        RequestError(#[from], reqwest::Error)
+        Other(String)
     }
     class R2RTool {
         -definition()
@@ -81,9 +81,9 @@ Deterministic technical architecture for the `R2r` module extracted directly fro
 ### R2RError
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `EnvVarMissing` | `variant` | Field of R2RError |
-| `RequestError` | `variant` | Field of R2RError |
-| `Other` | `variant` | Field of R2RError |
+| `EnvVarMissing(#[from], env::VarError)` | `variant` | Field of R2RError |
+| `RequestError(#[from], reqwest::Error)` | `variant` | Field of R2RError |
+| `Other(String)` | `variant` | Field of R2RError |
 
 
 
