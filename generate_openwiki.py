@@ -77,20 +77,20 @@ def parse_rust_file(filepath):
                             if rel_type and rel_type[0].isupper() and rel_type != struct_name:
                                 relations.append(f"{struct_name} --> {rel_type} : Association")
                 elif body and body.type == "ordered_field_declaration_list":
+                     visibility = "-"
                      for field in body.children:
-                         if field.type == "field_declaration":
-                             ftype = get_text(field.child_by_field_name("type"))
-                             visibility = "-"
-                             for c in field.children:
-                                 if c.type == "visibility_modifier":
-                                     visibility = "+"
-                                     break
+                         if field.type == "visibility_modifier":
+                             visibility = "+"
+                         elif field.type not in (",", "(", ")"):
+                             ftype = get_text(field)
                              fields.append(f"{visibility}{ftype}")
                              raw_fields.append(("", ftype))
 
                              rel_type = ''.join(c for c in ftype.split('<')[0] if c.isalnum() or c == '_')
                              if rel_type and rel_type[0].isupper() and rel_type != struct_name:
                                  relations.append(f"{struct_name} --> {rel_type} : Association")
+                             visibility = "-"
+
 
                 classes[struct_name] = {
                     "type": "class",
@@ -110,8 +110,26 @@ def parse_rust_file(filepath):
                     for variant in body.children:
                         if variant.type == "enum_variant":
                             vname = get_text(variant.child_by_field_name("name"))
+                            variant_types = []
+                            for vchild in variant.children:
+                                if vchild.type == "field_declaration_list":
+                                    for field in vchild.children:
+                                        if field.type == "field_declaration":
+                                            fname = get_text(field.child_by_field_name("name"))
+                                            ftype = get_text(field.child_by_field_name("type"))
+                                            variant_types.append(f"{fname}: {ftype}")
+                                elif vchild.type == "ordered_field_declaration_list":
+                                    for field in vchild.children:
+                                        if field.type not in (",", "(", ")"):
+                                            variant_types.append(get_text(field))
+
+                            if variant_types:
+                                type_str = f"variant({', '.join(variant_types)})"
+                            else:
+                                type_str = "variant"
+
                             fields.append(vname)
-                            raw_fields.append((vname, "variant"))
+                            raw_fields.append((vname, type_str))
                 classes[enum_name] = {
                     "type": "<<enumeration>>",
                     "fields": fields,
@@ -127,7 +145,7 @@ def parse_rust_file(filepath):
                 body = node.child_by_field_name("body")
                 if body and body.type == "declaration_list":
                     for child in body.children:
-                        if child.type == "function_item":
+                        if child.type in ("function_item", "function_signature_item"):
                             fname = get_text(child.child_by_field_name("name"))
                             trait_methods.append(f"+{fname}()")
 
@@ -171,7 +189,7 @@ def parse_rust_file(filepath):
                 body = node.child_by_field_name("body")
                 if body:
                     for child in body.children:
-                        if child.type == "function_item":
+                        if child.type in ("function_item", "function_signature_item"):
                             fname = get_text(child.child_by_field_name("name"))
                             visibility = "-"
                             for c in child.children:
