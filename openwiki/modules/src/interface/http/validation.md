@@ -6,8 +6,8 @@ title: "Module: Validation"
 source_path: "src/interface/http/validation.rs"
 description: "Detailed architecture and specifications for the Validation module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "b782e47"
-timestamp: "2026-08-09T20:16:29Z"
+last_verified_commit: "55dbf3f"
+timestamp: "2026-08-15T20:35:59Z"
 ---
 
 # Module Specification: Validation
@@ -31,11 +31,13 @@ Deterministic technical architecture for the `Validation` module extracted direc
 ```plantuml
 @startuml
     class ValidatedJson {
+        +T
     }
     class ValidatedJson<T> {
         -from_request()
     }
     FromRequest<S> <|.. ValidatedJson<T> : Realization
+    ValidatedJson --> T : Association
 @enduml
 ```
 
@@ -57,7 +59,10 @@ Deterministic technical architecture for the `Validation` module extracted direc
 
 ## 3. Data Structures, Structs & Class Properties
 
-No notable data structures or fields in this module.
+### ValidatedJson
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `N/A` | `T` | Field of ValidatedJson |
 
 
 

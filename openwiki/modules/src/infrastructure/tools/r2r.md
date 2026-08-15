@@ -6,8 +6,8 @@ title: "Module: R2r"
 source_path: "src/infrastructure/tools/r2r.rs"
 description: "Detailed architecture and specifications for the R2r module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "b782e47"
-timestamp: "2026-08-09T20:16:29Z"
+last_verified_commit: "55dbf3f"
+timestamp: "2026-08-15T20:35:59Z"
 ---
 
 # Module Specification: R2r
@@ -81,9 +81,9 @@ Deterministic technical architecture for the `R2r` module extracted directly fro
 ### R2RError
 | Property | Type | Description |
 | :--- | :--- | :--- |
-| `EnvVarMissing` | `variant` | Field of R2RError |
-| `RequestError` | `variant` | Field of R2RError |
-| `Other` | `variant` | Field of R2RError |
+| `EnvVarMissing` | `variant(#[from], env::VarError)` | Field of R2RError |
+| `RequestError` | `variant(#[from], reqwest::Error)` | Field of R2RError |
+| `Other` | `variant(String)` | Field of R2RError |
 
 
 
