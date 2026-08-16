@@ -111,15 +111,16 @@ def parse_rust_file(filepath):
                         if variant.type == "enum_variant":
                             vname = get_text(variant.child_by_field_name("name"))
                             variant_types = []
-                            for vchild in variant.children:
-                                if vchild.type == "field_declaration_list":
-                                    for field in vchild.children:
+                            vbody = variant.child_by_field_name("body")
+                            if vbody:
+                                if vbody.type == "field_declaration_list":
+                                    for field in vbody.children:
                                         if field.type == "field_declaration":
                                             fname = get_text(field.child_by_field_name("name"))
                                             ftype = get_text(field.child_by_field_name("type"))
                                             variant_types.append(f"{fname}: {ftype}")
-                                elif vchild.type == "ordered_field_declaration_list":
-                                    for field in vchild.children:
+                                elif vbody.type == "ordered_field_declaration_list":
+                                    for field in vbody.children:
                                         if field.type not in (",", "(", ")"):
                                             variant_types.append(get_text(field))
 
