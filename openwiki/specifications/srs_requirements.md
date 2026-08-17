@@ -5,7 +5,7 @@ type: "specification"
 title: "Srs Requirements"
 description: "Specification doc"
 tags: ["iso15289", "specification", "okf"]
-timestamp: "2026-08-15T20:35:59Z"
+timestamp: "2026-08-16T20:17:06Z"
 ---
 
 # Srs Requirements

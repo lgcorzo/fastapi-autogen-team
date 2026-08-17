@@ -6,8 +6,8 @@ title: "Module: Main"
 source_path: "src/main.rs"
 description: "Detailed architecture and specifications for the Main module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "55dbf3f"
-timestamp: "2026-08-15T20:35:59Z"
+last_verified_commit: "008ad08"
+timestamp: "2026-08-16T20:17:06Z"
 ---
 
 # Module Specification: Main

@@ -5,7 +5,7 @@ type: "architecture"
 title: "ISO/IEC/IEEE 42010 Architecture Description"
 description: "Master architecture description artifact defining stakeholders, viewpoints, and system views."
 tags: ["iso42010", "architecture", "okf"]
-timestamp: "2026-08-15T20:35:59Z"
+timestamp: "2026-08-16T20:17:06Z"
 ---
 
 # ISO/IEC/IEEE 42010 Architecture Description
