@@ -6,8 +6,8 @@ title: "Module: Jira"
 source_path: "src/infrastructure/tools/jira.rs"
 description: "Detailed architecture and specifications for the Jira module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "008ad08"
-timestamp: "2026-08-16T20:17:06Z"
+last_verified_commit: "d749c3b"
+timestamp: "2026-08-17T20:25:11Z"
 ---
 
 # Module Specification: Jira
@@ -85,6 +85,7 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
 | `RequestError` | `variant(#[from], reqwest::Error)` | Field of JiraError |
 | `Other` | `variant(String)` | Field of JiraError |
 
+### JiraTool
 
 
 ## 4. Comprehensive Methods & Functions Breakdown

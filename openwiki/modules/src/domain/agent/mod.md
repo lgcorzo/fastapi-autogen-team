@@ -6,8 +6,8 @@ title: "Module: AgentModule"
 source_path: "src/domain/agent/mod.rs"
 description: "Detailed architecture and specifications for the AgentModule module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "008ad08"
-timestamp: "2026-08-16T20:17:06Z"
+last_verified_commit: "d749c3b"
+timestamp: "2026-08-17T20:25:11Z"
 ---
 
 # Module Specification: AgentModule
@@ -42,8 +42,7 @@ Deterministic technical architecture for the `AgentModule` module extracted dire
 
 ## 3. Data Structures, Structs & Class Properties
 
-No notable data structures or fields in this module.
-
+### AgentModule
 
 
 ## 4. Comprehensive Methods & Functions Breakdown

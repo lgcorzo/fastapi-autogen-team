@@ -6,8 +6,8 @@ title: "Module: Team"
 source_path: "src/domain/agent/team.rs"
 description: "Detailed architecture and specifications for the Team module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "008ad08"
-timestamp: "2026-08-16T20:17:06Z"
+last_verified_commit: "d749c3b"
+timestamp: "2026-08-17T20:25:11Z"
 ---
 
 # Module Specification: Team
@@ -92,6 +92,13 @@ Deterministic technical architecture for the `Team` module extracted directly fr
 ## 3. Data Structures, Structs & Class Properties
 
 ### AgentEvent
+**Overview:** Events emitted by the agent pipeline during SSE streaming.
+
+`Progress` events are emitted after the planner and each RAG search.
+`Delta` events carry individual QA token chunks.
+`Done` signals end-of-stream.
+Progress events are **only** produced on the streaming path (`run_stream`).
+
 | Property | Type | Description |
 | :--- | :--- | :--- |
 | `Progress` | `variant(stage: String, message: String)` | Field of AgentEvent |
@@ -110,6 +117,10 @@ Deterministic technical architecture for the `Team` module extracted directly fr
 ### `is_valid_query_line`
 * **Visibility:** -
 * **Source Line Citation:** `src/domain/agent/team.rs:L32`
+
+**Description:** Returns `true` when a planner output line is a valid standalone search query.
+Rejects: empty lines, JSON structural tokens, quoted strings, the literal
+TERMINATE keyword, and lines that are too short to be meaningful queries.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -153,6 +164,15 @@ Deterministic technical architecture for the `Team` module extracted directly fr
 ### `AgentTeam::run_stream`
 * **Visibility:** +
 * **Source Line Citation:** `src/domain/agent/team.rs:L245`
+
+**Description:** Run the agent pipeline with full SSE progress streaming.
+
+Emits:
+- `AgentEvent::Progress` after the planner stage and after each RAG search.
+- `AgentEvent::Delta` for each streaming token from the QA agent.
+- `AgentEvent::Done` once all tokens have been emitted.
+
+Progress events are **not** produced by the non-streaming `run()` method.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |

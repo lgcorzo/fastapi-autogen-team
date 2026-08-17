@@ -50,6 +50,19 @@ def parse_rust_file(filepath):
     def get_text(node):
         return source_code[node.start_byte:node.end_byte].decode("utf-8")
 
+    def get_node_doc(node):
+        docs = []
+        curr = node.prev_sibling
+        while curr:
+            if curr.type == "attribute_item":
+                pass
+            elif curr.type == "line_comment" and get_text(curr).startswith("///"):
+                docs.insert(0, get_text(curr)[3:].strip())
+            else:
+                break
+            curr = curr.prev_sibling
+        return " ".join(docs)
+
     def walk_file(node):
         if node.type == "use_declaration":
             dependencies.append(get_text(node))
@@ -65,7 +78,11 @@ def parse_rust_file(filepath):
                         if field.type == "field_declaration":
                             fname = get_text(field.child_by_field_name("name"))
                             ftype = get_text(field.child_by_field_name("type"))
-                            visibility = "+" if field.child_by_field_name("visibility") else "-"
+                            visibility = "-"
+                            for c in field.children:
+                                if c.type == "visibility_modifier":
+                                    visibility = "+"
+                                    break
                             fields.append(f"{visibility}{ftype} {fname}")
                             raw_fields.append((fname, ftype))
 
@@ -73,23 +90,28 @@ def parse_rust_file(filepath):
                             if rel_type and rel_type[0].isupper() and rel_type != struct_name:
                                 relations.append(f"{struct_name} --> {rel_type} : Association")
                 elif body and body.type == "ordered_field_declaration_list":
+                     visibility = "-"
                      for field in body.children:
-                         if field.type == "field_declaration":
-                             ftype = get_text(field.child_by_field_name("type"))
-                             visibility = "+" if field.child_by_field_name("visibility") else "-"
+                         if field.type == "visibility_modifier":
+                             visibility = "+"
+                         elif field.type not in (",", "(", ")"):
+                             ftype = get_text(field)
                              fields.append(f"{visibility}{ftype}")
                              raw_fields.append(("", ftype))
 
                              rel_type = ''.join(c for c in ftype.split('<')[0] if c.isalnum() or c == '_')
                              if rel_type and rel_type[0].isupper() and rel_type != struct_name:
                                  relations.append(f"{struct_name} --> {rel_type} : Association")
+                             visibility = "-"
+
 
                 classes[struct_name] = {
                     "type": "class",
                     "fields": fields,
                     "raw_fields": raw_fields,
                     "methods": [],
-                    "line": node.start_point[0] + 1
+                    "line": node.start_point[0] + 1,
+                    "doc": get_node_doc(node)
                 }
         elif node.type == "enum_item":
             enum_name_node = node.child_by_field_name("name")
@@ -102,14 +124,34 @@ def parse_rust_file(filepath):
                     for variant in body.children:
                         if variant.type == "enum_variant":
                             vname = get_text(variant.child_by_field_name("name"))
+                            variant_types = []
+                            vbody = variant.child_by_field_name("body")
+                            if vbody:
+                                if vbody.type == "field_declaration_list":
+                                    for field in vbody.children:
+                                        if field.type == "field_declaration":
+                                            fname = get_text(field.child_by_field_name("name"))
+                                            ftype = get_text(field.child_by_field_name("type"))
+                                            variant_types.append(f"{fname}: {ftype}")
+                                elif vbody.type == "ordered_field_declaration_list":
+                                    for field in vbody.children:
+                                        if field.type not in (",", "(", ")"):
+                                            variant_types.append(get_text(field))
+
+                            if variant_types:
+                                type_str = f"variant({', '.join(variant_types)})"
+                            else:
+                                type_str = "variant"
+
                             fields.append(vname)
-                            raw_fields.append((vname, "variant"))
+                            raw_fields.append((vname, type_str))
                 classes[enum_name] = {
                     "type": "<<enumeration>>",
                     "fields": fields,
                     "raw_fields": raw_fields,
                     "methods": [],
-                    "line": node.start_point[0] + 1
+                    "line": node.start_point[0] + 1,
+                    "doc": get_node_doc(node)
                 }
         elif node.type == "trait_item":
             trait_name_node = node.child_by_field_name("name")
@@ -119,7 +161,7 @@ def parse_rust_file(filepath):
                 body = node.child_by_field_name("body")
                 if body and body.type == "declaration_list":
                     for child in body.children:
-                        if child.type == "function_item":
+                        if child.type in ("function_item", "function_signature_item"):
                             fname = get_text(child.child_by_field_name("name"))
                             trait_methods.append(f"+{fname}()")
 
@@ -140,14 +182,16 @@ def parse_rust_file(filepath):
                                 "calls": [],
                                 "params": params_str,
                                 "ret_type": ret_type_str,
-                                "is_pub": "+"
+                                "is_pub": "+",
+                                "doc": get_node_doc(child)
                             })
                 classes[trait_name] = {
                     "type": "<<interface>>",
                     "fields": [],
                     "raw_fields": [],
                     "methods": trait_methods,
-                    "line": node.start_point[0] + 1
+                    "line": node.start_point[0] + 1,
+                    "doc": get_node_doc(node)
                 }
         elif node.type == "impl_item":
             type_node = node.child_by_field_name("type")
@@ -163,9 +207,13 @@ def parse_rust_file(filepath):
                 body = node.child_by_field_name("body")
                 if body:
                     for child in body.children:
-                        if child.type == "function_item":
+                        if child.type in ("function_item", "function_signature_item"):
                             fname = get_text(child.child_by_field_name("name"))
-                            visibility = "+" if child.child_by_field_name("visibility") else "-"
+                            visibility = "-"
+                            for c in child.children:
+                                if c.type == "visibility_modifier":
+                                    visibility = "+"
+                                    break
                             method_sig = f"{visibility}{fname}()"
 
                             params_str = ""
@@ -202,7 +250,8 @@ def parse_rust_file(filepath):
                                 "calls": calls,
                                 "params": params_str,
                                 "ret_type": ret_type_str,
-                                "is_pub": visibility
+                                "is_pub": visibility,
+                                "doc": get_node_doc(child)
                             })
 
                             if struct_name in classes:
@@ -213,11 +262,16 @@ def parse_rust_file(filepath):
                                     "fields": [],
                                     "raw_fields": [],
                                     "methods": [method_sig],
-                                    "line": node.start_point[0] + 1
+                                    "line": node.start_point[0] + 1,
+                                    "doc": get_node_doc(node)
                                 }
         elif node.type == "function_item" and node.parent.type == "source_file":
             fname = get_text(node.child_by_field_name("name"))
-            visibility = "+" if node.child_by_field_name("visibility") else "-"
+            visibility = "-"
+            for c in node.children:
+                if c.type == "visibility_modifier":
+                    visibility = "+"
+                    break
 
             params_str = ""
             params_node = node.child_by_field_name("parameters")
@@ -253,7 +307,8 @@ def parse_rust_file(filepath):
                 "calls": calls,
                 "params": params_str,
                 "ret_type": ret_type_str,
-                "is_pub": visibility
+                "is_pub": visibility,
+                "doc": get_node_doc(node)
             })
 
         for child in node.children:
@@ -342,9 +397,12 @@ def generate_okf_markdown(filepath, rel_dir, ast, commit_hash):
     data_structs = "## 3. Data Structures, Structs & Class Properties\n\n"
     has_structs = False
     for name, data in ast["classes"].items():
+        has_structs = True
+        data_structs += f"### {name}\n"
+        if data.get("doc"):
+            data_structs += f"**Overview:** {data['doc']}\n\n"
+
         if data.get("raw_fields"):
-            has_structs = True
-            data_structs += f"### {name}\n"
             data_structs += "| Property | Type | Description |\n"
             data_structs += "| :--- | :--- | :--- |\n"
             for fname, ftype in data["raw_fields"]:
@@ -363,6 +421,9 @@ def generate_okf_markdown(filepath, rel_dir, ast, commit_hash):
         method_breakdown += f"### `{cls_str}{m['name']}`\n"
         method_breakdown += f"* **Visibility:** {m['is_pub']}\n"
         method_breakdown += f"* **Source Line Citation:** `{filepath.as_posix()}:L{m['line']}`\n\n"
+
+        if m.get("doc"):
+            method_breakdown += f"**Description:** {m['doc']}\n\n"
 
         # Parameters
         method_breakdown += "#### Input Parameters\n"
@@ -609,7 +670,39 @@ timestamp: "{timestamp}"
     for src, dst, _ in sorted(files_processed, key=lambda x: x[1]):
         rel_dst = dst.relative_to(target_dir)
         summary_content += f"- [{src.name}](./{rel_dst.as_posix()})\n"
-    summary_content += "\n## Alphabetical class index\n\n## Public API index\n"
+    summary_content += "\n## Alphabetical class index\n\n"
+
+    # Collect classes and methods from all ASTs to generate indexes
+    all_classes = []
+    all_methods = []
+    for src, dst, _ in files_processed:
+        ast_data = parse_rust_file(src)
+        rel_dst = dst.relative_to(target_dir)
+        link = f"./{rel_dst.as_posix()}"
+
+        for class_name, class_info in ast_data["classes"].items():
+            all_classes.append((class_name, class_info["type"], link))
+
+        for method_info in ast_data["methods"]:
+            if method_info["is_pub"] == "+":
+                all_methods.append((method_info["name"], method_info["struct"], link))
+
+    all_classes.sort(key=lambda x: x[0].lower())
+    for class_name, type_str, link in all_classes:
+        clean_type = type_str.replace("<<", "").replace(">>", "")
+        if clean_type == "class":
+            clean_type = "struct"
+        summary_content += f"- [{class_name} ({clean_type})]({link})\n"
+
+    summary_content += "\n## Public API index\n\n"
+    all_methods.sort(key=lambda x: x[0].lower())
+    for method_name, struct_name, link in all_methods:
+        if struct_name:
+            display_name = f"{struct_name}::{method_name}"
+        else:
+            display_name = method_name
+        summary_content += f"- [{display_name}]({link})\n"
+
     with open(summary_path, 'w', encoding='utf-8') as f:
         f.write(summary_content)
 

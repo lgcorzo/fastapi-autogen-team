@@ -6,8 +6,8 @@ title: "Module: Main"
 source_path: "src/main.rs"
 description: "Detailed architecture and specifications for the Main module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "008ad08"
-timestamp: "2026-08-16T20:17:06Z"
+last_verified_commit: "d749c3b"
+timestamp: "2026-08-17T20:25:11Z"
 ---
 
 # Module Specification: Main
@@ -53,8 +53,7 @@ Deterministic technical architecture for the `Main` module extracted directly fr
 
 ## 3. Data Structures, Structs & Class Properties
 
-No notable data structures or fields in this module.
-
+### Main
 
 
 ## 4. Comprehensive Methods & Functions Breakdown
