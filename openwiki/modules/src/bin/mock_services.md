@@ -6,8 +6,8 @@ title: "Module: Mock_services"
 source_path: "src/bin/mock_services.rs"
 description: "Detailed architecture and specifications for the Mock_services module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "008ad08"
-timestamp: "2026-08-16T20:17:06Z"
+last_verified_commit: "d749c3b"
+timestamp: "2026-08-17T20:25:11Z"
 ---
 
 # Module Specification: Mock_services
@@ -71,6 +71,7 @@ Deterministic technical architecture for the `Mock_services` module extracted di
 
 ## 3. Data Structures, Structs & Class Properties
 
+### AppState
 ### JiraQueryParams
 | Property | Type | Description |
 | :--- | :--- | :--- |

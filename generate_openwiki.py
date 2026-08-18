@@ -50,6 +50,19 @@ def parse_rust_file(filepath):
     def get_text(node):
         return source_code[node.start_byte:node.end_byte].decode("utf-8")
 
+    def get_node_doc(node):
+        docs = []
+        curr = node.prev_sibling
+        while curr:
+            if curr.type == "attribute_item":
+                pass
+            elif curr.type == "line_comment" and get_text(curr).startswith("///"):
+                docs.insert(0, get_text(curr)[3:].strip())
+            else:
+                break
+            curr = curr.prev_sibling
+        return "\n".join(docs)
+
     def walk_file(node):
         if node.type == "use_declaration":
             dependencies.append(get_text(node))
@@ -97,7 +110,8 @@ def parse_rust_file(filepath):
                     "fields": fields,
                     "raw_fields": raw_fields,
                     "methods": [],
-                    "line": node.start_point[0] + 1
+                    "line": node.start_point[0] + 1,
+                    "doc": get_node_doc(node)
                 }
         elif node.type == "enum_item":
             enum_name_node = node.child_by_field_name("name")
@@ -136,7 +150,8 @@ def parse_rust_file(filepath):
                     "fields": fields,
                     "raw_fields": raw_fields,
                     "methods": [],
-                    "line": node.start_point[0] + 1
+                    "line": node.start_point[0] + 1,
+                    "doc": get_node_doc(node)
                 }
         elif node.type == "trait_item":
             trait_name_node = node.child_by_field_name("name")
@@ -167,14 +182,16 @@ def parse_rust_file(filepath):
                                 "calls": [],
                                 "params": params_str,
                                 "ret_type": ret_type_str,
-                                "is_pub": "+"
+                                "is_pub": "+",
+                                "doc": get_node_doc(child)
                             })
                 classes[trait_name] = {
                     "type": "<<interface>>",
                     "fields": [],
                     "raw_fields": [],
                     "methods": trait_methods,
-                    "line": node.start_point[0] + 1
+                    "line": node.start_point[0] + 1,
+                    "doc": get_node_doc(node)
                 }
         elif node.type == "impl_item":
             type_node = node.child_by_field_name("type")
@@ -233,7 +250,8 @@ def parse_rust_file(filepath):
                                 "calls": calls,
                                 "params": params_str,
                                 "ret_type": ret_type_str,
-                                "is_pub": visibility
+                                "is_pub": visibility,
+                                "doc": get_node_doc(child)
                             })
 
                             if struct_name in classes:
@@ -244,7 +262,8 @@ def parse_rust_file(filepath):
                                     "fields": [],
                                     "raw_fields": [],
                                     "methods": [method_sig],
-                                    "line": node.start_point[0] + 1
+                                    "line": node.start_point[0] + 1,
+                                    "doc": get_node_doc(node)
                                 }
         elif node.type == "function_item" and node.parent.type == "source_file":
             fname = get_text(node.child_by_field_name("name"))
@@ -288,7 +307,8 @@ def parse_rust_file(filepath):
                 "calls": calls,
                 "params": params_str,
                 "ret_type": ret_type_str,
-                "is_pub": visibility
+                "is_pub": visibility,
+                "doc": get_node_doc(node)
             })
 
         for child in node.children:
@@ -377,9 +397,12 @@ def generate_okf_markdown(filepath, rel_dir, ast, commit_hash):
     data_structs = "## 3. Data Structures, Structs & Class Properties\n\n"
     has_structs = False
     for name, data in ast["classes"].items():
+        has_structs = True
+        data_structs += f"### {name}\n"
+        if data.get("doc"):
+            data_structs += f"**Overview:** {data['doc']}\n\n"
+
         if data.get("raw_fields"):
-            has_structs = True
-            data_structs += f"### {name}\n"
             data_structs += "| Property | Type | Description |\n"
             data_structs += "| :--- | :--- | :--- |\n"
             for fname, ftype in data["raw_fields"]:
@@ -398,6 +421,9 @@ def generate_okf_markdown(filepath, rel_dir, ast, commit_hash):
         method_breakdown += f"### `{cls_str}{m['name']}`\n"
         method_breakdown += f"* **Visibility:** {m['is_pub']}\n"
         method_breakdown += f"* **Source Line Citation:** `{filepath.as_posix()}:L{m['line']}`\n\n"
+
+        if m.get("doc"):
+            method_breakdown += f"**Description:** {m['doc']}\n\n"
 
         # Parameters
         method_breakdown += "#### Input Parameters\n"

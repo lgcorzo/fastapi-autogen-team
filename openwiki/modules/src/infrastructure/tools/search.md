@@ -6,8 +6,8 @@ title: "Module: Search"
 source_path: "src/infrastructure/tools/search.rs"
 description: "Detailed architecture and specifications for the Search module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "008ad08"
-timestamp: "2026-08-16T20:17:06Z"
+last_verified_commit: "d749c3b"
+timestamp: "2026-08-17T20:25:11Z"
 ---
 
 # Module Specification: Search
@@ -96,6 +96,7 @@ Deterministic technical architecture for the `Search` module extracted directly 
 | `RequestError` | `variant(#[from], reqwest::Error)` | Field of SearchError |
 | `Other` | `variant(String)` | Field of SearchError |
 
+### SearchTool
 
 
 ## 4. Comprehensive Methods & Functions Breakdown
