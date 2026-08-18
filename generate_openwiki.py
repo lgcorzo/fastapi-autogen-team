@@ -22,11 +22,27 @@ def mirror_directory(src_dir, target_dir):
     target_path = Path(target_dir) / "modules"
     if not src_path.exists():
         return []
+
+    ignored_dirs = {
+        ".git", ".github", ".vscode", ".idea", "node_modules",
+        "dist", "bin", "obj", "target", "coverage", "__pycache__",
+        target_dir, "graphify-out"
+    }
+
     files_to_process = []
     for root, dirs, files in os.walk(src_path):
+        dirs[:] = [d for d in dirs if d not in ignored_dirs and not d.startswith("graphify-out")]
         current_root = Path(root)
-        rel_path = current_root.relative_to(src_path)
-        current_target = target_path / src_path.name / rel_path
+
+        # When scanning from ".", relative_to(".") is the path itself.
+        # To avoid an extra "modules/." directory, handle root path.
+        if src_path.as_posix() == ".":
+            rel_path = current_root.relative_to(src_path)
+            current_target = target_path / rel_path
+        else:
+            rel_path = current_root.relative_to(src_path)
+            current_target = target_path / src_path.name / rel_path
+
         current_target.mkdir(parents=True, exist_ok=True)
         for file in files:
             if file.endswith('.rs'):
@@ -747,7 +763,7 @@ def main():
 
     generate_base_structure(target_dir)
 
-    all_files = mirror_directory("src", target_dir)
+    all_files = mirror_directory(".", target_dir)
 
     files_to_process = []
     if args.mode == "diff":

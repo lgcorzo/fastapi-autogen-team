@@ -6,8 +6,8 @@ title: "Module: R2r"
 source_path: "src/infrastructure/tools/r2r.rs"
 description: "Detailed architecture and specifications for the R2r module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "d749c3b"
-timestamp: "2026-08-17T20:25:11Z"
+last_verified_commit: "e0059f3"
+timestamp: "2026-08-18T20:35:50Z"
 ---
 
 # Module Specification: R2r
