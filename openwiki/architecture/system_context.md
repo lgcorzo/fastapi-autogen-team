@@ -5,7 +5,7 @@ type: "architecture"
 title: "System Context"
 description: "Architecture view for system_context"
 tags: ["iso42010", "architecture", "okf"]
-timestamp: "2026-08-17T20:25:11Z"
+timestamp: "2026-08-18T20:35:50Z"
 ---
 
 # System Context
