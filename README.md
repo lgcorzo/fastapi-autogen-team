@@ -5,6 +5,7 @@
 [![check.yml](https://img.shields.io/badge/check-passing-brightgreen.svg)](https://github.com/lgcorzo/fastapi-autogen-team/actions/workflows/check.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/lgcorzo/fastapi-autogen-team/blob/main/LICENSE)
 [![Release](https://img.shields.io/badge/release-v2.0.0-blue.svg)](https://github.com/lgcorzo/fastapi-autogen-team/releases)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/lgcorzo/fastapi-autogen-team)
 
 
 
