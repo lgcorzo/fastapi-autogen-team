@@ -6,8 +6,8 @@ title: "Module: InterfaceModule"
 source_path: "src/interface/mod.rs"
 description: "Detailed architecture and specifications for the InterfaceModule module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "e0059f3"
-timestamp: "2026-08-18T20:35:50Z"
+last_verified_commit: "631f244"
+timestamp: "2026-08-21T20:15:09Z"
 ---
 
 # Module Specification: InterfaceModule
