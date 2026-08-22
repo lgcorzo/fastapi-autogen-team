@@ -6,8 +6,8 @@ title: "Module: Api_integration"
 source_path: "tests/integration/api/api_integration.rs"
 description: "Detailed architecture and specifications for the Api_integration module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "e0059f3"
-timestamp: "2026-08-18T20:35:50Z"
+last_verified_commit: "631f244"
+timestamp: "2026-08-21T20:15:09Z"
 ---
 
 # Module Specification: Api_integration

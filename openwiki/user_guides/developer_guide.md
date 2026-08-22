@@ -5,7 +5,7 @@ type: "user_guide"
 title: "Developer Guide"
 description: "Guide for developers"
 tags: ["iso26514", "guide", "okf"]
-timestamp: "2026-08-18T20:35:50Z"
+timestamp: "2026-08-21T20:15:08Z"
 ---
 
 # Developer Guide
