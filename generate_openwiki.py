@@ -26,7 +26,7 @@ def mirror_directory(src_dir, target_dir):
     ignored_dirs = {
         ".git", ".github", ".vscode", ".idea", "node_modules",
         "dist", "bin", "obj", "target", "coverage", "__pycache__",
-        target_dir, "graphify-out"
+        "openwiki", "graphify-out"
     }
 
     files_to_process = []
