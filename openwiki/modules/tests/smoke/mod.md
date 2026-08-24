@@ -6,8 +6,8 @@ title: "Module: SmokeModule"
 source_path: "tests/smoke/mod.rs"
 description: "Detailed architecture and specifications for the SmokeModule module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "631f244"
-timestamp: "2026-08-21T20:15:09Z"
+last_verified_commit: "05e21ee"
+timestamp: "2026-08-23T20:36:01Z"
 ---
 
 # Module Specification: SmokeModule
