@@ -6,8 +6,8 @@ title: "Module: Unit_tests"
 source_path: "tests/unit_tests.rs"
 description: "Detailed architecture and specifications for the Unit_tests module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "37f8599"
+timestamp: "2026-08-25T07:30:18Z"
 ---
 
 # Module Specification: Unit_tests
