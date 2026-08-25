@@ -6,8 +6,8 @@ title: "Module: Handlers"
 source_path: "src/interface/http/handlers.rs"
 description: "Detailed architecture and specifications for the Handlers module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-25T20:56:04Z"
 ---
 
 # Module Specification: Handlers
@@ -77,6 +77,8 @@ Deterministic technical architecture for the `Handlers` module extracted directl
 * **Visibility:** +
 * **Source Line Citation:** `src/interface/http/handlers.rs:L17`
 
+**Description:** Natural language explaining exactly what the method does.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -86,11 +88,25 @@ Deterministic technical architecture for the `Handlers` module extracted directl
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `impl IntoResponse` | Success | Result of the operation |
+
+#### Side Effects
+- File operations or state changes.
+
+#### Complexity
+- **Time Complexity:** Unknown
+- **Space Complexity:** Unknown
+
+#### Example
+```rust
+// Example usage for docs_redirect
+```
 
 ### `get_models`
 * **Visibility:** +
 * **Source Line Citation:** `src/interface/http/handlers.rs:L24`
 
+**Description:** Natural language explaining exactly what the method does.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -101,9 +117,23 @@ Deterministic technical architecture for the `Handlers` module extracted directl
 | :--- | :--- | :--- |
 | `impl IntoResponse` | Success | Result of the operation |
 
+#### Side Effects
+- File operations or state changes.
+
+#### Complexity
+- **Time Complexity:** Unknown
+- **Space Complexity:** Unknown
+
+#### Example
+```rust
+// Example usage for get_models
+```
+
 ### `route_query`
 * **Visibility:** +
 * **Source Line Citation:** `src/interface/http/handlers.rs:L42`
+
+**Description:** Natural language explaining exactly what the method does.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -116,6 +146,18 @@ Deterministic technical architecture for the `Handlers` module extracted directl
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `impl IntoResponse` | Success | Result of the operation |
+
+#### Side Effects
+- File operations or state changes.
+
+#### Complexity
+- **Time Complexity:** Unknown
+- **Space Complexity:** Unknown
+
+#### Example
+```rust
+// Example usage for route_query
+```
 
 
 

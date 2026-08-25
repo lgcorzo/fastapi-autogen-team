@@ -6,8 +6,8 @@ title: "Module: Search_test"
 source_path: "tests/unit/infrastructure/search_test.rs"
 description: "Detailed architecture and specifications for the Search_test module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-25T20:56:04Z"
 ---
 
 # Module Specification: Search_test
@@ -56,6 +56,8 @@ Deterministic technical architecture for the `Search_test` module extracted dire
 ### `test_search_tool_definition`
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/infrastructure/search_test.rs:L5`
+
+**Purpose:** Internal helper method.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |

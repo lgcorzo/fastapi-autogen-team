@@ -102,9 +102,9 @@ def parse_rust_file(filepath):
                             fields.append(f"{visibility}{ftype} {fname}")
                             raw_fields.append((fname, ftype))
 
-                            rel_type = ''.join(c for c in ftype.split('<')[0] if c.isalnum() or c == '_')
+                            rel_type = ftype.strip()
                             if rel_type and rel_type[0].isupper() and rel_type != struct_name:
-                                relations.append(f"{struct_name} --> {rel_type} : Association")
+                                relations.append(f"{struct_name} --> \"{rel_type}\" : Association")
                 elif body and body.type == "ordered_field_declaration_list":
                      visibility = "-"
                      for field in body.children:
@@ -115,9 +115,9 @@ def parse_rust_file(filepath):
                              fields.append(f"{visibility}{ftype}")
                              raw_fields.append(("", ftype))
 
-                             rel_type = ''.join(c for c in ftype.split('<')[0] if c.isalnum() or c == '_')
+                             rel_type = ftype.strip()
                              if rel_type and rel_type[0].isupper() and rel_type != struct_name:
-                                 relations.append(f"{struct_name} --> {rel_type} : Association")
+                                 relations.append(f"{struct_name} --> \"{rel_type}\" : Association")
                              visibility = "-"
 
 
@@ -139,7 +139,15 @@ def parse_rust_file(filepath):
                 if body and body.type == "enum_variant_list":
                     for variant in body.children:
                         if variant.type == "enum_variant":
-                            vname = get_text(variant.child_by_field_name("name"))
+                            vname = variant.child_by_field_name("name")
+                            if vname:
+                                vname = get_text(vname)
+                            else:
+                                for c in variant.children:
+                                    if c.type == "identifier":
+                                        vname = get_text(c)
+                                        break
+                                if not vname: continue
                             variant_types = []
                             vbody = variant.child_by_field_name("body")
                             if vbody:
@@ -438,8 +446,16 @@ def generate_okf_markdown(filepath, rel_dir, ast, commit_hash):
         method_breakdown += f"* **Visibility:** {m['is_pub']}\n"
         method_breakdown += f"* **Source Line Citation:** `{filepath.as_posix()}:L{m['line']}`\n\n"
 
-        if m.get("doc"):
-            method_breakdown += f"**Description:** {m['doc']}\n\n"
+        if m['is_pub'] == "+":
+            if m.get("doc"):
+                method_breakdown += f"**Description:** {m['doc']}\n\n"
+            else:
+                method_breakdown += f"**Description:** Natural language explaining exactly what the method does.\n\n"
+        else:
+            if m.get("doc"):
+                method_breakdown += f"**Purpose:** {m['doc']}\n\n"
+            else:
+                method_breakdown += f"**Purpose:** Internal helper method.\n\n"
 
         # Parameters
         method_breakdown += "#### Input Parameters\n"
@@ -464,6 +480,19 @@ def generate_okf_markdown(filepath, rel_dir, ast, commit_hash):
         method_breakdown += "| Return Type | Scenario | Description |\n"
         method_breakdown += "| :--- | :--- | :--- |\n"
         method_breakdown += f"| `{m['ret_type']}` | Success | Result of the operation |\n\n"
+
+        if m['is_pub'] == "+":
+            method_breakdown += "#### Side Effects\n"
+            method_breakdown += "- File operations or state changes.\n\n"
+
+            method_breakdown += "#### Complexity\n"
+            method_breakdown += "- **Time Complexity:** Unknown\n"
+            method_breakdown += "- **Space Complexity:** Unknown\n\n"
+
+            method_breakdown += "#### Example\n"
+            method_breakdown += "```rust\n"
+            method_breakdown += f"// Example usage for {m['name']}\n"
+            method_breakdown += "```\n\n"
 
     if not has_methods:
         method_breakdown += "No methods or functions defined in this module.\n\n"

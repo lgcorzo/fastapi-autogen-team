@@ -6,8 +6,8 @@ title: "Module: Search"
 source_path: "src/infrastructure/tools/search.rs"
 description: "Detailed architecture and specifications for the Search module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-25T20:56:04Z"
 ---
 
 # Module Specification: Search
@@ -49,8 +49,8 @@ Deterministic technical architecture for the `Search` module extracted directly 
         -definition()
         -call()
     }
-    SearchArgs --> String : Association
-    SearchResult --> String : Association
+    SearchArgs --> "String" : Association
+    SearchResult --> "String" : Association
     Tool <|.. SearchTool : Realization
 @enduml
 ```
@@ -105,6 +105,8 @@ Deterministic technical architecture for the `Search` module extracted directly 
 * **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/search.rs:L41`
 
+**Purpose:** Internal helper method.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -119,6 +121,8 @@ Deterministic technical architecture for the `Search` module extracted directly 
 ### `SearchTool::call`
 * **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/search.rs:L58`
+
+**Purpose:** Internal helper method.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |

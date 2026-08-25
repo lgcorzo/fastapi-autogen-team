@@ -6,8 +6,8 @@ title: "Module: Jira"
 source_path: "src/infrastructure/tools/jira.rs"
 description: "Detailed architecture and specifications for the Jira module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-25T20:56:04Z"
 ---
 
 # Module Specification: Jira
@@ -41,7 +41,7 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
         -definition()
         -call()
     }
-    JiraArgs --> String : Association
+    JiraArgs --> "String" : Association
     Tool <|.. JiraTool : Realization
 @enduml
 ```
@@ -94,6 +94,8 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
 * **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/jira.rs:L31`
 
+**Purpose:** Internal helper method.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -108,6 +110,8 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
 ### `JiraTool::call`
 * **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/jira.rs:L48`
+
+**Purpose:** Internal helper method.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -124,6 +128,8 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
 * **Visibility:** +
 * **Source Line Citation:** `src/infrastructure/tools/jira.rs:L56`
 
+**Description:** Natural language explaining exactly what the method does.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -134,6 +140,18 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `anyhow::Result<String>` | Success | Result of the operation |
+
+#### Side Effects
+- File operations or state changes.
+
+#### Complexity
+- **Time Complexity:** Unknown
+- **Space Complexity:** Unknown
+
+#### Example
+```rust
+// Example usage for get_jira_results
+```
 
 
 

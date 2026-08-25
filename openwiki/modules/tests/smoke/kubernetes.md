@@ -6,8 +6,8 @@ title: "Module: Kubernetes"
 source_path: "tests/smoke/kubernetes.rs"
 description: "Detailed architecture and specifications for the Kubernetes module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-25T20:56:04Z"
 ---
 
 # Module Specification: Kubernetes
@@ -79,7 +79,7 @@ Deterministic technical architecture for the `Kubernetes` module extracted direc
 * **Visibility:** -
 * **Source Line Citation:** `tests/smoke/kubernetes.rs:L8`
 
-**Description:** Helper function to determine if the test is running inside a Kubernetes cluster.
+**Purpose:** Helper function to determine if the test is running inside a Kubernetes cluster.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -95,7 +95,7 @@ Deterministic technical architecture for the `Kubernetes` module extracted direc
 * **Visibility:** -
 * **Source Line Citation:** `tests/smoke/kubernetes.rs:L13`
 
-**Description:** Helper function to run the agent team with a specific prompt and check if a specific tool was triggered.
+**Purpose:** Helper function to run the agent team with a specific prompt and check if a specific tool was triggered.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -112,7 +112,7 @@ Deterministic technical architecture for the `Kubernetes` module extracted direc
 * **Visibility:** -
 * **Source Line Citation:** `tests/smoke/kubernetes.rs:L106`
 
-**Description:** PRODUCTION TEST: Verify that the agent successfully accesses R2R (RAG) information inside Kubernetes.
+**Purpose:** PRODUCTION TEST: Verify that the agent successfully accesses R2R (RAG) information inside Kubernetes.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -128,7 +128,7 @@ Deterministic technical architecture for the `Kubernetes` module extracted direc
 * **Visibility:** -
 * **Source Line Citation:** `tests/smoke/kubernetes.rs:L117`
 
-**Description:** PRODUCTION TEST: Verify that the agent successfully accesses JIRA information inside Kubernetes.
+**Purpose:** PRODUCTION TEST: Verify that the agent successfully accesses JIRA information inside Kubernetes.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -144,7 +144,7 @@ Deterministic technical architecture for the `Kubernetes` module extracted direc
 * **Visibility:** -
 * **Source Line Citation:** `tests/smoke/kubernetes.rs:L128`
 
-**Description:** PRODUCTION TEST: Verify that the agent successfully accesses Confluence information inside Kubernetes.
+**Purpose:** PRODUCTION TEST: Verify that the agent successfully accesses Confluence information inside Kubernetes.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -160,7 +160,7 @@ Deterministic technical architecture for the `Kubernetes` module extracted direc
 * **Visibility:** -
 * **Source Line Citation:** `tests/smoke/kubernetes.rs:L139`
 
-**Description:** PRODUCTION TEST: Verify that the agent successfully accesses ALL three systems in a single prompt.
+**Purpose:** PRODUCTION TEST: Verify that the agent successfully accesses ALL three systems in a single prompt.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |

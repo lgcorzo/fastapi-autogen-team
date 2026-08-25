@@ -6,8 +6,8 @@ title: "Module: Tools"
 source_path: "tests/integration/tools.rs"
 description: "Detailed architecture and specifications for the Tools module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-25T20:56:04Z"
 ---
 
 # Module Specification: Tools
@@ -72,6 +72,8 @@ Deterministic technical architecture for the `Tools` module extracted directly f
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/tools.rs:L7`
 
+**Purpose:** Internal helper method.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -86,6 +88,8 @@ Deterministic technical architecture for the `Tools` module extracted directly f
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/tools.rs:L36`
 
+**Purpose:** Internal helper method.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -99,6 +103,8 @@ Deterministic technical architecture for the `Tools` module extracted directly f
 ### `test_get_jira_results_no_issues`
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/tools.rs:L69`
+
+**Purpose:** Internal helper method.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |

@@ -6,8 +6,8 @@ title: "Module: SmokeModule"
 source_path: "tests/smoke/mod.rs"
 description: "Detailed architecture and specifications for the SmokeModule module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-25T20:56:04Z"
 ---
 
 # Module Specification: SmokeModule
@@ -67,7 +67,7 @@ Deterministic technical architecture for the `SmokeModule` module extracted dire
 * **Visibility:** -
 * **Source Line Citation:** `tests/smoke/mod.rs:L23`
 
-**Description:** PRODUCTION SMOKE TEST
+**Purpose:** PRODUCTION SMOKE TEST
 This test verifies that the system can connect to:
 1. LiteLLM (OpenAI Compatible)
 2. Jira

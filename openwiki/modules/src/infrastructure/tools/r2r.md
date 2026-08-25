@@ -6,8 +6,8 @@ title: "Module: R2r"
 source_path: "src/infrastructure/tools/r2r.rs"
 description: "Detailed architecture and specifications for the R2r module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-25T20:56:04Z"
 ---
 
 # Module Specification: R2r
@@ -41,7 +41,7 @@ Deterministic technical architecture for the `R2r` module extracted directly fro
         -definition()
         -call()
     }
-    R2RArgs --> String : Association
+    R2RArgs --> "String" : Association
     Tool <|.. R2RTool : Realization
 @enduml
 ```
@@ -94,6 +94,8 @@ Deterministic technical architecture for the `R2r` module extracted directly fro
 * **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/r2r.rs:L31`
 
+**Purpose:** Internal helper method.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -108,6 +110,8 @@ Deterministic technical architecture for the `R2r` module extracted directly fro
 ### `R2RTool::call`
 * **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/r2r.rs:L49`
+
+**Purpose:** Internal helper method.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -124,6 +128,8 @@ Deterministic technical architecture for the `R2r` module extracted directly fro
 * **Visibility:** +
 * **Source Line Citation:** `src/infrastructure/tools/r2r.rs:L57`
 
+**Description:** Natural language explaining exactly what the method does.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -134,6 +140,18 @@ Deterministic technical architecture for the `R2r` module extracted directly fro
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `anyhow::Result<String>` | Success | Result of the operation |
+
+#### Side Effects
+- File operations or state changes.
+
+#### Complexity
+- **Time Complexity:** Unknown
+- **Space Complexity:** Unknown
+
+#### Example
+```rust
+// Example usage for get_r2r_results
+```
 
 
 

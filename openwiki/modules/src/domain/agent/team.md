@@ -6,8 +6,8 @@ title: "Module: Team"
 source_path: "src/domain/agent/team.rs"
 description: "Detailed architecture and specifications for the Team module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-25T20:56:04Z"
 ---
 
 # Module Specification: Team
@@ -118,7 +118,7 @@ Progress events are **only** produced on the streaming path (`run_stream`).
 * **Visibility:** -
 * **Source Line Citation:** `src/domain/agent/team.rs:L32`
 
-**Description:** Returns `true` when a planner output line is a valid standalone search query.
+**Purpose:** Returns `true` when a planner output line is a valid standalone search query.
 Rejects: empty lines, JSON structural tokens, quoted strings, the literal
 TERMINATE keyword, and lines that are too short to be meaningful queries.
 
@@ -136,6 +136,8 @@ TERMINATE keyword, and lines that are too short to be meaningful queries.
 * **Visibility:** +
 * **Source Line Citation:** `src/domain/agent/team.rs:L56`
 
+**Description:** Natural language explaining exactly what the method does.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -146,9 +148,23 @@ TERMINATE keyword, and lines that are too short to be meaningful queries.
 | :--- | :--- | :--- |
 | `anyhow::Result<Self>` | Success | Result of the operation |
 
+#### Side Effects
+- File operations or state changes.
+
+#### Complexity
+- **Time Complexity:** Unknown
+- **Space Complexity:** Unknown
+
+#### Example
+```rust
+// Example usage for new
+```
+
 ### `AgentTeam::run`
 * **Visibility:** +
 * **Source Line Citation:** `src/domain/agent/team.rs:L69`
+
+**Description:** Natural language explaining exactly what the method does.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -160,6 +176,18 @@ TERMINATE keyword, and lines that are too short to be meaningful queries.
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `anyhow::Result<String>` | Success | Result of the operation |
+
+#### Side Effects
+- File operations or state changes.
+
+#### Complexity
+- **Time Complexity:** Unknown
+- **Space Complexity:** Unknown
+
+#### Example
+```rust
+// Example usage for run
+```
 
 ### `AgentTeam::run_stream`
 * **Visibility:** +
@@ -185,9 +213,23 @@ Progress events are **not** produced by the non-streaming `run()` method.
 | :--- | :--- | :--- |
 | `anyhow::Result<Pin<Box<dyn Stream<Item = anyhow::Result<AgentEvent>> + Send>>>` | Success | Result of the operation |
 
+#### Side Effects
+- File operations or state changes.
+
+#### Complexity
+- **Time Complexity:** Unknown
+- **Space Complexity:** Unknown
+
+#### Example
+```rust
+// Example usage for run_stream
+```
+
 ### `AgentTeam::new_mock`
 * **Visibility:** +
 * **Source Line Citation:** `src/domain/agent/team.rs:L457`
+
+**Description:** Natural language explaining exactly what the method does.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -199,9 +241,23 @@ Progress events are **not** produced by the non-streaming `run()` method.
 | :--- | :--- | :--- |
 | `Self` | Success | Result of the operation |
 
+#### Side Effects
+- File operations or state changes.
+
+#### Complexity
+- **Time Complexity:** Unknown
+- **Space Complexity:** Unknown
+
+#### Example
+```rust
+// Example usage for new_mock
+```
+
 ### `AgentTeam::new_test`
 * **Visibility:** +
 * **Source Line Citation:** `src/domain/agent/team.rs:L466`
+
+**Description:** Natural language explaining exactly what the method does.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -212,6 +268,18 @@ Progress events are **not** produced by the non-streaming `run()` method.
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `Self` | Success | Result of the operation |
+
+#### Side Effects
+- File operations or state changes.
+
+#### Complexity
+- **Time Complexity:** Unknown
+- **Space Complexity:** Unknown
+
+#### Example
+```rust
+// Example usage for new_test
+```
 
 
 

@@ -6,8 +6,8 @@ title: "Module: Team_test"
 source_path: "tests/unit/domain/team_test.rs"
 description: "Detailed architecture and specifications for the Team_test module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-25T20:56:04Z"
 ---
 
 # Module Specification: Team_test
@@ -70,6 +70,8 @@ Deterministic technical architecture for the `Team_test` module extracted direct
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/domain/team_test.rs:L5`
 
+**Purpose:** Internal helper method.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -84,6 +86,8 @@ Deterministic technical architecture for the `Team_test` module extracted direct
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/domain/team_test.rs:L23`
 
+**Purpose:** Internal helper method.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -97,6 +101,8 @@ Deterministic technical architecture for the `Team_test` module extracted direct
 ### `test_agent_team_run_stream_error_on_planner_failure`
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/domain/team_test.rs:L39`
+
+**Purpose:** Internal helper method.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
