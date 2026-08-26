@@ -6,8 +6,8 @@ title: "Module: Api_integration"
 source_path: "tests/integration/api/api_integration.rs"
 description: "Detailed architecture and specifications for the Api_integration module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-26T20:49:44Z"
 ---
 
 # Module Specification: Api_integration
@@ -93,6 +93,8 @@ Deterministic technical architecture for the `Api_integration` module extracted 
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/api_integration.rs:L16`
 
+**Purpose:** No description provided.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -106,6 +108,8 @@ Deterministic technical architecture for the `Api_integration` module extracted 
 ### `test_get_models`
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/api_integration.rs:L39`
+
+**Purpose:** No description provided.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -121,6 +125,8 @@ Deterministic technical architecture for the `Api_integration` module extracted 
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/api_integration.rs:L64`
 
+**Purpose:** No description provided.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -135,7 +141,7 @@ Deterministic technical architecture for the `Api_integration` module extracted 
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/api_integration.rs:L223`
 
-**Description:** Builds the full set of mockito mocks for the three-agent pipeline.
+**Purpose:** Builds the full set of mockito mocks for the three-agent pipeline.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -150,6 +156,8 @@ Deterministic technical architecture for the `Api_integration` module extracted 
 ### `test_chat_completions_streaming_sse`
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/api_integration.rs:L315`
+
+**Purpose:** No description provided.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |

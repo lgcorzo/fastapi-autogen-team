@@ -6,8 +6,8 @@ title: "Module: Handlers"
 source_path: "src/interface/http/handlers.rs"
 description: "Detailed architecture and specifications for the Handlers module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-26T20:49:44Z"
 ---
 
 # Module Specification: Handlers
@@ -77,6 +77,8 @@ Deterministic technical architecture for the `Handlers` module extracted directl
 * **Visibility:** +
 * **Source Line Citation:** `src/interface/http/handlers.rs:L17`
 
+**Description:** No description provided.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -86,11 +88,28 @@ Deterministic technical architecture for the `Handlers` module extracted directl
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `impl IntoResponse` | Success | Result of the operation |
+
+#### Side Effects
+* **Database:** None observed
+* **Network:** None observed
+* **State:** May mutate state if `&mut self` is passed.
+
+#### Complexity
+* **Time Complexity:** O(1) / O(N) depending on implementation
+* **Space Complexity:** O(1) / O(N) auxiliary space
+
+#### Example
+```rust
+// Example usage for docs_redirect
+let result = docs_redirect();
+```
 
 ### `get_models`
 * **Visibility:** +
 * **Source Line Citation:** `src/interface/http/handlers.rs:L24`
 
+**Description:** No description provided.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -101,9 +120,26 @@ Deterministic technical architecture for the `Handlers` module extracted directl
 | :--- | :--- | :--- |
 | `impl IntoResponse` | Success | Result of the operation |
 
+#### Side Effects
+* **Database:** None observed
+* **Network:** None observed
+* **State:** May mutate state if `&mut self` is passed.
+
+#### Complexity
+* **Time Complexity:** O(1) / O(N) depending on implementation
+* **Space Complexity:** O(1) / O(N) auxiliary space
+
+#### Example
+```rust
+// Example usage for get_models
+let result = get_models();
+```
+
 ### `route_query`
 * **Visibility:** +
 * **Source Line Citation:** `src/interface/http/handlers.rs:L42`
+
+**Description:** No description provided.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -116,6 +152,21 @@ Deterministic technical architecture for the `Handlers` module extracted directl
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `impl IntoResponse` | Success | Result of the operation |
+
+#### Side Effects
+* **Database:** None observed
+* **Network:** None observed
+* **State:** May mutate state if `&mut self` is passed.
+
+#### Complexity
+* **Time Complexity:** O(1) / O(N) depending on implementation
+* **Space Complexity:** O(1) / O(N) auxiliary space
+
+#### Example
+```rust
+// Example usage for route_query
+let result = route_query();
+```
 
 
 

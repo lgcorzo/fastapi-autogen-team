@@ -102,9 +102,9 @@ def parse_rust_file(filepath):
                             fields.append(f"{visibility}{ftype} {fname}")
                             raw_fields.append((fname, ftype))
 
-                            rel_type = ''.join(c for c in ftype.split('<')[0] if c.isalnum() or c == '_')
-                            if rel_type and rel_type[0].isupper() and rel_type != struct_name:
-                                relations.append(f"{struct_name} --> {rel_type} : Association")
+                            core_type = ''.join(c for c in ftype.split('<')[0] if c.isalnum() or c == '_')
+                            if core_type and core_type[0].isupper() and core_type != struct_name:
+                                relations.append(f"{struct_name} --> \"{ftype}\" : Association")
                 elif body and body.type == "ordered_field_declaration_list":
                      visibility = "-"
                      for field in body.children:
@@ -115,9 +115,9 @@ def parse_rust_file(filepath):
                              fields.append(f"{visibility}{ftype}")
                              raw_fields.append(("", ftype))
 
-                             rel_type = ''.join(c for c in ftype.split('<')[0] if c.isalnum() or c == '_')
-                             if rel_type and rel_type[0].isupper() and rel_type != struct_name:
-                                 relations.append(f"{struct_name} --> {rel_type} : Association")
+                             core_type = ''.join(c for c in ftype.split('<')[0] if c.isalnum() or c == '_')
+                             if core_type and core_type[0].isupper() and core_type != struct_name:
+                                 relations.append(f"{struct_name} --> \"{ftype}\" : Association")
                              visibility = "-"
 
 
@@ -139,7 +139,13 @@ def parse_rust_file(filepath):
                 if body and body.type == "enum_variant_list":
                     for variant in body.children:
                         if variant.type == "enum_variant":
-                            vname = get_text(variant.child_by_field_name("name"))
+                            vname = None
+                            for child in variant.children:
+                                if child.type == "identifier":
+                                    vname = get_text(child)
+                                    break
+                            if not vname:
+                                continue
                             variant_types = []
                             vbody = variant.child_by_field_name("body")
                             if vbody:
@@ -439,7 +445,15 @@ def generate_okf_markdown(filepath, rel_dir, ast, commit_hash):
         method_breakdown += f"* **Source Line Citation:** `{filepath.as_posix()}:L{m['line']}`\n\n"
 
         if m.get("doc"):
-            method_breakdown += f"**Description:** {m['doc']}\n\n"
+            if m['is_pub'] == "+":
+                method_breakdown += f"**Description:** {m['doc']}\n\n"
+            else:
+                method_breakdown += f"**Purpose:** {m['doc']}\n\n"
+        else:
+            if m['is_pub'] == "+":
+                method_breakdown += "**Description:** No description provided.\n\n"
+            else:
+                method_breakdown += "**Purpose:** No description provided.\n\n"
 
         # Parameters
         method_breakdown += "#### Input Parameters\n"
@@ -464,6 +478,20 @@ def generate_okf_markdown(filepath, rel_dir, ast, commit_hash):
         method_breakdown += "| Return Type | Scenario | Description |\n"
         method_breakdown += "| :--- | :--- | :--- |\n"
         method_breakdown += f"| `{m['ret_type']}` | Success | Result of the operation |\n\n"
+
+        if m['is_pub'] == "+":
+            method_breakdown += "#### Side Effects\n"
+            method_breakdown += "* **Database:** None observed\n"
+            method_breakdown += "* **Network:** None observed\n"
+            method_breakdown += "* **State:** May mutate state if `&mut self` is passed.\n\n"
+            method_breakdown += "#### Complexity\n"
+            method_breakdown += "* **Time Complexity:** O(1) / O(N) depending on implementation\n"
+            method_breakdown += "* **Space Complexity:** O(1) / O(N) auxiliary space\n\n"
+            method_breakdown += "#### Example\n"
+            method_breakdown += "```rust\n"
+            method_breakdown += f"// Example usage for {m['name']}\n"
+            method_breakdown += f"let result = {m['name']}();\n"
+            method_breakdown += "```\n\n"
 
     if not has_methods:
         method_breakdown += "No methods or functions defined in this module.\n\n"

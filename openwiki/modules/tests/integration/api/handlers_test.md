@@ -6,8 +6,8 @@ title: "Module: Handlers_test"
 source_path: "tests/integration/api/handlers_test.rs"
 description: "Detailed architecture and specifications for the Handlers_test module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-26T20:49:44Z"
 ---
 
 # Module Specification: Handlers_test
@@ -78,6 +78,8 @@ Deterministic technical architecture for the `Handlers_test` module extracted di
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/handlers_test.rs:L15`
 
+**Purpose:** No description provided.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -92,6 +94,8 @@ Deterministic technical architecture for the `Handlers_test` module extracted di
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/handlers_test.rs:L26`
 
+**Purpose:** No description provided.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -105,6 +109,8 @@ Deterministic technical architecture for the `Handlers_test` module extracted di
 ### `test_route_query_no_stream`
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/handlers_test.rs:L33`
+
+**Purpose:** No description provided.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |

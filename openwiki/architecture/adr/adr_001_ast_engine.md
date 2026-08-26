@@ -5,7 +5,7 @@ type: "adr"
 title: "ADR 001: Local AST Parsing Over Heavy External LLM Databases"
 description: "Decision record documenting choice of local Graphify/Pyreverse AST scripts over complex external LLM search servers."
 tags: ["adr", "iso42010", "decision"]
-timestamp: "2026-08-23T20:36:01Z"
+timestamp: "2026-08-26T20:49:44Z"
 ---
 
 # Architecture Decision Record (ADR 001)

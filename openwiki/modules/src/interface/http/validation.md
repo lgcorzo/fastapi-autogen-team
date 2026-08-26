@@ -6,8 +6,8 @@ title: "Module: Validation"
 source_path: "src/interface/http/validation.rs"
 description: "Detailed architecture and specifications for the Validation module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-26T20:49:44Z"
 ---
 
 # Module Specification: Validation
@@ -37,7 +37,7 @@ Deterministic technical architecture for the `Validation` module extracted direc
         -from_request()
     }
     FromRequest<S> <|.. ValidatedJson<T> : Realization
-    ValidatedJson --> T : Association
+    ValidatedJson --> "T" : Association
 @enduml
 ```
 
@@ -72,6 +72,8 @@ Deterministic technical architecture for the `Validation` module extracted direc
 ### `ValidatedJson<T>::from_request`
 * **Visibility:** -
 * **Source Line Citation:** `src/interface/http/validation.rs:L20`
+
+**Purpose:** No description provided.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |

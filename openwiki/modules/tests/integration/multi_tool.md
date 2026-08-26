@@ -6,8 +6,8 @@ title: "Module: Multi_tool"
 source_path: "tests/integration/multi_tool.rs"
 description: "Detailed architecture and specifications for the Multi_tool module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-26T20:49:44Z"
 ---
 
 # Module Specification: Multi_tool
@@ -60,6 +60,8 @@ Deterministic technical architecture for the `Multi_tool` module extracted direc
 ### `test_multi_tool_call`
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/multi_tool.rs:L7`
+
+**Purpose:** No description provided.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |

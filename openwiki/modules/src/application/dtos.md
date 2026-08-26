@@ -6,8 +6,8 @@ title: "Module: Dtos"
 source_path: "src/application/dtos.rs"
 description: "Detailed architecture and specifications for the Dtos module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-26T20:49:44Z"
 ---
 
 # Module Specification: Dtos
@@ -74,20 +74,22 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
         -default()
     }
     Default <|.. Output : Realization
-    ImageUrl --> Option : Association
-    ImageUrl --> String : Association
-    Input --> Option : Association
-    Input --> String : Association
-    Input --> Vec : Association
-    Message --> ContentType : Association
-    Message --> Option : Association
-    Message --> String : Association
-    ModelInformation --> HashMap : Association
-    ModelInformation --> Option : Association
-    ModelInformation --> String : Association
-    Output --> HashMap : Association
-    Output --> String : Association
-    Output --> Vec : Association
+    ImageUrl --> "Option<String>" : Association
+    ImageUrl --> "String" : Association
+    Input --> "Option<String>" : Association
+    Input --> "Option<bool>" : Association
+    Input --> "Option<f32>" : Association
+    Input --> "String" : Association
+    Input --> "Vec<Message>" : Association
+    Message --> "ContentType" : Association
+    Message --> "Option<String>" : Association
+    Message --> "String" : Association
+    ModelInformation --> "HashMap<String, Value>" : Association
+    ModelInformation --> "Option<HashMap<String, Value>>" : Association
+    ModelInformation --> "String" : Association
+    Output --> "HashMap<String, Value>" : Association
+    Output --> "String" : Association
+    Output --> "Vec<HashMap<String, Value>>" : Association
 @enduml
 ```
 
@@ -175,6 +177,8 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
 ### `Output::default`
 * **Visibility:** -
 * **Source Line Citation:** `src/application/dtos.rs:L71`
+
+**Purpose:** No description provided.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |

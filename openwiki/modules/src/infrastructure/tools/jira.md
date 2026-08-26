@@ -6,8 +6,8 @@ title: "Module: Jira"
 source_path: "src/infrastructure/tools/jira.rs"
 description: "Detailed architecture and specifications for the Jira module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-26T20:49:44Z"
 ---
 
 # Module Specification: Jira
@@ -41,7 +41,7 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
         -definition()
         -call()
     }
-    JiraArgs --> String : Association
+    JiraArgs --> "String" : Association
     Tool <|.. JiraTool : Realization
 @enduml
 ```
@@ -94,6 +94,8 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
 * **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/jira.rs:L31`
 
+**Purpose:** No description provided.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -108,6 +110,8 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
 ### `JiraTool::call`
 * **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/jira.rs:L48`
+
+**Purpose:** No description provided.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
@@ -124,6 +128,8 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
 * **Visibility:** +
 * **Source Line Citation:** `src/infrastructure/tools/jira.rs:L56`
 
+**Description:** No description provided.
+
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
@@ -134,6 +140,21 @@ Deterministic technical architecture for the `Jira` module extracted directly fr
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `anyhow::Result<String>` | Success | Result of the operation |
+
+#### Side Effects
+* **Database:** None observed
+* **Network:** None observed
+* **State:** May mutate state if `&mut self` is passed.
+
+#### Complexity
+* **Time Complexity:** O(1) / O(N) depending on implementation
+* **Space Complexity:** O(1) / O(N) auxiliary space
+
+#### Example
+```rust
+// Example usage for get_jira_results
+let result = get_jira_results();
+```
 
 
 

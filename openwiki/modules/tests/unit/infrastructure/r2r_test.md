@@ -6,8 +6,8 @@ title: "Module: R2r_test"
 source_path: "tests/unit/infrastructure/r2r_test.rs"
 description: "Detailed architecture and specifications for the R2r_test module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "6133000"
+timestamp: "2026-08-26T20:49:44Z"
 ---
 
 # Module Specification: R2r_test
@@ -58,6 +58,8 @@ Deterministic technical architecture for the `R2r_test` module extracted directl
 ### `test_get_r2r_results_success`
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/infrastructure/r2r_test.rs:L6`
+
+**Purpose:** No description provided.
 
 #### Input Parameters
 | Parameter | Data Type | Required / Default | Semantic Description |
