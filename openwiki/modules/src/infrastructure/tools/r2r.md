@@ -6,8 +6,8 @@ title: "Module: R2r"
 source_path: "src/infrastructure/tools/r2r.rs"
 description: "Detailed architecture and specifications for the R2r module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "37f8599"
+timestamp: "2026-08-25T07:30:17Z"
 ---
 
 # Module Specification: R2r
@@ -29,7 +29,7 @@ Deterministic technical architecture for the `R2r` module extracted directly fro
 ```plantuml
 @startuml
     class R2RArgs {
-        +String query
+        +query: String
     }
     class R2RError {
         <<enumeration>>

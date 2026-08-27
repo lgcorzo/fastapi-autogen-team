@@ -6,8 +6,8 @@ title: "Module: Dtos"
 source_path: "src/application/dtos.rs"
 description: "Detailed architecture and specifications for the Dtos module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "37f8599"
+timestamp: "2026-08-25T07:30:18Z"
 ---
 
 # Module Specification: Dtos
@@ -26,8 +26,8 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
 ```plantuml
 @startuml
     class ImageUrl {
-        +String url
-        +Option<String> detail
+        +url: String
+        +detail: Option<String>
     }
     class Content {
         <<enumeration>>
@@ -35,19 +35,19 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
         Text
     }
     class ModelInformation {
-        +String id
-        +String name
-        +String description
-        +HashMap<String, Value> pricing
-        +u32 context_length
-        +HashMap<String, Value> architecture
-        +HashMap<String, Value> top_provider
-        +Option<HashMap<String, Value>> per_request_limits
+        +id: String
+        +name: String
+        +description: String
+        +pricing: HashMap<String, Value>
+        +context_length: u32
+        +architecture: HashMap<String, Value>
+        +top_provider: HashMap<String, Value>
+        +per_request_limits: Option<HashMap<String, Value>>
     }
     class Message {
-        +String role
-        +ContentType content
-        +Option<String> name
+        +role: String
+        +content: ContentType
+        +name: Option<String>
     }
     class ContentType {
         <<enumeration>>
@@ -55,22 +55,22 @@ Deterministic technical architecture for the `Dtos` module extracted directly fr
         List
     }
     class Input {
-        +String model
-        +Option<String> user
-        +Vec<Message> messages
-        +Option<f32> temperature
-        +Option<f32> top_p
-        +Option<f32> presence_penalty
-        +Option<f32> frequency_penalty
-        +Option<bool> stream
+        +model: String
+        +user: Option<String>
+        +messages: Vec<Message>
+        +temperature: Option<f32>
+        +top_p: Option<f32>
+        +presence_penalty: Option<f32>
+        +frequency_penalty: Option<f32>
+        +stream: Option<bool>
     }
     class Output {
-        +String id
-        +String object
-        +i64 created
-        +String model
-        +Vec<HashMap<String, Value>> choices
-        +HashMap<String, Value> usage
+        +id: String
+        +object: String
+        +created: i64
+        +model: String
+        +choices: Vec<HashMap<String, Value>>
+        +usage: HashMap<String, Value>
         -default()
     }
     Default <|.. Output : Realization

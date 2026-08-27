@@ -6,8 +6,8 @@ title: "Module: Team"
 source_path: "src/domain/agent/team.rs"
 description: "Detailed architecture and specifications for the Team module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "05e21ee"
-timestamp: "2026-08-23T20:36:01Z"
+last_verified_commit: "37f8599"
+timestamp: "2026-08-25T07:30:18Z"
 ---
 
 # Module Specification: Team
@@ -43,7 +43,7 @@ Deterministic technical architecture for the `Team` module extracted directly fr
         Done
     }
     class AgentTeam {
-        -openai::Client client
+        -client: openai::Client
         +new()
         +run()
         +run_stream()

@@ -72,6 +72,8 @@ def parse_rust_file(filepath):
         while curr:
             if curr.type == "attribute_item":
                 pass
+            elif curr.type == "line_comment" and not get_text(curr).startswith("///"):
+                pass
             elif curr.type == "line_comment" and get_text(curr).startswith("///"):
                 docs.insert(0, get_text(curr)[3:].strip())
             else:
@@ -99,7 +101,7 @@ def parse_rust_file(filepath):
                                 if c.type == "visibility_modifier":
                                     visibility = "+"
                                     break
-                            fields.append(f"{visibility}{ftype} {fname}")
+                            fields.append(f"{visibility}{fname}: {ftype}")
                             raw_fields.append((fname, ftype))
 
                             rel_type = ''.join(c for c in ftype.split('<')[0] if c.isalnum() or c == '_')
