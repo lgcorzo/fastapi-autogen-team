@@ -6,8 +6,8 @@ title: "Module: SmokeModule"
 source_path: "tests/smoke/mod.rs"
 description: "Detailed architecture and specifications for the SmokeModule module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-27T21:46:14Z"
 ---
 
 # Module Specification: SmokeModule
@@ -67,7 +67,7 @@ Deterministic technical architecture for the `SmokeModule` module extracted dire
 * **Visibility:** -
 * **Source Line Citation:** `tests/smoke/mod.rs:L23`
 
-**Description:** PRODUCTION SMOKE TEST
+**Purpose:** PRODUCTION SMOKE TEST
 This test verifies that the system can connect to:
 1. LiteLLM (OpenAI Compatible)
 2. Jira
@@ -76,15 +76,13 @@ This test verifies that the system can connect to:
 CAUTION: This test consumes real LLM tokens and makes live requests.
 It is ignored by default. Run with `cargo test --test smoke_tests -- --ignored`.
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 
 

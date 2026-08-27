@@ -6,8 +6,8 @@ title: "Module: Confluence"
 source_path: "src/infrastructure/tools/confluence.rs"
 description: "Detailed architecture and specifications for the Confluence module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:17Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-27T21:46:14Z"
 ---
 
 # Module Specification: Confluence
@@ -41,7 +41,7 @@ Deterministic technical architecture for the `Confluence` module extracted direc
         -definition()
         -call()
     }
-    ConfluenceArgs --> String : Association
+    ConfluenceArgs --> "String" : Association
     Tool <|.. ConfluenceTool : Realization
 @enduml
 ```
@@ -94,46 +94,54 @@ Deterministic technical architecture for the `Confluence` module extracted direc
 * **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/confluence.rs:L31`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| `&self` | `self` | Required | Instance reference |
-| `_prompt` | `String` | Required | Parameter |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| `&self` | `self` |
+| `_prompt` | `String` |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `ToolDefinition` | Success | Result of the operation |
+#### Return value
+- `ToolDefinition`
 
 ### `ConfluenceTool::call`
 * **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/confluence.rs:L48`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| `&self` | `self` | Required | Instance reference |
-| `args: Self::Args` | `self` | Required | Instance reference |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| `&self` | `self` |
+| `args: Self::Args` | `self` |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `Result<Self::Output, Self::Error>` | Success | Result of the operation |
+#### Return value
+- `Result<Self::Output, Self::Error>`
 
 ### `get_confluence_results`
 * **Visibility:** +
 * **Source Line Citation:** `src/infrastructure/tools/confluence.rs:L56`
 
-#### Input Parameters
+#### Inputs
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
 | `url` | `&str` | Required | Parameter |
 | `query` | `&str` | Required | Parameter |
 
-#### Return Value & Output Shape
+#### Output
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `anyhow::Result<String>` | Success | Result of the operation |
+
+#### Side Effects
+- Potential database updates, state changes, or network calls.
+
+#### Complexity
+- **Time Complexity:** O(1) (Estimated)
+- **Space Complexity:** O(1) (Estimated)
+
+#### Example
+```rust
+// Example usage for get_confluence_results
+```
 
 
 

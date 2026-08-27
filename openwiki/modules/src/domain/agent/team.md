@@ -6,8 +6,8 @@ title: "Module: Team"
 source_path: "src/domain/agent/team.rs"
 description: "Detailed architecture and specifications for the Team module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-27T21:46:14Z"
 ---
 
 # Module Specification: Team
@@ -118,48 +118,70 @@ Progress events are **only** produced on the streaming path (`run_stream`).
 * **Visibility:** -
 * **Source Line Citation:** `src/domain/agent/team.rs:L32`
 
-**Description:** Returns `true` when a planner output line is a valid standalone search query.
+**Purpose:** Returns `true` when a planner output line is a valid standalone search query.
 Rejects: empty lines, JSON structural tokens, quoted strings, the literal
 TERMINATE keyword, and lines that are too short to be meaningful queries.
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| `line` | `&str` | Required | Parameter |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| `line` | `&str` |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `bool` | Success | Result of the operation |
+#### Return value
+- `bool`
 
 ### `AgentTeam::new`
 * **Visibility:** +
 * **Source Line Citation:** `src/domain/agent/team.rs:L56`
 
-#### Input Parameters
+#### Inputs
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
 | None | None | N/A | No parameters |
 
-#### Return Value & Output Shape
+#### Output
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `anyhow::Result<Self>` | Success | Result of the operation |
+
+#### Side Effects
+- Potential database updates, state changes, or network calls.
+
+#### Complexity
+- **Time Complexity:** O(1) (Estimated)
+- **Space Complexity:** O(1) (Estimated)
+
+#### Example
+```rust
+// Example usage for new
+```
 
 ### `AgentTeam::run`
 * **Visibility:** +
 * **Source Line Citation:** `src/domain/agent/team.rs:L69`
 
-#### Input Parameters
+#### Inputs
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
 | `&self` | `self` | Required | Instance reference |
 | `input` | `Input` | Required | Parameter |
 
-#### Return Value & Output Shape
+#### Output
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `anyhow::Result<String>` | Success | Result of the operation |
+
+#### Side Effects
+- Potential database updates, state changes, or network calls.
+
+#### Complexity
+- **Time Complexity:** O(1) (Estimated)
+- **Space Complexity:** O(1) (Estimated)
+
+#### Example
+```rust
+// Example usage for run
+```
 
 ### `AgentTeam::run_stream`
 * **Visibility:** +
@@ -174,44 +196,80 @@ Emits:
 
 Progress events are **not** produced by the non-streaming `run()` method.
 
-#### Input Parameters
+#### Inputs
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
 | `&self` | `self` | Required | Instance reference |
 | `input` | `Input` | Required | Parameter |
 
-#### Return Value & Output Shape
+#### Output
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `anyhow::Result<Pin<Box<dyn Stream<Item = anyhow::Result<AgentEvent>> + Send>>>` | Success | Result of the operation |
+
+#### Side Effects
+- Potential database updates, state changes, or network calls.
+
+#### Complexity
+- **Time Complexity:** O(1) (Estimated)
+- **Space Complexity:** O(1) (Estimated)
+
+#### Example
+```rust
+// Example usage for run_stream
+```
 
 ### `AgentTeam::new_mock`
 * **Visibility:** +
 * **Source Line Citation:** `src/domain/agent/team.rs:L457`
 
-#### Input Parameters
+#### Inputs
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
 | None | None | N/A | No parameters |
 
-#### Return Value & Output Shape
+#### Output
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `Self` | Success | Result of the operation |
+
+#### Side Effects
+- Potential database updates, state changes, or network calls.
+
+#### Complexity
+- **Time Complexity:** O(1) (Estimated)
+- **Space Complexity:** O(1) (Estimated)
+
+#### Example
+```rust
+// Example usage for new_mock
+```
 
 ### `AgentTeam::new_test`
 * **Visibility:** +
 * **Source Line Citation:** `src/domain/agent/team.rs:L466`
 
-#### Input Parameters
+#### Inputs
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
 | `base_url` | `&str` | Required | Parameter |
 
-#### Return Value & Output Shape
+#### Output
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `Self` | Success | Result of the operation |
+
+#### Side Effects
+- Potential database updates, state changes, or network calls.
+
+#### Complexity
+- **Time Complexity:** O(1) (Estimated)
+- **Space Complexity:** O(1) (Estimated)
+
+#### Example
+```rust
+// Example usage for new_test
+```
 
 
 

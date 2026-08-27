@@ -6,8 +6,8 @@ title: "Module: Routes"
 source_path: "src/interface/http/routes.rs"
 description: "Detailed architecture and specifications for the Routes module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-27T21:46:14Z"
 ---
 
 # Module Specification: Routes
@@ -34,7 +34,7 @@ Deterministic technical architecture for the `Routes` module extracted directly 
     class AppState {
         +team: AgentTeam
     }
-    AppState --> AgentTeam : Association
+    AppState --> "AgentTeam" : Association
 @enduml
 ```
 
@@ -69,15 +69,27 @@ Deterministic technical architecture for the `Routes` module extracted directly 
 * **Visibility:** +
 * **Source Line Citation:** `src/interface/http/routes.rs:L15`
 
-#### Input Parameters
+#### Inputs
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
 | `state` | `Arc<AppState>` | Required | Parameter |
 
-#### Return Value & Output Shape
+#### Output
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `Router` | Success | Result of the operation |
+
+#### Side Effects
+- Potential database updates, state changes, or network calls.
+
+#### Complexity
+- **Time Complexity:** O(1) (Estimated)
+- **Space Complexity:** O(1) (Estimated)
+
+#### Example
+```rust
+// Example usage for create_app
+```
 
 
 

@@ -6,8 +6,8 @@ title: "Module: Kubernetes"
 source_path: "tests/smoke/kubernetes.rs"
 description: "Detailed architecture and specifications for the Kubernetes module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-27T21:46:14Z"
 ---
 
 # Module Specification: Kubernetes
@@ -79,98 +79,86 @@ Deterministic technical architecture for the `Kubernetes` module extracted direc
 * **Visibility:** -
 * **Source Line Citation:** `tests/smoke/kubernetes.rs:L8`
 
-**Description:** Helper function to determine if the test is running inside a Kubernetes cluster.
+**Purpose:** Helper function to determine if the test is running inside a Kubernetes cluster.
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `bool` | Success | Result of the operation |
+#### Return value
+- `bool`
 
 ### `run_kubernetes_agent_test`
 * **Visibility:** -
 * **Source Line Citation:** `tests/smoke/kubernetes.rs:L13`
 
-**Description:** Helper function to run the agent team with a specific prompt and check if a specific tool was triggered.
+**Purpose:** Helper function to run the agent team with a specific prompt and check if a specific tool was triggered.
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| `prompt` | `&str` | Required | Parameter |
-| `expected_tool_indicator` | `&str` | Required | Parameter |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| `prompt` | `&str` |
+| `expected_tool_indicator` | `&str` |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 ### `test_r2r_access_in_kubernetes`
 * **Visibility:** -
 * **Source Line Citation:** `tests/smoke/kubernetes.rs:L106`
 
-**Description:** PRODUCTION TEST: Verify that the agent successfully accesses R2R (RAG) information inside Kubernetes.
+**Purpose:** PRODUCTION TEST: Verify that the agent successfully accesses R2R (RAG) information inside Kubernetes.
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 ### `test_jira_access_in_kubernetes`
 * **Visibility:** -
 * **Source Line Citation:** `tests/smoke/kubernetes.rs:L117`
 
-**Description:** PRODUCTION TEST: Verify that the agent successfully accesses JIRA information inside Kubernetes.
+**Purpose:** PRODUCTION TEST: Verify that the agent successfully accesses JIRA information inside Kubernetes.
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 ### `test_confluence_access_in_kubernetes`
 * **Visibility:** -
 * **Source Line Citation:** `tests/smoke/kubernetes.rs:L128`
 
-**Description:** PRODUCTION TEST: Verify that the agent successfully accesses Confluence information inside Kubernetes.
+**Purpose:** PRODUCTION TEST: Verify that the agent successfully accesses Confluence information inside Kubernetes.
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 ### `test_all_tools_access_in_kubernetes`
 * **Visibility:** -
 * **Source Line Citation:** `tests/smoke/kubernetes.rs:L139`
 
-**Description:** PRODUCTION TEST: Verify that the agent successfully accesses ALL three systems in a single prompt.
+**Purpose:** PRODUCTION TEST: Verify that the agent successfully accesses ALL three systems in a single prompt.
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 
 

@@ -6,8 +6,8 @@ title: "Module: Sanitization_test"
 source_path: "tests/security/sanitization_test.rs"
 description: "Detailed architecture and specifications for the Sanitization_test module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-27T21:46:14Z"
 ---
 
 # Module Specification: Sanitization_test
@@ -90,71 +90,61 @@ Deterministic technical architecture for the `Sanitization_test` module extracte
 * **Visibility:** -
 * **Source Line Citation:** `tests/security/sanitization_test.rs:L13`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 ### `test_invalid_json_rejection`
 * **Visibility:** -
 * **Source Line Citation:** `tests/security/sanitization_test.rs:L50`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 ### `test_empty_messages_validation`
 * **Visibility:** -
 * **Source Line Citation:** `tests/security/sanitization_test.rs:L79`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 ### `test_cors_malformed_origins_no_panic`
 * **Visibility:** -
 * **Source Line Citation:** `tests/security/sanitization_test.rs:L107`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 ### `test_cors_empty_origins_no_panic`
 * **Visibility:** -
 * **Source Line Citation:** `tests/security/sanitization_test.rs:L118`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 
 

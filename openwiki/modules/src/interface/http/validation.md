@@ -6,8 +6,8 @@ title: "Module: Validation"
 source_path: "src/interface/http/validation.rs"
 description: "Detailed architecture and specifications for the Validation module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-27T21:46:14Z"
 ---
 
 # Module Specification: Validation
@@ -37,7 +37,7 @@ Deterministic technical architecture for the `Validation` module extracted direc
         -from_request()
     }
     FromRequest<S> <|.. ValidatedJson<T> : Realization
-    ValidatedJson --> T : Association
+    ValidatedJson --> "T" : Association
 @enduml
 ```
 
@@ -73,16 +73,14 @@ Deterministic technical architecture for the `Validation` module extracted direc
 * **Visibility:** -
 * **Source Line Citation:** `src/interface/http/validation.rs:L20`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| `req` | `Request` | Required | Parameter |
-| `state` | `&S` | Required | Parameter |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| `req` | `Request` |
+| `state` | `&S` |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `Result<Self, Self::Rejection>` | Success | Result of the operation |
+#### Return value
+- `Result<Self, Self::Rejection>`
 
 
 

@@ -6,8 +6,8 @@ title: "Module: Main"
 source_path: "src/main.rs"
 description: "Detailed architecture and specifications for the Main module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:17Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-27T21:46:14Z"
 ---
 
 # Module Specification: Main
@@ -62,15 +62,13 @@ Deterministic technical architecture for the `Main` module extracted directly fr
 * **Visibility:** -
 * **Source Line Citation:** `src/main.rs:L9`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `anyhow::Result<()>` | Success | Result of the operation |
+#### Return value
+- `anyhow::Result<()>`
 
 
 

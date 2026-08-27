@@ -6,8 +6,8 @@ title: "Module: Handlers"
 source_path: "src/interface/http/handlers.rs"
 description: "Detailed architecture and specifications for the Handlers module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-27T21:46:14Z"
 ---
 
 # Module Specification: Handlers
@@ -77,45 +77,81 @@ Deterministic technical architecture for the `Handlers` module extracted directl
 * **Visibility:** +
 * **Source Line Citation:** `src/interface/http/handlers.rs:L17`
 
-#### Input Parameters
+#### Inputs
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
 | None | None | N/A | No parameters |
 
-#### Return Value & Output Shape
+#### Output
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `impl IntoResponse` | Success | Result of the operation |
+
+#### Side Effects
+- Potential database updates, state changes, or network calls.
+
+#### Complexity
+- **Time Complexity:** O(1) (Estimated)
+- **Space Complexity:** O(1) (Estimated)
+
+#### Example
+```rust
+// Example usage for docs_redirect
+```
 
 ### `get_models`
 * **Visibility:** +
 * **Source Line Citation:** `src/interface/http/handlers.rs:L24`
 
-#### Input Parameters
+#### Inputs
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
 | None | None | N/A | No parameters |
 
-#### Return Value & Output Shape
+#### Output
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `impl IntoResponse` | Success | Result of the operation |
+
+#### Side Effects
+- Potential database updates, state changes, or network calls.
+
+#### Complexity
+- **Time Complexity:** O(1) (Estimated)
+- **Space Complexity:** O(1) (Estimated)
+
+#### Example
+```rust
+// Example usage for get_models
+```
 
 ### `route_query`
 * **Visibility:** +
 * **Source Line Citation:** `src/interface/http/handlers.rs:L42`
 
-#### Input Parameters
+#### Inputs
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
 | `State(state)` | `State<Arc<AppState>>` | Required | Parameter |
 | `headers` | `HeaderMap` | Required | Parameter |
 | `ValidatedJson(request)` | `ValidatedJson<Input>` | Required | Parameter |
 
-#### Return Value & Output Shape
+#### Output
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `impl IntoResponse` | Success | Result of the operation |
+
+#### Side Effects
+- Potential database updates, state changes, or network calls.
+
+#### Complexity
+- **Time Complexity:** O(1) (Estimated)
+- **Space Complexity:** O(1) (Estimated)
+
+#### Example
+```rust
+// Example usage for route_query
+```
 
 
 

@@ -6,8 +6,8 @@ title: "Module: WorkflowModule"
 source_path: "tests/integration/workflow/mod.rs"
 description: "Detailed architecture and specifications for the WorkflowModule module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-27T21:46:14Z"
 ---
 
 # Module Specification: WorkflowModule

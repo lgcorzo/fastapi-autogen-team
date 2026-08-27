@@ -6,8 +6,8 @@ title: "Module: Middleware"
 source_path: "src/interface/http/middleware.rs"
 description: "Detailed architecture and specifications for the Middleware module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-27T21:46:14Z"
 ---
 
 # Module Specification: Middleware
@@ -63,29 +63,53 @@ Deterministic technical architecture for the `Middleware` module extracted direc
 * **Visibility:** +
 * **Source Line Citation:** `src/interface/http/middleware.rs:L6`
 
-#### Input Parameters
+#### Inputs
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
 | None | None | N/A | No parameters |
 
-#### Return Value & Output Shape
+#### Output
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `Vec<SetResponseHeaderLayer<HeaderValue>>` | Success | Result of the operation |
+
+#### Side Effects
+- Potential database updates, state changes, or network calls.
+
+#### Complexity
+- **Time Complexity:** O(1) (Estimated)
+- **Space Complexity:** O(1) (Estimated)
+
+#### Example
+```rust
+// Example usage for security_headers
+```
 
 ### `cors_layer`
 * **Visibility:** +
 * **Source Line Citation:** `src/interface/http/middleware.rs:L33`
 
-#### Input Parameters
+#### Inputs
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
 | None | None | N/A | No parameters |
 
-#### Return Value & Output Shape
+#### Output
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `Option<CorsLayer>` | Success | Result of the operation |
+
+#### Side Effects
+- Potential database updates, state changes, or network calls.
+
+#### Complexity
+- **Time Complexity:** O(1) (Estimated)
+- **Space Complexity:** O(1) (Estimated)
+
+#### Example
+```rust
+// Example usage for cors_layer
+```
 
 
 

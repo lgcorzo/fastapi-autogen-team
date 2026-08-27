@@ -6,8 +6,8 @@ title: "Module: Tools"
 source_path: "tests/integration/tools.rs"
 description: "Detailed architecture and specifications for the Tools module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-27T21:46:14Z"
 ---
 
 # Module Specification: Tools
@@ -72,43 +72,37 @@ Deterministic technical architecture for the `Tools` module extracted directly f
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/tools.rs:L7`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 ### `test_get_jira_results_success`
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/tools.rs:L36`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 ### `test_get_jira_results_no_issues`
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/tools.rs:L69`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 
 

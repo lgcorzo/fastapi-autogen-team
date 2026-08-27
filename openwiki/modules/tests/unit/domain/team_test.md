@@ -6,8 +6,8 @@ title: "Module: Team_test"
 source_path: "tests/unit/domain/team_test.rs"
 description: "Detailed architecture and specifications for the Team_test module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-27T21:46:14Z"
 ---
 
 # Module Specification: Team_test
@@ -70,43 +70,37 @@ Deterministic technical architecture for the `Team_test` module extracted direct
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/domain/team_test.rs:L5`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| `text` | `&str` | Required | Parameter |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| `text` | `&str` |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `Input` | Success | Result of the operation |
+#### Return value
+- `Input`
 
 ### `test_agent_team_run_error`
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/domain/team_test.rs:L23`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 ### `test_agent_team_run_stream_error_on_planner_failure`
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/domain/team_test.rs:L39`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+#### Parameters
+| Parameter | Type |
+| :--- | :--- |
+| None | None |
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
-| :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+#### Return value
+- `()`
 
 
 
