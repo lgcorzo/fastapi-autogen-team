@@ -6,8 +6,8 @@ title: "Module: SecurityModule"
 source_path: "tests/security/mod.rs"
 description: "Detailed architecture and specifications for the SecurityModule module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-28T20:18:23Z"
 ---
 
 # Module Specification: SecurityModule
@@ -77,43 +77,43 @@ Deterministic technical architecture for the `SecurityModule` module extracted d
 * **Visibility:** -
 * **Source Line Citation:** `tests/security/mod.rs:L12`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 ### `test_cors_specific_origins`
 * **Visibility:** -
 * **Source Line Citation:** `tests/security/mod.rs:L47`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 ### `test_header_injection_sanitization`
 * **Visibility:** -
 * **Source Line Citation:** `tests/security/mod.rs:L100`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 
 

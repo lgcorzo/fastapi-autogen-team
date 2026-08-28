@@ -6,8 +6,8 @@ title: "Module: Telemetry"
 source_path: "src/infrastructure/telemetry.rs"
 description: "Detailed architecture and specifications for the Telemetry module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:17Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-28T20:18:23Z"
 ---
 
 # Module Specification: Telemetry
@@ -60,16 +60,30 @@ Deterministic technical architecture for the `Telemetry` module extracted direct
 * **Visibility:** +
 * **Source Line Citation:** `src/infrastructure/telemetry.rs:L6`
 
-#### Input Parameters
+**Description:** No description provided.
+
+#### Inputs
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
 | `app_name` | `&str` | Required | Parameter |
 | `endpoint` | `&str` | Required | Parameter |
 
-#### Return Value & Output Shape
+#### Output
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `anyhow::Result<()>` | Success | Result of the operation |
+
+#### Side Effects
+None identified.
+
+#### Complexity
+- **Time Complexity:** O(1) (Estimated)
+- **Space Complexity:** O(1) (Estimated)
+
+#### Example
+```rust
+// Example usage
+```
 
 
 

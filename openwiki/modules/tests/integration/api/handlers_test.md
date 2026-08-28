@@ -6,8 +6,8 @@ title: "Module: Handlers_test"
 source_path: "tests/integration/api/handlers_test.rs"
 description: "Detailed architecture and specifications for the Handlers_test module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-28T20:18:23Z"
 ---
 
 # Module Specification: Handlers_test
@@ -78,43 +78,43 @@ Deterministic technical architecture for the `Handlers_test` module extracted di
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/handlers_test.rs:L15`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 ### `test_get_models`
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/handlers_test.rs:L26`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 ### `test_route_query_no_stream`
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/handlers_test.rs:L33`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 
 

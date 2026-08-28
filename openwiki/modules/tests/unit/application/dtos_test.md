@@ -6,8 +6,8 @@ title: "Module: Dtos_test"
 source_path: "tests/unit/application/dtos_test.rs"
 description: "Detailed architecture and specifications for the Dtos_test module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-28T20:18:23Z"
 ---
 
 # Module Specification: Dtos_test
@@ -77,71 +77,71 @@ Deterministic technical architecture for the `Dtos_test` module extracted direct
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/application/dtos_test.rs:L5`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 ### `test_message_valid`
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/application/dtos_test.rs:L23`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 ### `test_input_valid`
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/application/dtos_test.rs:L33`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 ### `test_content_type_list`
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/application/dtos_test.rs:L45`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 ### `test_output_default`
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/application/dtos_test.rs:L65`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 
 

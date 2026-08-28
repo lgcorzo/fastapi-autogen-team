@@ -6,8 +6,8 @@ title: "Module: Api_integration"
 source_path: "tests/integration/api/api_integration.rs"
 description: "Detailed architecture and specifications for the Api_integration module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-28T20:18:23Z"
 ---
 
 # Module Specification: Api_integration
@@ -93,73 +93,71 @@ Deterministic technical architecture for the `Api_integration` module extracted 
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/api_integration.rs:L16`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 ### `test_get_models`
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/api_integration.rs:L39`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 ### `test_chat_completions_route`
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/api_integration.rs:L64`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 ### `setup_pipeline_mocks`
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/api_integration.rs:L223`
 
-**Description:** Builds the full set of mockito mocks for the three-agent pipeline.
+**Purpose:** Builds the full set of mockito mocks for the three-agent pipeline.
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| `server` | `&mut Server` | Required | Parameter |
-
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `Vec<mockito::Mock>` | Success | Result of the operation |
+| `server` | `&mut Server` | Parameter |
+
+#### Return value
+`Vec<mockito::Mock>`
 
 ### `test_chat_completions_streaming_sse`
 * **Visibility:** -
 * **Source Line Citation:** `tests/integration/api/api_integration.rs:L315`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 
 

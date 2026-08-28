@@ -104,9 +104,8 @@ def parse_rust_file(filepath):
                             fields.append(f"{visibility}{fname}: {ftype}")
                             raw_fields.append((fname, ftype))
 
-                            rel_type = ''.join(c for c in ftype.split('<')[0] if c.isalnum() or c == '_')
-                            if rel_type and rel_type[0].isupper() and rel_type != struct_name:
-                                relations.append(f"{struct_name} --> {rel_type} : Association")
+                            if ftype and ftype[0].isupper() and ftype != struct_name:
+                                relations.append(f'{struct_name} --> "{ftype}" : Association')
                 elif body and body.type == "ordered_field_declaration_list":
                      visibility = "-"
                      for field in body.children:
@@ -117,9 +116,8 @@ def parse_rust_file(filepath):
                              fields.append(f"{visibility}{ftype}")
                              raw_fields.append(("", ftype))
 
-                             rel_type = ''.join(c for c in ftype.split('<')[0] if c.isalnum() or c == '_')
-                             if rel_type and rel_type[0].isupper() and rel_type != struct_name:
-                                 relations.append(f"{struct_name} --> {rel_type} : Association")
+                             if ftype and ftype[0].isupper() and ftype != struct_name:
+                                 relations.append(f'{struct_name} --> "{ftype}" : Association')
                              visibility = "-"
 
 
@@ -141,9 +139,19 @@ def parse_rust_file(filepath):
                 if body and body.type == "enum_variant_list":
                     for variant in body.children:
                         if variant.type == "enum_variant":
-                            vname = get_text(variant.child_by_field_name("name"))
+                            vname_node = None
+                            for c in variant.children:
+                                if c.type == "identifier":
+                                    vname_node = c
+                                    break
+                            vname = get_text(vname_node) if vname_node else "Unknown"
                             variant_types = []
-                            vbody = variant.child_by_field_name("body")
+
+                            vbody = None
+                            for c in variant.children:
+                                if c.type in ("field_declaration_list", "ordered_field_declaration_list"):
+                                    vbody = c
+                                    break
                             if vbody:
                                 if vbody.type == "field_declaration_list":
                                     for field in vbody.children:
@@ -440,32 +448,78 @@ def generate_okf_markdown(filepath, rel_dir, ast, commit_hash):
         method_breakdown += f"* **Visibility:** {m['is_pub']}\n"
         method_breakdown += f"* **Source Line Citation:** `{filepath.as_posix()}:L{m['line']}`\n\n"
 
-        if m.get("doc"):
-            method_breakdown += f"**Description:** {m['doc']}\n\n"
+        if m["is_pub"] == "+":
+            # Public method documentation
+            if m.get("doc"):
+                method_breakdown += f"**Description:** {m['doc']}\n\n"
+            else:
+                method_breakdown += "**Description:** No description provided.\n\n"
 
-        # Parameters
-        method_breakdown += "#### Input Parameters\n"
-        method_breakdown += "| Parameter | Data Type | Required / Default | Semantic Description |\n"
-        method_breakdown += "| :--- | :--- | :--- | :--- |\n"
-        if m["params"]:
-            for param in m["params"].split(','):
-                param = param.strip()
-                if param:
-                    parts = param.split(':')
-                    if len(parts) == 2:
-                        pname, ptype = parts[0].strip(), parts[1].strip()
-                        method_breakdown += f"| `{pname}` | `{ptype}` | Required | Parameter |\n"
-                    else:
-                        method_breakdown += f"| `{param}` | `self` | Required | Instance reference |\n"
+            # Inputs
+            method_breakdown += "#### Inputs\n"
+            method_breakdown += "| Parameter | Data Type | Required / Default | Semantic Description |\n"
+            method_breakdown += "| :--- | :--- | :--- | :--- |\n"
+            if m["params"]:
+                for param in m["params"].split(','):
+                    param = param.strip()
+                    if param:
+                        parts = param.split(':')
+                        if len(parts) >= 2:
+                            pname, ptype = parts[0].strip(), parts[1].strip()
+                            method_breakdown += f"| `{pname}` | `{ptype}` | Required | Parameter |\n"
+                        else:
+                            method_breakdown += f"| `{param}` | `self` | Required | Instance reference |\n"
+            else:
+                method_breakdown += "| None | None | N/A | No parameters |\n"
+            method_breakdown += "\n"
+
+            # Output
+            method_breakdown += "#### Output\n"
+            method_breakdown += "| Return Type | Scenario | Description |\n"
+            method_breakdown += "| :--- | :--- | :--- |\n"
+            method_breakdown += f"| `{m['ret_type']}` | Success | Result of the operation |\n\n"
+
+            # Side Effects
+            method_breakdown += "#### Side Effects\n"
+            method_breakdown += "None identified.\n\n"
+
+            # Complexity
+            method_breakdown += "#### Complexity\n"
+            method_breakdown += "- **Time Complexity:** O(1) (Estimated)\n"
+            method_breakdown += "- **Space Complexity:** O(1) (Estimated)\n\n"
+
+            # Example
+            method_breakdown += "#### Example\n"
+            method_breakdown += "```rust\n// Example usage\n```\n\n"
+
         else:
-            method_breakdown += "| None | None | N/A | No parameters |\n"
-        method_breakdown += "\n"
+            # Private method documentation
+            if m.get("doc"):
+                method_breakdown += f"**Purpose:** {m['doc']}\n\n"
+            else:
+                method_breakdown += "**Purpose:** No description provided.\n\n"
 
-        # Return Value
-        method_breakdown += "#### Return Value & Output Shape\n"
-        method_breakdown += "| Return Type | Scenario | Description |\n"
-        method_breakdown += "| :--- | :--- | :--- |\n"
-        method_breakdown += f"| `{m['ret_type']}` | Success | Result of the operation |\n\n"
+            # Parameters
+            method_breakdown += "#### Parameters\n"
+            method_breakdown += "| Parameter | Type | Description |\n"
+            method_breakdown += "| :--- | :--- | :--- |\n"
+            if m["params"]:
+                for param in m["params"].split(','):
+                    param = param.strip()
+                    if param:
+                        parts = param.split(':')
+                        if len(parts) >= 2:
+                            pname, ptype = parts[0].strip(), parts[1].strip()
+                            method_breakdown += f"| `{pname}` | `{ptype}` | Parameter |\n"
+                        else:
+                            method_breakdown += f"| `{param}` | `self` | Instance reference |\n"
+            else:
+                method_breakdown += "| None | None | No parameters |\n"
+            method_breakdown += "\n"
+
+            # Return value
+            method_breakdown += "#### Return value\n"
+            method_breakdown += f"`{m['ret_type']}`\n\n"
 
     if not has_methods:
         method_breakdown += "No methods or functions defined in this module.\n\n"

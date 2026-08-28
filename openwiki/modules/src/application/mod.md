@@ -6,8 +6,8 @@ title: "Module: ApplicationModule"
 source_path: "src/application/mod.rs"
 description: "Detailed architecture and specifications for the ApplicationModule module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-28T20:18:23Z"
 ---
 
 # Module Specification: ApplicationModule
