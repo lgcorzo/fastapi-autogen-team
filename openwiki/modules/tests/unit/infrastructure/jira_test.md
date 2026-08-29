@@ -6,8 +6,8 @@ title: "Module: Jira_test"
 source_path: "tests/unit/infrastructure/jira_test.rs"
 description: "Detailed architecture and specifications for the Jira_test module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "a4e0af3"
-timestamp: "2026-08-28T20:18:23Z"
+last_verified_commit: "7a5d2bc"
+timestamp: "2026-08-29T20:26:14Z"
 ---
 
 # Module Specification: Jira_test

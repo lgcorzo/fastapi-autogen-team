@@ -6,8 +6,8 @@ title: "Module: Validation"
 source_path: "src/interface/http/validation.rs"
 description: "Detailed architecture and specifications for the Validation module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "a4e0af3"
-timestamp: "2026-08-28T20:18:23Z"
+last_verified_commit: "7a5d2bc"
+timestamp: "2026-08-29T20:26:14Z"
 ---
 
 # Module Specification: Validation
@@ -32,11 +32,9 @@ Deterministic technical architecture for the `Validation` module extracted direc
 @startuml
     class ValidatedJson {
         +T
-    }
-    class ValidatedJson<T> {
         -from_request()
     }
-    FromRequest<S> <|.. ValidatedJson<T> : Realization
+    FromRequest<S> <|.. ValidatedJson : Realization
     ValidatedJson --> "T" : Association
 @enduml
 ```
@@ -64,12 +62,11 @@ Deterministic technical architecture for the `Validation` module extracted direc
 | :--- | :--- | :--- |
 | `N/A` | `T` | Field of ValidatedJson |
 
-### ValidatedJson<T>
 
 
 ## 4. Comprehensive Methods & Functions Breakdown
 
-### `ValidatedJson<T>::from_request`
+### `ValidatedJson::from_request`
 * **Visibility:** -
 * **Source Line Citation:** `src/interface/http/validation.rs:L20`
 
@@ -88,5 +85,4 @@ Deterministic technical architecture for the `Validation` module extracted direc
 
 ## 5. Source Code Citations & Index
 * Class `ValidatedJson`: `src/interface/http/validation.rs:L10`
-* Class `ValidatedJson<T>`: `src/interface/http/validation.rs:L13`
-* Method `from_request` in `ValidatedJson<T>`: `src/interface/http/validation.rs:L20`
+* Method `from_request` in `ValidatedJson`: `src/interface/http/validation.rs:L20`
