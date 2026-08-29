@@ -6,8 +6,8 @@ title: "Module: Confluence_test"
 source_path: "tests/unit/infrastructure/confluence_test.rs"
 description: "Detailed architecture and specifications for the Confluence_test module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:18Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-28T20:18:23Z"
 ---
 
 # Module Specification: Confluence_test
@@ -65,29 +65,29 @@ Deterministic technical architecture for the `Confluence_test` module extracted 
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/infrastructure/confluence_test.rs:L6`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 ### `test_get_confluence_results_no_results`
 * **Visibility:** -
 * **Source Line Citation:** `tests/unit/infrastructure/confluence_test.rs:L29`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| None | None | N/A | No parameters |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `()` | Success | Result of the operation |
+| None | None | No parameters |
+
+#### Return value
+`()`
 
 
 

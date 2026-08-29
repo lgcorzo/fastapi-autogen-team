@@ -6,8 +6,8 @@ title: "Module: R2r"
 source_path: "src/infrastructure/tools/r2r.rs"
 description: "Detailed architecture and specifications for the R2r module."
 tags: ["core", "module", "okf", "iso42010"]
-last_verified_commit: "37f8599"
-timestamp: "2026-08-25T07:30:17Z"
+last_verified_commit: "a4e0af3"
+timestamp: "2026-08-28T20:18:23Z"
 ---
 
 # Module Specification: R2r
@@ -41,7 +41,7 @@ Deterministic technical architecture for the `R2r` module extracted directly fro
         -definition()
         -call()
     }
-    R2RArgs --> String : Association
+    R2RArgs --> "String" : Association
     Tool <|.. R2RTool : Realization
 @enduml
 ```
@@ -94,46 +94,60 @@ Deterministic technical architecture for the `R2r` module extracted directly fro
 * **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/r2r.rs:L31`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| `&self` | `self` | Required | Instance reference |
-| `_prompt` | `String` | Required | Parameter |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `ToolDefinition` | Success | Result of the operation |
+| `&self` | `self` | Instance reference |
+| `_prompt` | `String` | Parameter |
+
+#### Return value
+`ToolDefinition`
 
 ### `R2RTool::call`
 * **Visibility:** -
 * **Source Line Citation:** `src/infrastructure/tools/r2r.rs:L49`
 
-#### Input Parameters
-| Parameter | Data Type | Required / Default | Semantic Description |
-| :--- | :--- | :--- | :--- |
-| `&self` | `self` | Required | Instance reference |
-| `args: Self::Args` | `self` | Required | Instance reference |
+**Purpose:** No description provided.
 
-#### Return Value & Output Shape
-| Return Type | Scenario | Description |
+#### Parameters
+| Parameter | Type | Description |
 | :--- | :--- | :--- |
-| `Result<Self::Output, Self::Error>` | Success | Result of the operation |
+| `&self` | `self` | Instance reference |
+| `args` | `Self` | Parameter |
+
+#### Return value
+`Result<Self::Output, Self::Error>`
 
 ### `get_r2r_results`
 * **Visibility:** +
 * **Source Line Citation:** `src/infrastructure/tools/r2r.rs:L57`
 
-#### Input Parameters
+**Description:** No description provided.
+
+#### Inputs
 | Parameter | Data Type | Required / Default | Semantic Description |
 | :--- | :--- | :--- | :--- |
 | `url` | `&str` | Required | Parameter |
 | `query` | `&str` | Required | Parameter |
 
-#### Return Value & Output Shape
+#### Output
 | Return Type | Scenario | Description |
 | :--- | :--- | :--- |
 | `anyhow::Result<String>` | Success | Result of the operation |
+
+#### Side Effects
+None identified.
+
+#### Complexity
+- **Time Complexity:** O(1) (Estimated)
+- **Space Complexity:** O(1) (Estimated)
+
+#### Example
+```rust
+// Example usage
+```
 
 
 
