@@ -5,7 +5,7 @@ type: "architecture"
 title: "Security View"
 description: "Architecture view for security_view"
 tags: ["iso42010", "architecture", "okf"]
-timestamp: "2026-08-28T20:18:23Z"
+timestamp: "2026-08-30T20:43:56Z"
 ---
 
 # Security View

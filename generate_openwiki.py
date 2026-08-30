@@ -139,12 +139,14 @@ def parse_rust_file(filepath):
                 if body and body.type == "enum_variant_list":
                     for variant in body.children:
                         if variant.type == "enum_variant":
-                            vname_node = None
+                            vname = ""
                             for c in variant.children:
                                 if c.type == "identifier":
-                                    vname_node = c
+                                    vname = get_text(c)
                                     break
-                            vname = get_text(vname_node) if vname_node else "Unknown"
+                            if not vname:
+                                vname = get_text(variant)
+
                             variant_types = []
 
                             vbody = None
@@ -224,7 +226,14 @@ def parse_rust_file(filepath):
             trait_node = node.child_by_field_name("trait")
 
             if type_node:
-                struct_name = get_text(type_node)
+                if type_node.type == "generic_type":
+                    base_type_node = type_node.child_by_field_name("type")
+                    if base_type_node:
+                        struct_name = get_text(base_type_node)
+                    else:
+                        struct_name = get_text(type_node.children[0])
+                else:
+                    struct_name = get_text(type_node)
                 if trait_node:
                     trait_name = get_text(trait_node)
                     clean_trait = trait_name.split('::')[-1]
