@@ -224,7 +224,7 @@ def parse_rust_file(filepath):
             trait_node = node.child_by_field_name("trait")
 
             if type_node:
-                struct_name = get_text(type_node)
+                struct_name = get_text(type_node.child_by_field_name("type") or type_node.children[0]) if type_node.type == "generic_type" else get_text(type_node)
                 if trait_node:
                     trait_name = get_text(trait_node)
                     clean_trait = trait_name.split('::')[-1]

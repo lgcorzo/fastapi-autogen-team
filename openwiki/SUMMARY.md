@@ -111,7 +111,6 @@
 - [Unit_tests (module)](./modules/tests/unit_tests.md)
 - [UnitModule (module)](./modules/tests/unit/mod.md)
 - [ValidatedJson (struct)](./modules/src/interface/http/validation.md)
-- [ValidatedJson<T> (struct)](./modules/src/interface/http/validation.md)
 - [WorkflowModule (module)](./modules/tests/integration/workflow/mod.md)
 
 ## Public API index

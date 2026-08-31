@@ -5,7 +5,7 @@ type: "architecture"
 title: "Component Structure"
 description: "Architecture view for component_structure"
 tags: ["iso42010", "architecture", "okf"]
-timestamp: "2026-08-28T20:18:23Z"
+timestamp: "2026-08-29T20:26:14Z"
 ---
 
 # Component Structure
