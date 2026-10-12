@@ -13,6 +13,23 @@
 
 It provides an OpenAI-compatible streaming interface for multi-agent workflows, leveraging **Qwen 2.5 7B** (running via Ollama and LiteLLM) to deliver fast and reliable reasoning.
 
+---
+
+## 🛡️ Dark Gravity Integration & Technological Sovereignty Policy
+
+This service functions as the **Agentic Access & Multi-Agent Execution Layer** for the **[Dark Gravity Autonomous CA/CD Software Factory](https://github.com/lgcorzo/rust_CACD_autonomous_factory)** ([Architecture Knowledge Base](https://notebook.google.com/notebook/116d5f03-2fb0-4fa7-bd7c-1c9849920abc)).
+
+### 1. Architectural Role in Dark Gravity
+- **OpenAI-Compatible Streaming Gateway:** Exposes specialized multi-agent squads (Planner, Searcher, QA/Expert) via OpenAI-compatible endpoints to interact seamlessly with Dark Gravity's Hatchet DAG orchestrators and OpenWebUI.
+- **Low-Latency Rust Core:** Built natively in Rust (Axum + Rig) to minimize memory overhead and ensure rapid inter-agent request routing under high concurrency without garbage collection delays.
+- **Air-Gapped Local Model Ingestion:** Routes inferences locally via Ollama / LiteLLM (Qwen 2.5 Coder 7B) across OpenZiti dark network overlays, preserving confidential source code within the private Kubernetes cluster.
+
+### 2. Supply-Chain Sovereignty & Independent Maintenance
+- **Sovereign Agent Framework:** Avoids proprietary closed-source agent lock-in by maintaining an independent, high-performance Rust multi-agent stack under `@lgcorzo`.
+- **Zero-Vulnerability Enforcement:** Maintained with continuous automated CI/CD audits, zero leaked secrets, and strict resource clamping ($\le 30\text{ MiB}$ RAM per container).
+
+---
+
 # Table of Contents
 
 - [Rust-Agent Team-team Service](#rust-agent-team-service)
