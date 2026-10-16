@@ -213,8 +213,7 @@ impl AgentTeam {
              response. You MUST reply in the language identified as: {}. \
              Even if the search results are in English, your final response MUST be translated to {}. \
              Always provide a helpful answer based on the search results provided. \
-             If no relevant information was found, state it clearly. \
-             IMPORTANT: End your response with the word: TERMINATE",
+             If no relevant information was found, state it clearly.",
             detected_language, detected_language
         );
 
@@ -231,7 +230,10 @@ impl AgentTeam {
             ))
             .await?;
 
-        Ok(final_response)
+        // Sanitize any accidental trailing or standalone TERMINATE tokens
+        let cleaned_response = final_response.replace("TERMINATE", "").trim_end().to_string();
+
+        Ok(cleaned_response)
     }
 
     /// Run the agent pipeline with full SSE progress streaming.
@@ -416,8 +418,7 @@ impl AgentTeam {
                  response. You MUST reply in the language identified as: {}. \
                  Even if the search results are in English, your final response MUST be translated to {}. \
                  Always provide a helpful answer based on the search results provided. \
-                 If no relevant information was found, state it clearly. \
-                 IMPORTANT: End your response with the word: TERMINATE",
+                 If no relevant information was found, state it clearly.",
                 detected_language, detected_language
             );
 
