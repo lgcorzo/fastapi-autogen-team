@@ -95,7 +95,7 @@ pub async fn route_query(
                                 "model": model,
                                 "choices": [{
                                     "delta": {
-                                        "content": format!("<think>[{}] {}</think>\n", stage, message),
+                                        "content": "",
                                         "reasoning_content": format!("[{}] {}\n", stage, message)
                                     },
                                     "index": 0,
@@ -107,18 +107,26 @@ pub async fn route_query(
 
                         // --- Delta event: a single QA streaming token ---
                         Ok(AgentEvent::Delta(content)) => {
-                            let finish_reason = if content.contains("TERMINATE") {
+                            let has_terminate = content.contains("TERMINATE");
+                            let cleaned_content = if has_terminate {
+                                content.replace("TERMINATE", "")
+                            } else {
+                                content
+                            };
+
+                            let finish_reason = if has_terminate {
                                 Some("stop")
                             } else {
                                 None
                             };
+
                             let chunk = json!({
                                 "id": id,
                                 "object": "chat.completion.chunk",
                                 "created": created,
                                 "model": model,
                                 "choices": [{
-                                    "delta": { "content": content },
+                                    "delta": { "content": cleaned_content },
                                     "index": 0,
                                     "finish_reason": finish_reason
                                 }]
