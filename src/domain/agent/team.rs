@@ -231,7 +231,10 @@ impl AgentTeam {
             .await?;
 
         // Sanitize any accidental trailing or standalone TERMINATE tokens
-        let cleaned_response = final_response.replace("TERMINATE", "").trim_end().to_string();
+        let cleaned_response = final_response
+            .replace("TERMINATE", "")
+            .trim_end()
+            .to_string();
 
         Ok(cleaned_response)
     }
