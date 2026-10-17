@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: lgcorzo/gitops_internal_lgcorzo
-          token: ${{ secrets.GITOPS_TOKEN }}
+          token: ${{ secrets.GITOPS_PAT || secrets.GITOPS_TOKEN || secrets.GITHUB_TOKEN }}
           path: gitops
 
       - name: Install Flux CLI
