@@ -14,7 +14,7 @@ tokio = { version = "1", features = ["full"] }
 tower-http = { version = "0.5", features = ["trace", "cors", "set-header", "util"] }
 
 # LLM Framework
-rig = { package = "rig-core", version = "0.34.0", features = ["all"] }
+rig = { package = "rig-core", version = "0.34.0", features = ["derive", "rayon"] }
 
 # Serialization
 serde = { version = "1.0", features = ["derive"] }
