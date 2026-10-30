@@ -1,3 +1,8 @@
+---
+name: ast-documentation-generator
+description: Generates complete technical documentation for an entire software project using AST (Abstract Syntax Tree) analysis following OKF and OpenWiki standards.
+---
+
 # ASKILL: AST Documentation Generator for Jules using OKF + UML
 
 ## Purpose

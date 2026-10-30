@@ -1,4 +1,4 @@
---
+---
 name: okf-professional-documenter
 description: "Use when generating ISO-compliant OKF v0.2 documentation with deterministic AST extraction, mandatory provenance metadata, and strict ISO 42010/15289 viewpoint mapping. Enforces relative paths, Mermaid UML 2.0 diagrams, and architecture description coherence."
 ---
