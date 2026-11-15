@@ -147,6 +147,8 @@ tests/                   # DDD Testing Suite
 └── integration_tests.rs # Integration Test Suite Entry Point
 ```
 
+> **Note on Auxiliary Python Files:** The runtime application is 100% native Rust (`Cargo.toml` / `src/`). The root helper scripts (`generate_openwiki.py`, `fix_openwiki.py`) and `requirements.txt` are offline documentation/CI maintenance utilities used to generate and audit the `openwiki/` and `wiki/` Markdown trees; they are not loaded or executed by the Rust service at runtime.
+
 # Installation
 
 ### Prerequisites
